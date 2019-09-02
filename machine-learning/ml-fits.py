@@ -9,9 +9,12 @@ Example code for building models in scikit-learn and xgboost
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import warnings
 
-from sklearn.metrics import mean_absolute_error
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, mean_absolute_error
+from sklearn.model_selection import cross_val_score, train_test_split
+
+warnings.filterwarnings('ignore')
 
 
 def load_column_dataset(folder, train_file='train.csv', test_file='test.csv', index_col=None):
@@ -33,6 +36,12 @@ def evaluate_model_mae(model, X_val, y_val):
     y_pred = model.predict(X_val)
     mae = mean_absolute_error(y_pred, y_val)
     return mae
+
+
+def evaluate_model_acc(model, X_val, y_val):
+    y_pred = model.predict(X_val)
+    acc = accuracy_score(y_pred, y_val)
+    return acc
 
 
 def submit_to_kaggle(model, sample_submission, submission_file='submission.csv'):
