@@ -44,14 +44,6 @@ def evaluate_model_acc(model, X_val, y_val):
     return acc
 
 
-def submit_to_kaggle(model, sample_submission, submission_file='submission.csv'):
-    submission = pd.read_csv(sample_submission, index_col=0)
-    y_pred = model.predict(X_test)
-    assert np.all(submission.index == X_test.index)
-    submission.iloc[:, -1] = y_pred
-    submission.to_csv(submission_file)
-
-
 if __name__ == "__main__":
     
     # ----- Random Forest Example -----
@@ -59,7 +51,7 @@ if __name__ == "__main__":
 
     rf = RandomForestClassifier(n_estimators=n_estimators)
     rf.fit(X_train, y_train)
-    print(f'Random Forest{n_estimators}: {evaluate_model_mae(rf, X_val, y_val)}')
+    print(f'Random Forest, n={n_estimators}: {evaluate_model_mae(rf, X_val, y_val)}')
 
 
     # ----- XGBoost Example
@@ -67,5 +59,5 @@ if __name__ == "__main__":
 
     xgb = XGBRegressor(n_estimators=n_estimators)
     xgb.fit(X_train, y_train)
-    print(f'XGB: {evaluate_model_mae(xgb, X_val, y_val)}')    
+    print(f'XGB, n={n_estimators}: {evaluate_model_mae(xgb, X_val, y_val)}')
 
