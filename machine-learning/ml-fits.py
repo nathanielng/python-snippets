@@ -44,6 +44,11 @@ def evaluate_model_acc(model, X_val, y_val):
     return acc
 
 
+def cross_val_score(model, X_train, y_train, cv=5):
+    score = cross_val_score(model, X_train, y_train, cv=cv)
+    return score.mean()
+
+
 if __name__ == "__main__":
     
     # ----- Random Forest Example -----
@@ -61,3 +66,10 @@ if __name__ == "__main__":
     xgb.fit(X_train, y_train)
     print(f'XGB, n={n_estimators}: {evaluate_model_mae(xgb, X_val, y_val)}')
 
+
+    # ----- Regression Example -----
+    from sklearn.linear_model import LinearRegression, Ridge, Lasso
+
+    lr = LinearRegression(normalize=True)
+    lr.fit(X_train, y_train)
+    print(f'LinearRegression: {evaluate_model_mae(lr, X_val, y_val)}')
