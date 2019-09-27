@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import argparse
+import dropbox
 import os
 import pandas as pd
 import paramiko
@@ -81,5 +83,49 @@ class SSHHost:
         return img
 
 
+class DropboxHost:
+    """A class to handle Dropbox connections"""
+
+    def __init__(self, access_token):
+        self._access_token = access_token
+        self._dbx = dropbox.Dropbox(access_token)
+        self._account = self._dbx.users_get_current_account()
+
+    def get_file_list(self, folder=''):
+        files = [entry.name for entry in
+                 self._dbx.files_list_folder(folder).entries]
+        return files
+
+    def print_file_list(self, path):
+        file_list = self.get_file_list(path)
+        for filename in file_list:
+            print(filename)
+
+    def upload(self, src, dest):
+        with open(src) as f:
+            data = f.read()
+        self._dbx.files_upload(data.encode('ascii'), dest)
+
+    def download(self, src, dest):
+        self._dbx.files_download_to_file(dest, src)
+
+
+def main(args):
+    if args.host == 'DROPBOX':
+        DROPBOX_API_TOKEN = os.getenv("DROPBOX_API_TOKEN")
+        DBX = DropboxHost(DROPBOX_API_TOKEN)
+    else:
+        SSH = SSHHost(
+            args.user,
+            args.host,
+            os.path.abspath(args.key))
+        SSH.remote_execute('ls -al')
+
+
 if __name__ == "__main__":
-    pass
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--user')
+    parser.add_argument('--host')
+    parser.add_argument('--key')
+    args = parser.parse_args()
+    main(args)
