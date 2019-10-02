@@ -79,6 +79,11 @@ class SSHHost:
         return img
 
 
+    def describe(self):
+        print(f"Login: {self._userid}@{self._host}")
+        print(f"Key: {self._key}")
+
+
     def close(self):
         self._ssh_client.close()
 
@@ -119,7 +124,10 @@ def main(args):
             args.user,
             args.host,
             os.path.abspath(args.key))
-        SSH.remote_execute('ls -al')
+        SSH.describe()
+        stdin, stdout, stderr = SSH.remote_execute('ls -al')
+        for txt in stdout:
+            print(txt)
 
 
 if __name__ == "__main__":
