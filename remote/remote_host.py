@@ -15,20 +15,28 @@ class SSHHost:
     """A class to handle remote SSH connections"""
 
 
-    def __init__(self, userid, host, key):
+    def __init__(self, userid, host, key, passwd=None):
         self._userid = userid
         self._host = host
-        self._key = os.path.expanduser(key)
+        self._keyfile = os.path.expanduser(key)
+        if 'ed25519' in self._keyfile:
+            if passwd is None:
+                self._key = paramiko.Ed25519Key.from_private_key_file(self._keyfile)
+            else:
+                self._key = paramiko.Ed25519Key.from_private_key_file(self._keyfile, password=passwd)
+        elif 'edcsa' in self._keyfile:
+            self._key = paramiko.ECDSAKey.from_private_key_file(self._keyfile)
+        else:
+            self._key = paramiko.RSAKey.from_private_key_file(self._keyfile)
         self._ssh_client = self.get_remote_ssh_client()
 
 
     def get_remote_ssh_client(self):
-        k = paramiko.RSAKey.from_private_key_file(self._key)
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh_client.connect(hostname=self._host,
                            username=self._userid,
-                           pkey=k)
+                           pkey=self._key)
         return ssh_client
 
 
@@ -81,7 +89,7 @@ class SSHHost:
 
     def describe(self):
         print(f"Login: {self._userid}@{self._host}")
-        print(f"Key: {self._key}")
+        print(f"Key File: {self._keyfile}")
 
 
     def close(self):
@@ -123,9 +131,10 @@ def main(args):
         SSH = SSHHost(
             args.user,
             args.host,
-            os.path.abspath(args.key))
+            os.path.abspath(args.key),
+            args.password)
         SSH.describe()
-        stdin, stdout, stderr = SSH.remote_execute('ls -al')
+        stdin, stdout, stderr = SSH.remote_execute(args.command)
         for txt in stdout:
             print(txt)
 
@@ -135,5 +144,7 @@ if __name__ == "__main__":
     parser.add_argument('--user')
     parser.add_argument('--host')
     parser.add_argument('--key')
+    parser.add_argument('--command', help="Remote command")
+    parser.add_argument('--password', default=None)
     args = parser.parse_args()
     main(args)
