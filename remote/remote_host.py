@@ -2,6 +2,7 @@
 
 import argparse
 import dropbox
+import io
 import os
 import pandas as pd
 import paramiko
@@ -96,6 +97,18 @@ class SSHHost:
         self._ssh_client.close()
 
 
+class PBSHost:
+    """A class to handle PBS connections"""
+    def __init__(self, user, host, key, password=None):
+        self._SSH = SSHHost(user, host, key, password)
+
+    def qstat(self):
+        stdin, stdout, stderr = \
+            self._SSH.remote_execute("qstat")
+        qstat_txt = '\n'.join([stdout[0]] + stdout[2:])
+        return pd.read_fwf(io.StringIO(qstat_txt), header=0)
+
+
 class DropboxHost:
     """A class to handle Dropbox connections"""
 
@@ -127,6 +140,16 @@ def main(args):
     if args.host == 'DROPBOX':
         DROPBOX_API_TOKEN = os.getenv("DROPBOX_API_TOKEN")
         DBX = DropboxHost(DROPBOX_API_TOKEN)
+
+    elif args.command == 'qstat':
+        PBS = PBSHost(
+            args.user,
+            args.host,
+            os.path.abspath(args.key),
+            args.password)
+        qstat_df = PBS.qstat()
+        print(qstat_df)
+
     else:
         SSH = SSHHost(
             args.user,
