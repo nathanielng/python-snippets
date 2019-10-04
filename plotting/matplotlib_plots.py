@@ -8,6 +8,8 @@ import pandas as pd
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
+from pandas.plotting import scatter_matrix
+
 
 def plot_xy(x, y, imgfile=None, figsize=(7, 5)):
     fig, ax = plt.subplots(1, 1, figsize=figsize)

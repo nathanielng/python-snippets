@@ -13,4 +13,3 @@
 pd.set_option('precision', 5)
 pd.set_option('max_colwidth', 300)
 ```
-   
