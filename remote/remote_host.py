@@ -99,8 +99,8 @@ class SSHHost:
 
 class PBSHost:
     """A class to handle PBS connections"""
-    def __init__(self, user, host, key, password=None):
-        self._SSH = SSHHost(user, host, key, password)
+    def __init__(self, userid, host, key, password=None):
+        self._SSH = SSHHost(userid, host, key, password)
 
     def qstat(self):
         stdin, stdout, stderr = \
