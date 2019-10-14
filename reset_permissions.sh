@@ -7,6 +7,6 @@ export folders=`ls -d */ | xargs`
 for folder in $folders; do
     chmod 755 "$folder"
     cd $folder
-    chmod -x *.py
+    chmod -x *.py *.sh
     cd ..
 done
