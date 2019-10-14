@@ -3,6 +3,8 @@
 import argparse
 import pickle
 
+from azureml.train import automl
+
 
 def read_pickle_file(filename):
     with open('model.pkl', 'rb') as f:
@@ -19,3 +21,4 @@ if __name__ == "__main__":
     parser.add_argument('--file')
     args = parser.parse_args()
     main(args)
+
