@@ -42,10 +42,14 @@ class SSHHost:
 
 
     def remote_execute(self, command):
-        stdin, stdout, stderr = self._ssh_client.exec_command(command)
-        stdout = [x.strip() for x in stdout.readlines()]
-        stderr = [x.strip() for x in stderr.readlines()]
-        return stdin, stdout, stderr
+        try:
+            stdin, stdout, stderr = self._ssh_client.exec_command(command)
+            stdout = [x.strip() for x in stdout.readlines()]
+            stderr = [x.strip() for x in stderr.readlines()]
+            return stdin, stdout, stderr
+        except Exception as e:
+            print("Exception: {e}")
+            return None, None, None
 
 
     def remote_file_download(self, src_file, dest_file):
@@ -107,6 +111,9 @@ class PBSHost:
             self._SSH.remote_execute("qstat")
         qstat_txt = '\n'.join([stdout[0]] + stdout[2:])
         return pd.read_fwf(io.StringIO(qstat_txt), header=0)
+
+    def close(self):
+        self._SSH.close()
 
 
 class DropboxHost:
