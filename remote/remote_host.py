@@ -109,6 +109,8 @@ class PBSHost:
     def qstat(self):
         stdin, stdout, stderr = \
             self._SSH.remote_execute("qstat")
+        if len(stdout) == 0:
+            return pd.DataFrame()
         qstat_txt = '\n'.join([stdout[0]] + stdout[2:])
         return pd.read_fwf(io.StringIO(qstat_txt), header=0)
 
