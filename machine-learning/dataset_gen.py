@@ -17,21 +17,21 @@ def anscombes_quartet():
     return df
 
 
-def load_sk_dataset(dataset_name: str):
+def load_sk_dataset(dataset_name: str, return_X_y: bool):
     if dataset_name == 'boston':
-        return sklearn.datasets.load_boston()
+        return sklearn.datasets.load_boston(return_X_y=return_X_y)
     elif dataset_name == 'breast_cancer':
-        return sklearn.datasets.load_breast_cancer()
+        return sklearn.datasets.load_breast_cancer(return_X_y=return_X_y)
     elif dataset_name == 'diabetes':
-        return sklearn.datasets.load_diabetes()
+        return sklearn.datasets.load_diabetes(return_X_y=return_X_y)
     elif dataset_name == 'digits':
-        return sklearn.datasets.load_digits()
+        return sklearn.datasets.load_digits(return_X_y=return_X_y)
     elif dataset_name == 'iris':
-        return sklearn.datasets.load_iris()
+        return sklearn.datasets.load_iris(return_X_y=return_X_y)
     elif dataset_name == 'linnerud':
-        return sklearn.datasets.load_linnerud()
+        return sklearn.datasets.load_linnerud(return_X_y=return_X_y)
     elif dataset_name == 'wine':
-        return sklearn.datasets.load_wine()
+        return sklearn.datasets.load_wine(return_X_y=return_X_y)
     else:
         return None
 
@@ -52,5 +52,6 @@ def plot_anscombe(data):
     plt.savefig('anscombe.png')
 
 
-aq = anscombes_quartet()
-plot_anscombe(aq)
+if __name__ == "__main__":
+    aq = anscombes_quartet()
+    plot_anscombe(aq)
