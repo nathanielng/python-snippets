@@ -9,11 +9,31 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import sklearn.datasets
 
 
 def anscombes_quartet():
     df = pd.read_fwf('data/anscombe.txt')  # np.loadtxt("anscombe.txt")
     return df
+
+
+def load_sk_dataset(dataset_name: str):
+    if dataset_name == 'boston':
+        return sklearn.datasets.load_boston()
+    elif dataset_name == 'breast_cancer':
+        return sklearn.datasets.load_breast_cancer()
+    elif dataset_name == 'diabetes':
+        return sklearn.datasets.load_diabetes()
+    elif dataset_name == 'digits':
+        return sklearn.datasets.load_digits()
+    elif dataset_name == 'iris':
+        return sklearn.datasets.load_iris()
+    elif dataset_name == 'linnerud':
+        return sklearn.datasets.load_linnerud()
+    elif dataset_name == 'wine':
+        return sklearn.datasets.load_wine()
+    else:
+        return None
 
 
 def plot_anscombe(data):
