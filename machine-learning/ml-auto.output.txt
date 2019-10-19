@@ -1,13 +1,26 @@
-$ python ml-auto.py --file ../../data/data.csv
 /home/vmuser/miniconda3/lib/python3.7/site-packages/pyparsing.py:3168: FutureWarning: Possible set intersection at position 3
   self.re = re.compile(self.reString)
 /home/vmuser/miniconda3/lib/python3.7/site-packages/sklearn/ensemble/weight_boosting.py:29: DeprecationWarning: numpy.core.umath_tests is an internal NumPy module and should not be imported. It will be removed in a future NumPy release.
   from numpy.core.umath_tests import inner1d
 /home/vmuser/miniconda3/lib/python3.7/site-packages/autosklearn/evaluation/train_evaluator.py:197: RuntimeWarning: Mean of empty slice
   Y_train_pred = np.nanmean(Y_train_pred_full, axis=0)
-[WARNING] [2019-10-07 08:41:25,272:AutoMLSMBO(1)::83251f9f864fd70f51ea82de306de017] Could not find meta-data directory /home/vmuser/miniconda3/lib/python3.7/site-packages/autosklearn/metalearning/files/r2_regression_dense
-[WARNING] [2019-10-07 08:41:25,291:EnsembleBuilder(1):83251f9f864fd70f51ea82de306de017] No models better than random - using Dummy Score!
-[WARNING] [2019-10-07 08:41:25,299:EnsembleBuilder(1):83251f9f864fd70f51ea82de306de017] No models better than random - using Dummy Score!
+[WARNING] [2019-10-08 09:48:24,027:AutoMLSMBO(1)::83251f9f864fd70f51ea82de306de017] Could not find meta-data directory /home/vmuser/miniconda3/lib/python3.7/site-packages/autosklearn/metalearning/files/r2_regression_dense
+[WARNING] [2019-10-08 09:48:24,049:EnsembleBuilder(1):83251f9f864fd70f51ea82de306de017] No models better than random - using Dummy Score!
+[WARNING] [2019-10-08 09:48:24,057:EnsembleBuilder(1):83251f9f864fd70f51ea82de306de017] No models better than random - using Dummy Score!
+/home/vmuser/miniconda3/lib/python3.7/site-packages/autosklearn/evaluation/train_evaluator.py:197: RuntimeWarning: Mean of empty slice
+  Y_train_pred = np.nanmean(Y_train_pred_full, axis=0)
+/home/vmuser/miniconda3/lib/python3.7/site-packages/autosklearn/evaluation/train_evaluator.py:197: RuntimeWarning: Mean of empty slice
+  Y_train_pred = np.nanmean(Y_train_pred_full, axis=0)
+/home/vmuser/miniconda3/lib/python3.7/site-packages/autosklearn/evaluation/train_evaluator.py:197: RuntimeWarning: Mean of empty slice
+  Y_train_pred = np.nanmean(Y_train_pred_full, axis=0)
+/home/vmuser/miniconda3/lib/python3.7/site-packages/autosklearn/evaluation/train_evaluator.py:197: RuntimeWarning: Mean of empty slice
+  Y_train_pred = np.nanmean(Y_train_pred_full, axis=0)
+/home/vmuser/miniconda3/lib/python3.7/site-packages/autosklearn/evaluation/train_evaluator.py:197: RuntimeWarning: Mean of empty slice
+  Y_train_pred = np.nanmean(Y_train_pred_full, axis=0)
+/home/vmuser/miniconda3/lib/python3.7/site-packages/autosklearn/evaluation/train_evaluator.py:197: RuntimeWarning: Mean of empty slice
+  Y_train_pred = np.nanmean(Y_train_pred_full, axis=0)
+/home/vmuser/miniconda3/lib/python3.7/site-packages/autosklearn/evaluation/train_evaluator.py:197: RuntimeWarning: Mean of empty slice
+  Y_train_pred = np.nanmean(Y_train_pred_full, axis=0)
 /home/vmuser/miniconda3/lib/python3.7/site-packages/autosklearn/evaluation/train_evaluator.py:197: RuntimeWarning: Mean of empty slice
   Y_train_pred = np.nanmean(Y_train_pred_full, axis=0)
 /home/vmuser/miniconda3/lib/python3.7/site-packages/autosklearn/evaluation/train_evaluator.py:197: RuntimeWarning: Mean of empty slice
@@ -87,8 +100,9 @@ $ python ml-auto.py --file ../../data/data.csv
 /home/vmuser/miniconda3/lib/python3.7/site-packages/autosklearn/evaluation/train_evaluator.py:197: RuntimeWarning: Mean of empty slice
   Y_train_pred = np.nanmean(Y_train_pred_full, axis=0)
 1
-['/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000000.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000001.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000002.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000003.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000004.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000005.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000006.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000007.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000008.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000009.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000010.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000011.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000012.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000013.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000014.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000015.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000016.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000017.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000018.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000019.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000020.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000021.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000022.ensemble']
-[(0.320000, SimpleRegressionPipeline({'categorical_encoding:__choice__': 'no_encoding', 'imputation:strategy': 'median', 'preprocessor:__choice__': 'no_preprocessing', 'regressor:__choice__': 'gradient_boosting', 'rescaling:__choice__': 'none', 'regressor:gradient_boosting:learning_rate': 0.23626739400663643, 'regressor:gradient_boosting:loss': 'ls', 'regressor:gradient_boosting:max_depth': 8, 'regressor:gradient_boosting:max_features': 0.20444352129747667, 'regressor:gradient_boosting:max_leaf_nodes': 'None', 'regressor:gradient_boosting:min_impurity_decrease': 0.0, 'regressor:gradient_boosting:min_samples_leaf': 12, 'regressor:gradient_boosting:min_samples_split': 19, 'regressor:gradient_boosting:min_weight_fraction_leaf': 0.0, 'regressor:gradient_boosting:n_estimators': 60, 'regressor:gradient_boosting:subsample': 0.9913273094318275},
+['/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000000.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000001.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000002.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000003.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000004.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000005.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000006.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000007.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000008.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000009.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000010.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000011.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000012.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000013.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000014.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000015.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000016.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000017.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000018.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000019.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000020.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000021.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000022.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000023.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000024.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000025.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000026.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000027.ensemble', '/tmp/autosklearn_regression_tmp/.auto-sklearn/ensembles/1.0000000028.ensemble']
+[09:50:18] WARNING: /workspace/src/objective/regression_obj.cu:152: reg:linear is now deprecated in favor of reg:squarederror.
+[(0.380000, SimpleRegressionPipeline({'categorical_encoding:__choice__': 'one_hot_encoding', 'imputation:strategy': 'most_frequent', 'preprocessor:__choice__': 'polynomial', 'regressor:__choice__': 'libsvm_svr', 'rescaling:__choice__': 'minmax', 'categorical_encoding:one_hot_encoding:use_minimum_fraction': 'False', 'preprocessor:polynomial:degree': 2, 'preprocessor:polynomial:include_bias': 'True', 'preprocessor:polynomial:interaction_only': 'True', 'regressor:libsvm_svr:C': 4.424652429988773, 'regressor:libsvm_svr:epsilon': 0.09588032975990053, 'regressor:libsvm_svr:kernel': 'linear', 'regressor:libsvm_svr:max_iter': -1, 'regressor:libsvm_svr:shrinking': 'False', 'regressor:libsvm_svr:tol': 0.0034229780865259},
 dataset_properties={
   'task': 4,
   'sparse': False,
@@ -96,7 +110,7 @@ dataset_properties={
   'multiclass': False,
   'target_type': 'regression',
   'signed': False})),
-(0.260000, SimpleRegressionPipeline({'categorical_encoding:__choice__': 'one_hot_encoding', 'imputation:strategy': 'most_frequent', 'preprocessor:__choice__': 'feature_agglomeration', 'regressor:__choice__': 'extra_trees', 'rescaling:__choice__': 'standardize', 'categorical_encoding:one_hot_encoding:use_minimum_fraction': 'False', 'preprocessor:feature_agglomeration:affinity': 'euclidean', 'preprocessor:feature_agglomeration:linkage': 'average', 'preprocessor:feature_agglomeration:n_clusters': 164, 'preprocessor:feature_agglomeration:pooling_func': 'max', 'regressor:extra_trees:bootstrap': 'False', 'regressor:extra_trees:criterion': 'mse', 'regressor:extra_trees:max_depth': 'None', 'regressor:extra_trees:max_features': 1.0, 'regressor:extra_trees:max_leaf_nodes': 'None', 'regressor:extra_trees:min_impurity_decrease': 0.0, 'regressor:extra_trees:min_samples_leaf': 1, 'regressor:extra_trees:min_samples_split': 2, 'regressor:extra_trees:n_estimators': 100},
+(0.320000, SimpleRegressionPipeline({'categorical_encoding:__choice__': 'one_hot_encoding', 'imputation:strategy': 'most_frequent', 'preprocessor:__choice__': 'feature_agglomeration', 'regressor:__choice__': 'extra_trees', 'rescaling:__choice__': 'robust_scaler', 'categorical_encoding:one_hot_encoding:use_minimum_fraction': 'True', 'preprocessor:feature_agglomeration:affinity': 'euclidean', 'preprocessor:feature_agglomeration:linkage': 'ward', 'preprocessor:feature_agglomeration:n_clusters': 64, 'preprocessor:feature_agglomeration:pooling_func': 'max', 'regressor:extra_trees:bootstrap': 'False', 'regressor:extra_trees:criterion': 'mse', 'regressor:extra_trees:max_depth': 'None', 'regressor:extra_trees:max_features': 0.934267683452068, 'regressor:extra_trees:max_leaf_nodes': 'None', 'regressor:extra_trees:min_impurity_decrease': 0.0, 'regressor:extra_trees:min_samples_leaf': 1, 'regressor:extra_trees:min_samples_split': 17, 'regressor:extra_trees:n_estimators': 100, 'rescaling:robust_scaler:q_max': 0.7287245115442502, 'rescaling:robust_scaler:q_min': 0.2523344983118383, 'categorical_encoding:one_hot_encoding:minimum_fraction': 0.01945797649257682},
 dataset_properties={
   'task': 4,
   'sparse': False,
@@ -104,7 +118,7 @@ dataset_properties={
   'multiclass': False,
   'target_type': 'regression',
   'signed': False})),
-(0.200000, SimpleRegressionPipeline({'categorical_encoding:__choice__': 'one_hot_encoding', 'imputation:strategy': 'most_frequent', 'preprocessor:__choice__': 'feature_agglomeration', 'regressor:__choice__': 'ridge_regression', 'rescaling:__choice__': 'robust_scaler', 'categorical_encoding:one_hot_encoding:use_minimum_fraction': 'False', 'preprocessor:feature_agglomeration:affinity': 'manhattan', 'preprocessor:feature_agglomeration:linkage': 'average', 'preprocessor:feature_agglomeration:n_clusters': 103, 'preprocessor:feature_agglomeration:pooling_func': 'median', 'regressor:ridge_regression:alpha': 1.4467302287296093, 'regressor:ridge_regression:fit_intercept': 'True', 'regressor:ridge_regression:tol': 0.0029020092462586676, 'rescaling:robust_scaler:q_max': 0.8385049904773149, 'rescaling:robust_scaler:q_min': 0.17362159033588861},
+(0.220000, SimpleRegressionPipeline({'categorical_encoding:__choice__': 'one_hot_encoding', 'imputation:strategy': 'most_frequent', 'preprocessor:__choice__': 'random_trees_embedding', 'regressor:__choice__': 'libsvm_svr', 'rescaling:__choice__': 'robust_scaler', 'categorical_encoding:one_hot_encoding:use_minimum_fraction': 'True', 'preprocessor:random_trees_embedding:bootstrap': 'False', 'preprocessor:random_trees_embedding:max_depth': 4, 'preprocessor:random_trees_embedding:max_leaf_nodes': 'None', 'preprocessor:random_trees_embedding:min_samples_leaf': 3, 'preprocessor:random_trees_embedding:min_samples_split': 19, 'preprocessor:random_trees_embedding:min_weight_fraction_leaf': 1.0, 'preprocessor:random_trees_embedding:n_estimators': 91, 'regressor:libsvm_svr:C': 1.355310029945452, 'regressor:libsvm_svr:epsilon': 0.025048932106440058, 'regressor:libsvm_svr:kernel': 'linear', 'regressor:libsvm_svr:max_iter': -1, 'regressor:libsvm_svr:shrinking': 'False', 'regressor:libsvm_svr:tol': 0.03604696783399261, 'rescaling:robust_scaler:q_max': 0.7473359492764189, 'rescaling:robust_scaler:q_min': 0.05783775715409923, 'categorical_encoding:one_hot_encoding:minimum_fraction': 0.003610047478887321},
 dataset_properties={
   'task': 4,
   'sparse': False,
@@ -112,7 +126,7 @@ dataset_properties={
   'multiclass': False,
   'target_type': 'regression',
   'signed': False})),
-(0.100000, SimpleRegressionPipeline({'categorical_encoding:__choice__': 'no_encoding', 'imputation:strategy': 'median', 'preprocessor:__choice__': 'feature_agglomeration', 'regressor:__choice__': 'libsvm_svr', 'rescaling:__choice__': 'minmax', 'preprocessor:feature_agglomeration:affinity': 'euclidean', 'preprocessor:feature_agglomeration:linkage': 'complete', 'preprocessor:feature_agglomeration:n_clusters': 133, 'preprocessor:feature_agglomeration:pooling_func': 'max', 'regressor:libsvm_svr:C': 3.6094589885576465, 'regressor:libsvm_svr:epsilon': 0.10626041968059922, 'regressor:libsvm_svr:kernel': 'poly', 'regressor:libsvm_svr:max_iter': -1, 'regressor:libsvm_svr:shrinking': 'False', 'regressor:libsvm_svr:tol': 0.00033986513809274027, 'regressor:libsvm_svr:coef0': 0.0266172945625609, 'regressor:libsvm_svr:degree': 5, 'regressor:libsvm_svr:gamma': 2.9095435806427052},
+(0.060000, SimpleRegressionPipeline({'categorical_encoding:__choice__': 'one_hot_encoding', 'imputation:strategy': 'median', 'preprocessor:__choice__': 'no_preprocessing', 'regressor:__choice__': 'xgradient_boosting', 'rescaling:__choice__': 'quantile_transformer', 'categorical_encoding:one_hot_encoding:use_minimum_fraction': 'False', 'regressor:xgradient_boosting:base_score': 0.5, 'regressor:xgradient_boosting:booster': 'gbtree', 'regressor:xgradient_boosting:colsample_bylevel': 0.28199608698423717, 'regressor:xgradient_boosting:colsample_bytree': 0.7813605773707643, 'regressor:xgradient_boosting:gamma': 0, 'regressor:xgradient_boosting:learning_rate': 0.07993037496910801, 'regressor:xgradient_boosting:max_delta_step': 0, 'regressor:xgradient_boosting:max_depth': 5, 'regressor:xgradient_boosting:min_child_weight': 14, 'regressor:xgradient_boosting:n_estimators': 512, 'regressor:xgradient_boosting:reg_alpha': 3.971969734281047e-05, 'regressor:xgradient_boosting:reg_lambda': 0.010257023046830438, 'regressor:xgradient_boosting:scale_pos_weight': 1, 'regressor:xgradient_boosting:subsample': 0.9530483594817959, 'rescaling:quantile_transformer:n_quantiles': 895, 'rescaling:quantile_transformer:output_distribution': 'normal'},
 dataset_properties={
   'task': 4,
   'sparse': False,
@@ -120,23 +134,7 @@ dataset_properties={
   'multiclass': False,
   'target_type': 'regression',
   'signed': False})),
-(0.080000, SimpleRegressionPipeline({'categorical_encoding:__choice__': 'one_hot_encoding', 'imputation:strategy': 'median', 'preprocessor:__choice__': 'feature_agglomeration', 'regressor:__choice__': 'libsvm_svr', 'rescaling:__choice__': 'minmax', 'categorical_encoding:one_hot_encoding:use_minimum_fraction': 'True', 'preprocessor:feature_agglomeration:affinity': 'euclidean', 'preprocessor:feature_agglomeration:linkage': 'complete', 'preprocessor:feature_agglomeration:n_clusters': 133, 'preprocessor:feature_agglomeration:pooling_func': 'median', 'regressor:libsvm_svr:C': 3.6094589885576465, 'regressor:libsvm_svr:epsilon': 0.10626041968059922, 'regressor:libsvm_svr:kernel': 'poly', 'regressor:libsvm_svr:max_iter': -1, 'regressor:libsvm_svr:shrinking': 'False', 'regressor:libsvm_svr:tol': 0.00033986513809274027, 'categorical_encoding:one_hot_encoding:minimum_fraction': 0.010000000000000004, 'regressor:libsvm_svr:coef0': 0.0266172945625609, 'regressor:libsvm_svr:degree': 5, 'regressor:libsvm_svr:gamma': 2.9095435806427052},
-dataset_properties={
-  'task': 4,
-  'sparse': False,
-  'multilabel': False,
-  'multiclass': False,
-  'target_type': 'regression',
-  'signed': False})),
-(0.020000, SimpleRegressionPipeline({'categorical_encoding:__choice__': 'no_encoding', 'imputation:strategy': 'most_frequent', 'preprocessor:__choice__': 'pca', 'regressor:__choice__': 'adaboost', 'rescaling:__choice__': 'minmax', 'preprocessor:pca:keep_variance': 0.9021106725246424, 'preprocessor:pca:whiten': 'False', 'regressor:adaboost:learning_rate': 1.0487810146087861, 'regressor:adaboost:loss': 'square', 'regressor:adaboost:max_depth': 9, 'regressor:adaboost:n_estimators': 480},
-dataset_properties={
-  'task': 4,
-  'sparse': False,
-  'multilabel': False,
-  'multiclass': False,
-  'target_type': 'regression',
-  'signed': False})),
-(0.020000, SimpleRegressionPipeline({'categorical_encoding:__choice__': 'no_encoding', 'imputation:strategy': 'median', 'preprocessor:__choice__': 'kitchen_sinks', 'regressor:__choice__': 'liblinear_svr', 'rescaling:__choice__': 'none', 'preprocessor:kitchen_sinks:gamma': 0.0037444621792065234, 'preprocessor:kitchen_sinks:n_components': 2529, 'regressor:liblinear_svr:C': 1.7310894805455708, 'regressor:liblinear_svr:dual': 'False', 'regressor:liblinear_svr:epsilon': 0.0017418372910937968, 'regressor:liblinear_svr:fit_intercept': 'True', 'regressor:liblinear_svr:intercept_scaling': 1, 'regressor:liblinear_svr:loss': 'squared_epsilon_insensitive', 'regressor:liblinear_svr:tol': 0.00011640805689521785},
+(0.020000, SimpleRegressionPipeline({'categorical_encoding:__choice__': 'one_hot_encoding', 'imputation:strategy': 'mean', 'preprocessor:__choice__': 'polynomial', 'regressor:__choice__': 'libsvm_svr', 'rescaling:__choice__': 'standardize', 'categorical_encoding:one_hot_encoding:use_minimum_fraction': 'True', 'preprocessor:polynomial:degree': 2, 'preprocessor:polynomial:include_bias': 'True', 'preprocessor:polynomial:interaction_only': 'False', 'regressor:libsvm_svr:C': 1.355310029945452, 'regressor:libsvm_svr:epsilon': 0.1505115384206547, 'regressor:libsvm_svr:kernel': 'linear', 'regressor:libsvm_svr:max_iter': -1, 'regressor:libsvm_svr:shrinking': 'False', 'regressor:libsvm_svr:tol': 0.0029593843899887186, 'categorical_encoding:one_hot_encoding:minimum_fraction': 0.003610047478887321},
 dataset_properties={
   'task': 4,
   'sparse': False,
@@ -145,4 +143,6 @@ dataset_properties={
   'target_type': 'regression',
   'signed': False})),
 ]
-R2 score 0.9818337780996871
+R2 score: 0.9840674123610981
+RMSE: 495.41119658989356
+MAE: 16.040508679476655

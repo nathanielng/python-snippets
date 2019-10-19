@@ -30,8 +30,10 @@ def main(args):
     model.fit(X_train, y_train, feat_type=feature_types)
 
     print(model.show_models())
-    y_hat = model.predict(X_test)
-    print("R2 score", sklearn.metrics.r2_score(y_test, y_hat))
+    y_pred = model.predict(X_test)
+    print(f"R2 score: {sklearn.metrics.r2_score(y_test, y_pred)}")
+    print(f"RMSE: {sklearn.metrics.mean_squared_error(y_test, y_pred)}")
+    print(f"MAE: {sklearn.metrics.mean_absolute_error(y_test, y_pred)}")
 
 
 if __name__ == '__main__':
@@ -39,4 +41,5 @@ if __name__ == '__main__':
     parser.add_argument('--file')
     args = parser.parse_args()
     main(args)
+
 
