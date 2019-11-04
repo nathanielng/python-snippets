@@ -16,7 +16,7 @@ def split_dataframe(df):
     return X_train, X_test, y_train, y_test
 
 
-def main(args):
+def run_autosklearn(args):
     df = pd.read_csv(os.path.abspath(args.file))
     df.drop(labels=['Sl. No.'], axis=1, inplace=True)
     X_train, X_test, y_train, y_test = split_dataframe(df)
@@ -36,9 +36,22 @@ def main(args):
     print(f"MAE: {sklearn.metrics.mean_absolute_error(y_test, y_pred)}")
 
 
+def run_h2o(args):
+    df = pd.read_csv(os.path.abspath(args.file))
+    df.drop(labels=['Sl. No.'], axis=1, inplace=True)
+
+
+def main(args):
+    if args.engine == 'autosklearn':
+        run_autosklearn(args)
+    elif args.engine == 'h2o':
+        run_h2o(args)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--file')
+    parser.add_argument('--engine', default='autosklearn')
     args = parser.parse_args()
     main(args)
 

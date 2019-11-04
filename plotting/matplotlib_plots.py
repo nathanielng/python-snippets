@@ -85,7 +85,6 @@ def main(args):
         plot_xyz(df.x,df.y,df.z,imgfile=args.imgfile)
 
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--imgfile', help='Output image')
