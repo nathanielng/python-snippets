@@ -1,2 +1,8 @@
 dropbox
+gspread
+oauth2client
+openpyxl
 paramiko
+requests
+xlrd
+
