@@ -5,6 +5,11 @@
 1. Combine dictionaries `d1`, `d2` into `d3`:
    `d3 = {**d1, **d2}`
 
+## Lists
+
+1. Check that two lists, `l1`, `l2` are the same:
+   `assert set(l1) == set(l2)`
+
 ## Pandas
 
 1. [Pandas Options](https://pandas.pydata.org/pandas-docs/stable/user_guide/options.html):
@@ -32,3 +37,4 @@ df = pd.DataFrame(
           ['i', 'j', 'k']],
     columns=['a', 'b', 'c'], index=[1, 2, 3])
 ```
+
