@@ -1,8 +1,12 @@
 #!/bin/bash
 
-# Runs the qstat command on a specified server
-# To set up, add the following line to ~/.bash_profile:
-# export PBS_SERVER="userid@server"
+if [ "$1" = "help" ]; then
+    echo "Runs the qstat command on a specified server"
+    echo "To set up, add the following line to ~/.bash_profile:"
+    echo "export PBS_SERVER=\"userid@hostname\""
+    echo "(replacing userid with your user id and hostname with the name of your server)"
+    exit 0
+fi
 
 CMD="qstat"
 if [ "$1" = "jobs" ]; then
