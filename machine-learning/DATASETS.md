@@ -15,18 +15,22 @@
 
 ## 3. Pydataset
 
-- https://github.com/iamaziz/PyDataset
+- **Github**: https://github.com/iamaziz/PyDataset
 
-**Example Code**
+### 3.1 Available Datasets
+
+To load a Pandas Dataframe of the available datasets:
+
+```python
+df = data()
+df.head()
+```
+
+### 3.2 Example Code
 
 ```python
 from pydataset import data
 boston = data('boston')
 iris = data('iris')
-```
-
-To see list of available datasets:
-
-```python
-data()
+titanic = data('titanic')
 ```
