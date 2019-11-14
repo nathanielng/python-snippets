@@ -9,6 +9,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import sklearn.datasets
 
 
@@ -34,6 +35,13 @@ def load_sk_dataset(dataset_name: str, return_X_y: bool):
         return sklearn.datasets.load_wine(return_X_y=return_X_y)
     else:
         return None
+
+
+def load_sns_dataset(dataset_name: str):
+    datasets = sns.get_dataset_names()
+    if dataset_name not in datasets:
+        return None
+    return sns.load_dataset(dataset_name)
 
 
 def plot_anscombe(data):
