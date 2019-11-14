@@ -22,9 +22,9 @@ def load_data(cols=['CRIM', 'ZN', 'INDUS', 'CHAS', 'MEDV']):
         return df[cols]
 
 
-def pair_plot(df, filename=None):
+def pair_plot(df, hue, filename=None):
     sns.set(style="whitegrid", rc={'figure.figsize': (12, 12)})
-    sns_plot = sns.pairplot(df, hue='CHAS', size=2.5)
+    sns_plot = sns.pairplot(df, hue=hue, size=2.5)
     if filename is not None:
         sns_plot.savefig(filename)
 
@@ -40,7 +40,7 @@ def main(args):
     df = load_data()
     print(df.head())
     if args.pairplot is True:
-        pair_plot(df, args.imgfile)
+        pair_plot(df, 'CHAS', args.imgfile)
     if args.heatmap is True:
         heat_map(df, args.imgfile)
 
