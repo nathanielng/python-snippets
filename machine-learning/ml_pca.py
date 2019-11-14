@@ -20,9 +20,11 @@ def do_pca(df, n, scale=True):
     return my_df, my_pca
 
 
-def plot_pca(my_pca):
+def plot_pca(my_pca, style='bar'):
     evr = np.cumsum(my_pca.explained_variance_ratio_)
-    plt.bar(height=evr, x=np.arange(my_pca.n_components))
+    if style == 'bar':
+        plt.bar(height=evr, x=np.arange(my_pca.n_components))
+    elif style == 'line':
+        plt.plot(evr)
     plt.xlabel('n')
     plt.ylabel('Variance')
-
