@@ -21,7 +21,7 @@ def do_pca(df, n, scale=True):
     return my_df, my_pca
 
 
-def plot_pca(my_pca, style='bar'):
+def plot_pca_evr(my_pca, style='bar', imgfile=None):
     evr = np.cumsum(my_pca.explained_variance_ratio_)
     if style == 'bar':
         plt.bar(height=evr, x=np.arange(my_pca.n_components))
@@ -29,6 +29,19 @@ def plot_pca(my_pca, style='bar'):
         plt.plot(evr)
     plt.xlabel('n')
     plt.ylabel('Variance')
+    if imgfile is not None:
+        plt.savefig(imgfile)
+
+
+def plot_pca_scatter(df, label_list, labels, imgfile=None):
+    fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+    ax.scatter(df['pc1'], df['pc2'], c=label_list,
+               marker='o', s=50, alpha=1.0)
+    ax.set_xlabel('Principal Component 1')
+    ax.set_ylabel('Principal Component 2')
+    ax.grid()
+    if imgfile is not None:
+        plt.savefig(imgfile)
 
 
 def plot_kmeans_clusters(df, n, imgfile=None):
