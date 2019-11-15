@@ -18,6 +18,38 @@ def anscombes_quartet():
     return df
 
 
+def get_iris_dataset():
+    from sklearn.datasets import load_iris
+    iris = load_iris(return_X_y=False)
+    X = pd.DataFrame(iris.data, columns=iris.feature_names)
+    y = pd.Series(iris.target).replace(
+        to_replace=[0, 1, 2], value=iris.target_names)
+    y = pd.DataFrame({'target': y})
+    df = pd.concat((X, y), axis=1)
+    return df, iris.DESCR
+
+
+def get_mnist_dataset():
+    from sklearn.datasets import load_digits
+    mnist = load_digits(n_class=10, return_X_y=False)
+    X = pd.DataFrame(mnist.data)
+    y = pd.DataFrame({'y': mnist.target})
+    df = pd.concat((X, y), axis=1)
+    return df, mnist.DESCR
+
+
+def get_wine_dataset():
+    from sklearn.datasets import load_wine
+
+    wine = load_wine(return_X_y=False)
+    X = pd.DataFrame(wine.data, columns=wine.feature_names)
+    y = pd.Series(wine.target).replace(
+        to_replace=[0, 1, 2], value=wine.target_names)
+    y = pd.DataFrame({'class': y})
+    df = pd.concat((X, y), axis=1)
+    return df, wine.DESCR
+
+
 def load_sk_dataset(dataset_name: str, return_X_y: bool):
     if dataset_name == 'boston':
         return sklearn.datasets.load_boston(return_X_y=return_X_y)
