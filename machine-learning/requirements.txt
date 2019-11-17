@@ -1,2 +1,4 @@
 azureml-sdk[notebooks,automl]
 pydataset
+umap-learn
+
