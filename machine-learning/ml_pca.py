@@ -9,6 +9,18 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
 
+def get_dynamic_range1(df):
+    dynamic_range = df.apply(
+        lambda x: pd.Series([x[x > 0].min(), x.max()]), axis=1)
+    return dynamic_range
+
+
+def get_dynamic_range2(df):
+    df_min = df.apply(lambda x: x[x > 0].min(), axis=1)
+    df_max = df.apply(lambda x: x.max(), axis=1)
+    return pd.concat((df_min, df_max), axis=1)
+
+
 def do_pca(df, n, scale=True):
     pca_cols = ('pc' + pd.Series(np.arange(n)+1).astype(str)).values
     if scale is True:
@@ -22,13 +34,14 @@ def do_pca(df, n, scale=True):
 
 
 def plot_pca_evr(my_pca, style='bar', imgfile=None):
+    fig, ax = plt.subplots(1, 1, figsize=(7, 5))
     evr = np.cumsum(my_pca.explained_variance_ratio_)
     if style == 'bar':
-        plt.bar(height=evr, x=np.arange(my_pca.n_components))
+        ax.bar(height=evr, x=np.arange(my_pca.n_components))
     elif style == 'line':
-        plt.plot(evr)
-    plt.xlabel('n')
-    plt.ylabel('Variance')
+        ax.plot(evr)
+    ax.set_xlabel('n')
+    ax.set_ylabel('Variance')
     if imgfile is not None:
         plt.savefig(imgfile)
 
