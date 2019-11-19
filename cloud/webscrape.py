@@ -17,11 +17,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 def open_chrome():
     driver_path = os.path.abspath('chromedriver')
     try:
-        print(driver_path)
         browser = webdriver.Chrome(driver_path)
         return browser
     except Exception as e:
-        print("Could not open Chrome browser")
+        print(f"Could not find ChromeDriver at {driver_path}")
+        print("ChromeDriver may be downloaded from https://chromedriver.chromium.org")
+        print(f"The executable should be copied to the location: {driver_path}")
         print(f"Exception: {e}")
         return None
 
