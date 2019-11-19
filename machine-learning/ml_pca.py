@@ -9,16 +9,19 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
 
-def get_dynamic_range1(df):
-    dynamic_range = df.apply(
-        lambda x: pd.Series([x[x > 0].min(), x.max()]), axis=1)
-    return dynamic_range
+def get_dynamic_range1(df, axis=1):
+    dr = df.apply(
+        lambda x: pd.Series([x[x > 0].min(), x.max()]), axis=axis)
+    dr['Dynamic Range'] = np.log10(dr[1] / dr[0])
+    return dr
 
 
-def get_dynamic_range2(df):
-    df_min = df.apply(lambda x: x[x > 0].min(), axis=1)
-    df_max = df.apply(lambda x: x.max(), axis=1)
-    return pd.concat((df_min, df_max), axis=1)
+def get_dynamic_range2(df, axis=1):
+    df_min = df.apply(lambda x: x[x > 0].min(), axis=axis)
+    df_max = df.apply(lambda x: x.max(), axis=axis)
+    dr = pd.concat((df_min, df_max), axis=1)
+    dr['Dynamic Range'] = np.log10(dr[1] / dr[0])
+    return dr
 
 
 def do_pca(df, n, scale=True):
