@@ -30,14 +30,25 @@ class XL_Table():
         return self._xl.parse(sheet_name, **params)
 
 
+def main(args):
+    if args.filename.endswith('.pdf'):
+        pdf_file = PDF_Table(args.filename)
+        df = pdf_file._df
+
+    elif (args.filename.endswith('.xlsx') or
+          args.filename.endsiwth('.xls')):
+        xl = XL_Table(args.filename)
+        sheets = xl.sheet_names()
+        print(f"Sheet Names: {', '.join(sheets)}")
+        df = xl.extract_sheet(sheets[0], header=0)
+        print("First sheet:")
+
+    print(df)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('filename', help='Name of file')
     args = parser.parse_args()
+    main(args)
 
-    xl = XL_Table(args.filename)
-    sheets = xl.sheet_names()
-    print(f"Sheet Names: {', '.join(sheets)}")
-    print("First sheet:")
-    df = xl.extract_sheet(sheets[0], header=0)
-    print(df)
