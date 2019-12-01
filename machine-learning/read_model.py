@@ -7,13 +7,14 @@ from azureml.train import automl
 
 
 def read_pickle_file(filename):
-    with open('model.pkl', 'rb') as f:
-        data = pickle.load(f)
-    return data
+    with open(filename, 'rb') as f:
+        model = pickle.load(f)
+    return model
 
 
 def main(args):
-    read_pickle_file(args.file)
+    model = read_pickle_file(args.file)
+    print(model)
 
     
 if __name__ == "__main__":
