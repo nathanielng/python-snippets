@@ -79,12 +79,23 @@ def load_sns_dataset(dataset_name: str):
 def gen_sk_dataset(dataset_name: str, **kwargs):
     if dataset_name == 'moons':
         X, y = sklearn.datasets.make_moons(**kwargs)
-    else:
+    elif dataset_name == 'circles':
         X, y = sklearn.datasets.make_circles(**kwargs)
+    else:
+        X, y = sklearn.datasets.make_blobs(**kwargs)
 
     df = pd.concat((pd.DataFrame(X), pd.DataFrame(y)), axis=1)
     df.columns=['x1', 'x2', 'y']
     return df
+
+
+def generated_dataset_example():
+    blobs = gen_sk_dataset('blobs', n_samples=200)
+    moons = gen_sk_dataset('moons', n_samples=200, noise=0.1)
+    circles = gen_sk_dataset('circles', n_samples=200, factor=0.5, noise=0.1)
+    fig, ax = plt.subplots(1, 3, figsize=(15,4))
+    for i, df in enumerate([blobs, moons, circles]):
+        df.plot.scatter(x='x1', y='x2', c='y', ax=ax[i])
 
 
 def plot_anscombe(data):
