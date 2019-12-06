@@ -76,6 +76,17 @@ def load_sns_dataset(dataset_name: str):
     return sns.load_dataset(dataset_name)
 
 
+def gen_sk_dataset(dataset_name: str, **kwargs):
+    if dataset_name == 'moons':
+        X, y = sklearn.datasets.make_moons(**kwargs)
+    else:
+        X, y = sklearn.datasets.make_circles(**kwargs)
+
+    df = pd.concat((pd.DataFrame(X), pd.DataFrame(y)), axis=1)
+    df.columns=['x1', 'x2', 'y']
+    return df
+
+
 def plot_anscombe(data):
     fig = plt.figure(figsize=(10, 7))
     for i in range(4):
