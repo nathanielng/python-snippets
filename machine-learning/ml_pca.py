@@ -60,6 +60,23 @@ def plot_pca_scatter(df, label_list, labels, imgfile=None):
         plt.savefig(imgfile)
 
 
+def plot_pca_imagecompare(X0, X1, cmp=plt.cm.gray, interp='nearest', filename=None):
+    img_size = int(X0.shape[0])
+    px_max = X0.max()
+    cl = (0, px_max)
+    c2 = (-px_max/2.0, px_max/2.0)
+
+    fig, ax = plt.subplots(1, 3, figsize=(12,4))
+    ax[0].imshow(X0, cmap=cmp, interpolation=interp, clim=cl);
+    ax[0].set_title('Original')
+    ax[1].imshow(X1, cmap=cmp, interpolation=interp, clim=cl);
+    ax[1].set_title('Reconstructed')
+    ax[2].imshow(X1-X0, cmap=cmp, interpolation=interp, clim=cl);
+    ax[2].set_title('Difference')
+    if filename is not None:
+        plt.savefig(filename)
+
+
 def plot_kmeans_clusters(df, n, imgfile=None):
     kmeans = KMeans(n_clusters=n).fit(df)
     centroids = kmeans.cluster_centers_
@@ -69,3 +86,23 @@ def plot_kmeans_clusters(df, n, imgfile=None):
     ax.scatter(x=centroids[:, 0], y=centroids[:, 1], c='red', s=100)
     if imgfile is not None:
         plt.savefig(imgfile)
+
+
+def mnist_demo(fraction=0.92, row=1):
+    from sklearn.datasets import load_digits
+    # X, y = load_digits(return_X_y=True)
+    mnist = load_digits()
+    X = mnist.data
+    y = mnist.target
+
+    pca = PCA(fraction)
+    Xp = pca.fit_transform(X)
+    Xp_r = pca.inverse_transform(Xp)
+    plot_pca_imagecompare(
+        X[row].reshape(8,8),
+        Xp_r[row].reshape(8,8),
+        filename="pca_comparison.png")
+
+
+if __name__ == "__main__":
+    mnist_demo()
