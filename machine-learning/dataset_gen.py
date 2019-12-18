@@ -4,8 +4,7 @@
 This is a module for generating datasets
 """
 
-import matplotlib
-matplotlib.use('Agg')
+import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -89,6 +88,18 @@ def gen_sk_dataset(dataset_name: str, **kwargs):
     return df
 
 
+def gen_gaussian_2D(n=100, dx=1., dy=1., x0=0., y0=0., theta=0., seed=12345):
+    x = x0 + dx*np.random.normal(size=n)
+    y = y0 + dy*np.random.normal(size=n)
+    X0 = np.vstack((x, y)).T
+
+    # Rotate points using a rotation matrix
+    theta_rad = np.radians(theta) 
+    rot = np.array([[ np.cos(theta_rad), -np.sin(theta_rad) ],
+                    [ np.sin(theta_rad),  np.cos(theta_rad) ]])
+    return X0 @ rot.T
+
+
 def generated_dataset_example():
     blobs = gen_sk_dataset('blobs', n_samples=200)
     moons = gen_sk_dataset('moons', n_samples=200, noise=0.1)
@@ -115,5 +126,10 @@ def plot_anscombe(data):
 
 
 if __name__ == "__main__":
-    aq = anscombes_quartet()
-    plot_anscombe(aq)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('action')
+    args = parser.parse_args()
+
+    if args.action == 'anscombe':
+        aq = anscombes_quartet()
+        plot_anscombe(aq)
