@@ -3,6 +3,7 @@ gspread
 oauth2client
 openpyxl
 paramiko
+PyOpenSSL
 requests
 xlrd
 
