@@ -1,4 +1,4 @@
-# Git
+# Git Usage Guide
 
 ## 1. Repository Creation
 
@@ -27,7 +27,20 @@ git tag v0.2
 #### 1.1.3 First Push
 
 ```bash
-git remote add origin https://github.com/{userid}/reponame.git
+git remote add origin https://github.com/{userid}/{reponame}.git
 git push origin --all
 git push origin --tags
+```
+
+## 2. Repository Maintenance
+
+### 2.1 Keeping a fork synchronised with an upstream repository
+
+```bash
+cd path/to/{reponame}
+git remote add upstream git@github.com:{userid}/{reponame}.git
+git checkout master
+git fetch upstream
+git merge upstream/master
+git push origin master
 ```
