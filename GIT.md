@@ -32,9 +32,17 @@ git push origin --all
 git push origin --tags
 ```
 
-## 2. Repository Maintenance
+## 2. Repository Management
 
-### 2.1 Keeping a fork synchronised with an upstream repository
+### 2.1 Inspecting a repository
+
+```bash
+git status       # View repository status
+git log          # View git history
+git branch -avv  # View local & remote branches
+```
+
+### 2.2 Keeping a fork synchronised with an upstream repository
 
 ```bash
 cd path/to/{reponame}
