@@ -40,6 +40,7 @@ git push origin --tags
 git status       # View repository status
 git log          # View git history
 git branch -avv  # View local & remote branches
+git remote -v    # View remote URLs
 ```
 
 ### 2.2 Keeping a fork synchronised with an upstream repository
@@ -52,3 +53,9 @@ git fetch upstream
 git merge upstream/master
 git push origin master
 ```
+
+## 3. Notes
+
+Replace `{userid}` with your user id and replace `{reponame}`
+with the name of your Github repository.  If your repository is not
+hosted on Github, replace `github.com` with the name of your server.
