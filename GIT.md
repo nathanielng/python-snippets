@@ -54,6 +54,12 @@ git merge upstream/master
 git push origin master
 ```
 
+### 2.3 Changing a repository URL
+
+```bash
+git remote set-url origin git@github.com:{userid}/{reponame}.git
+```
+
 ## 3. Notes
 
 Replace `{userid}` with your user id and replace `{reponame}`
