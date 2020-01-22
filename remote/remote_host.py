@@ -46,10 +46,36 @@ class SSHHost:
             stdin, stdout, stderr = self._ssh_client.exec_command(command)
             stdout = [x.strip() for x in stdout.readlines()]
             stderr = [x.strip() for x in stderr.readlines()]
-            return stdin, stdout, stderr
+            exit_status = stdout.channel.recv_exit_status()
+            return {
+                'stdin': stdin,
+                'stdout': stdout,
+                'stderr': stderr,
+                'exit_status': exit_status
+            }
         except Exception as e:
             print("Exception: {e}")
-            return None, None, None
+            return None
+
+
+    def remote_folder_creation(self, dest):
+        ftp_client = self._ssh_client.open_sftp()
+        try:
+            ftp_client.mkdir(dest)
+        except Exception as e:
+            print(f'Failed to create remote folder {dest}')
+        ftp_client.close()
+
+
+    def remote_folder_deletion(self, dest):
+        ftp_client = self._ssh_client.open_sftp()
+        try:
+            files = ftp_client.listdir(path=dest)
+            for file in files:
+                ftp_client.remove(os.path.join(dest, file))
+        except Exception as e:
+            print(f'Failed to delete files in remote folder {dest}')
+        ftp_client.close()
 
 
     def remote_file_download(self, src_file, dest_file):
@@ -107,8 +133,8 @@ class PBSHost:
         self._SSH = SSHHost(userid, host, key, password)
 
     def qstat(self):
-        stdin, stdout, stderr = \
-            self._SSH.remote_execute("qstat")
+        r = self._SSH.remote_execute("qstat")
+        stdout = r['stdout']
         if len(stdout) == 0:
             return pd.DataFrame()
         qstat_txt = '\n'.join([stdout[0]] + stdout[2:])
@@ -166,8 +192,8 @@ def main(args):
             os.path.abspath(args.key),
             args.password)
         SSH.describe()
-        stdin, stdout, stderr = SSH.remote_execute(args.command)
-        for txt in stdout:
+        r = SSH.remote_execute(args.command)
+        for txt in r['stdout']:
             print(txt)
 
 
