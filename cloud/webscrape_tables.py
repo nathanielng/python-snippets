@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import requests
 
 
@@ -50,4 +51,11 @@ def get_tables(url):
 
 
 if __name__ == "__main__":
-    pass
+    parser = argparse.ArgumentParser()
+    parser.add_argument('url')
+    parser.add_argument('csv')
+    args = parser.parse_args()
+    dfs = get_tables(args.url)
+    if len(dfs) > 0:
+        dfs[0].to_csv(args.csv)
+
