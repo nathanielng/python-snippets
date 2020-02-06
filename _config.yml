@@ -1,0 +1,37 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog.
+#
+# If you need help with YAML syntax, here are some quick references for you: 
+# https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
+# https://learnxinyminutes.com/docs/yaml/
+
+title: Python Snippets
+description: A library of frequently-used Python snippets
+github_username: nathanielng
+
+# Email and twitter are optional:
+email: 
+twitter_username: nathanielng
+
+# Set this to true to get LaTeX math equation support
+use_math: true
+
+# Everything below here can be ignored, unless you want to change the theme entirely
+theme: jekyll-theme-cayman
+plugins:
+  - jekyll-feed
+
+titles_from_headings:
+  enabled:     true
+  strip_title: true
+  collections: true
+
+highlighter: rouge
+markdown: kramdown
+kramdown:
+  math_engine: katex
+  input: GFM
+  auto_ids: true
+  hard_wrap: false
+  syntax_highlighter: rouge
