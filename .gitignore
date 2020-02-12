@@ -6,5 +6,8 @@ __pycache__
 *.swp
 *.zip
 
-chromedriver
+cloud/chromedriver*
+cloud/webscrape*.sh
+cloud/webscrape_inputs*.txt
+cloud/webscrape_results.html
 plotting/sample*
