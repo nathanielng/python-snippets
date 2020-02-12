@@ -26,6 +26,7 @@ def open_chrome():
         print("ChromeDriver may be downloaded from https://chromedriver.chromium.org")
         print(f"The executable should be copied to the location: {driver_path}")
         print(f"Exception: {e}")
+        quit()
         return None
 
 
