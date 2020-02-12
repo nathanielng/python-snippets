@@ -31,8 +31,9 @@ def open_chrome():
 
 
 def open_safari():
+    driver_path = '/usr/bin/safaridriver'
     try:
-        browser = webdriver.Safari()
+        browser = webdriver.Safari(executable_path=driver_path)
         return browser
     except Exception as e:
         print("Could not open Safari browser")
@@ -118,7 +119,9 @@ def parse_code(browser, codes):
             # Skip commented lines and blank lines
             continue
         elif line[0] == 'pause':
-            time.sleep(int(line[1]))
+            t = int(line[1])
+            print(f'{i}: Pause for {t} seconds')
+            time.sleep(t)
             continue
         elif len(line) != 3:
             print(f'Error: line #{i} does not have 3 elements:')
@@ -129,7 +132,7 @@ def parse_code(browser, codes):
         if tag == 'browseto':
             if value == 'None':
                 value = None
-            print(f'Browsing to "{attribute}" until xpath="{value}" is detected"...')
+            print(f'{i}. Browsing to "{attribute}" until xpath="{value}" is detected"...')
             access_url(browser, url=attribute, xpath=value)
         elif tag == 'input':
             assignment = value.split('>')
@@ -138,24 +141,25 @@ def parse_code(browser, codes):
                 print(assignment)
                 continue
             variable, input_val = assignment
-            print(f'Looking for "<{tag} {attribute}={variable}>"... to fill with {input_val}')
+            print(f'{i}. Looking for "<{tag} {attribute}={variable}>"... to fill with {input_val}')
 
             element = find_element(method=attribute, variable=variable)
             element.send_keys(input_val)
         elif tag == 'click':
-            print(f'Clicking on "{attribute}={value}"...')
+            print(f'{i}. Clicking on "{attribute}={value}"...')
             element = find_element(method=attribute, variable=value)
             # assert element.get_attribute('type') == 'radio'
-            element.click()
+            try:
+                element.click()
+            except selenium.common.exceptions.ElementNotInteractableException as e:
+                print(f"Exception: {e}")
 
         elif tag == 'submit':
-            print(f'Submitting "{attribute}={value}"...')
+            print(f'{i}. Submitting "{attribute}={value}"...')
             element = find_element(method=attribute, variable=value)
             element.submit()
         else:
-            print(f'Invalid tag: {tag}')
-            print(f'  attribute={attribute}')
-            print(f'  value={value}')
+            print(f'{i}. Invalid tag: {tag}, attribute={attribute}, value={value}')
 
     return None
 
