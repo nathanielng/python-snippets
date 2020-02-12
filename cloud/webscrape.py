@@ -53,16 +53,6 @@ def open_browser(browser_name):
 
 
 # ----- Subroutines -----
-def login(browser, url, userid, token, elm_id_userid, elm_id_token, timeout=10):
-    browser.get(url)
-    time.sleep(2)
-    userid_box = browser.find_element_by_id(elm_id_userid)
-    userid_box.send_keys(userid)
-    token_box = browser.find_element_by_id(elm_id_token)
-    token_box.send_keys(token)
-    token_box.submit()
-
-
 def access_url(browser, url, xpath=None, timeout=10):
     browser.get(url)
     if xpath is None:
