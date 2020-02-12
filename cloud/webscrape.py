@@ -169,17 +169,6 @@ def parse_code(browser, codes):
     return None
 
 
-def main(args):
-    browser = open_browser()
-
-    login(browser, args.login, args.userid, args.token,
-          args.elm_id_userid, args.elm_id_token)
-    time.sleep(3)
-
-    elms = access_url(browser, args.url, args.xpath)
-    return elms
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--browser', default='chrome', help='Browser')
