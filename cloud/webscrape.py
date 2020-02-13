@@ -72,6 +72,28 @@ def access_url(browser, url, xpath=None, timeout=10):
         return
 
 
+def create_expected_condition(method, variable):
+    if method == 'class':
+        mthd = By.CLASS_NAME
+    elif method == 'css':
+        mthd = By.CSS_SELECTOR
+    elif method == 'id':
+        mthd = By.ID
+    elif method == 'link_text':
+        mthd = By.LINK_TEXT
+    elif method == 'name':
+        mthd = By.NAME
+    elif method == 'partial_link_text':
+        mthd = By.PARTIAL_LINK_TEXT
+    elif method == 'tag':
+        mthd = By.TAG_NAME
+    elif method == 'xpath':
+        mthd = By.XPATH
+    else:
+        mthd = None
+    return mthd, variable
+
+
 def find_element(method, variable):
     try:
         if method == 'class':
@@ -107,6 +129,11 @@ def find_elements(method, variable):
     return elements
 
 
+def split_value(value, split_char='>'):
+    assignment = value.split(split_char)
+    return '>'.join(assignment[:-1]), assignment[-1]
+
+
 def parse_code(browser, codes):
     """
     Browse to a website using selenium webdriver
@@ -139,35 +166,7 @@ def parse_code(browser, codes):
                 value = None
             print(f'{i}. Browsing to "{attribute}" until xpath="{value}" is detected"...')
             access_url(browser, url=attribute, xpath=value)
-        elif tag == 'input':
-            assignment = value.split('>')
-            input_val = assignment[-1]
-            variable = '>'.join(assignment[:-1])
-            print(f'{i}. Looking for "<{tag} {attribute}={variable}>"... textbox to fill with {input_val}')
 
-            element = find_element(method=attribute, variable=variable)
-            if element is None:
-                return False
-            if input_val == 'tab':
-                element.send_keys(Keys.TAB)
-            else:
-                element.send_keys(input_val)
-        elif tag == 'select':
-            assignment = value.split('>')
-            input_val = assignment[-1]
-            variable = '>'.join(assignment[:-1])
-            print(f'{i}. Looking for "<{tag} {attribute}={variable}>"... dropdown with {input_val}')
-            elements = find_elements(method=attribute, variable=variable)
-            if len(elements) == 0:
-                print('Element not found')
-                return False
-
-            for ii, element in enumerate(elements):
-                print(f' - {ii}: element.text={element.text}')
-                if element.text == input_val:
-                    element.click()
-                    print('(CLICK)')
-                    break
         elif tag == 'click':
             print(f'{i}. Clicking on "{attribute}={value}"...')
             element = find_element(method=attribute, variable=value)
@@ -180,11 +179,48 @@ def parse_code(browser, codes):
                 print("Exception: selenium.common.exceptions.ElementNotInteractableException")
                 print(e)
                 return False
+
+        elif tag == 'execute':
+            variable, input_val = split_value(value, '>')
+            element = find_element(method=attribute, variable=variable)
+            if element is None:
+                return False
+            browser.execute_script(input_val, element)
+
+        elif tag == 'input':
+            variable, input_val = split_value(value, '>')
+            print(f'{i}. Looking for "<{tag} {attribute}={variable}>"... textbox to fill with {input_val}')
+
+            element = find_element(method=attribute, variable=variable)
+            if element is None:
+                return False
+            if input_val == 'tab':
+                element.send_keys(Keys.TAB)
+            else:
+                element.send_keys(input_val)
+
+        elif tag == 'select':
+            variable, input_val = split_value(value, '>')
+            print(f'{i}. Looking for "<{tag} {attribute}={variable}>"... dropdown with {input_val}')
+            time.sleep(3)
+            elements = find_elements(method=attribute, variable=variable)
+            if len(elements) == 0:
+                print('Element not found')
+                return False
+
+            for ii, element in enumerate(elements):
+                print(f' - {ii}: element.text={element.text}')
+                if element.text == input_val:
+                    element.click()
+                    print('(CLICK)')
+                    break
+
         elif tag == 'scrollto':
             x = int(attribute)
             y = int(value)
             print(f'{i}. Scrolling to ({x},{y})...')
             browser.execute_script(f'window.scrollTo({x},{y})')
+
         elif tag == 'setwindowsize':
             x = int(attribute)
             y = int(value)
@@ -195,6 +231,16 @@ def parse_code(browser, codes):
             print(f'{i}. Submitting "{attribute}={value}"...')
             element = find_element(method=attribute, variable=value)
             element.submit()
+
+        elif tag == 'wait':
+            ec = create_expected_condition(method=attribute, variable=value)
+            try:
+                WebdriverWait(browser, 10).until(
+                    expected_conditions.visibility_of_element_located(ec)
+                )
+            except TimeoutException:
+                print('TimeoutException')
+
         else:
             print(f'{i}. Invalid tag: {tag}, attribute={attribute}, value={value}')
 
