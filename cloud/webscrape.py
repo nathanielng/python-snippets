@@ -73,19 +73,24 @@ def access_url(browser, url, xpath=None, timeout=10):
 
 
 def find_element(method, variable):
-    if method == 'class':
-        element = browser.find_element_by_class_name(variable)
-    elif method == 'css':
-        element = browser.find_element_by_css_selector(variable)
-    elif method == 'id':
-        element = browser.find_element_by_id(variable)
-    elif method == 'name':
-        element = browser.find_element_by_name(variable)
-    elif method == 'tag':
-        element = browser.find_element_by_tag(variable)
-    elif method == 'xpath':
-        element = browser.find_element_by_xpath(variable)
-    return element
+    try:
+        if method == 'class':
+            element = browser.find_element_by_class_name(variable)
+        elif method == 'css':
+            element = browser.find_element_by_css_selector(variable)
+        elif method == 'id':
+            element = browser.find_element_by_id(variable)
+        elif method == 'name':
+            element = browser.find_element_by_name(variable)
+        elif method == 'tag':
+            element = browser.find_element_by_tag(variable)
+        elif method == 'xpath':
+            element = browser.find_element_by_xpath(variable)
+        return element
+    except selenium.common.exceptions.NoSuchElementException as e:
+        print(f'No such element: find_element_by_{method}[...]({variable})')
+        print(f'Exception: {e}')
+        return None
 
 
 def find_elements(method, variable):
@@ -136,23 +141,55 @@ def parse_code(browser, codes):
             access_url(browser, url=attribute, xpath=value)
         elif tag == 'input':
             assignment = value.split('>')
-            if len(assignment) != 2:
-                print(f'Error: assignment does not have 2 elements:')
-                print(assignment)
-                continue
-            variable, input_val = assignment
-            print(f'{i}. Looking for "<{tag} {attribute}={variable}>"... to fill with {input_val}')
+            input_val = assignment[-1]
+            variable = '>'.join(assignment[:-1])
+            print(f'{i}. Looking for "<{tag} {attribute}={variable}>"... textbox to fill with {input_val}')
 
             element = find_element(method=attribute, variable=variable)
-            element.send_keys(input_val)
+            if element is None:
+                return False
+            if input_val == 'tab':
+                element.send_keys(Keys.TAB)
+            else:
+                element.send_keys(input_val)
+        elif tag == 'select':
+            assignment = value.split('>')
+            input_val = assignment[-1]
+            variable = '>'.join(assignment[:-1])
+            print(f'{i}. Looking for "<{tag} {attribute}={variable}>"... dropdown with {input_val}')
+            elements = find_elements(method=attribute, variable=variable)
+            if len(elements) == 0:
+                print('Element not found')
+                return False
+
+            for ii, element in enumerate(elements):
+                print(f' - {ii}: element.text={element.text}')
+                if element.text == input_val:
+                    element.click()
+                    print('(CLICK)')
+                    break
         elif tag == 'click':
             print(f'{i}. Clicking on "{attribute}={value}"...')
             element = find_element(method=attribute, variable=value)
             # assert element.get_attribute('type') == 'radio'
+            if element is None:
+                return False
             try:
                 element.click()
             except selenium.common.exceptions.ElementNotInteractableException as e:
-                print(f"Exception: {e}")
+                print("Exception: selenium.common.exceptions.ElementNotInteractableException")
+                print(e)
+                return False
+        elif tag == 'scrollto':
+            x = int(attribute)
+            y = int(value)
+            print(f'{i}. Scrolling to ({x},{y})...')
+            browser.execute_script(f'window.scrollTo({x},{y})')
+        elif tag == 'setwindowsize':
+            x = int(attribute)
+            y = int(value)
+            print(f'{i}. Setting window size to ({x},{y})...')
+            browser.set_window_size(x, y)
 
         elif tag == 'submit':
             print(f'{i}. Submitting "{attribute}={value}"...')
@@ -161,7 +198,7 @@ def parse_code(browser, codes):
         else:
             print(f'{i}. Invalid tag: {tag}, attribute={attribute}, value={value}')
 
-    return None
+    return True
 
 
 if __name__ == "__main__":
@@ -175,5 +212,7 @@ if __name__ == "__main__":
     codes = codes.split('\n')
 
     browser = open_browser(args.browser.lower())
-    parse_code(browser, codes)
-    browser.quit()
+    success = parse_code(browser, codes)
+    x = input('Quit browser? (y/n) ')
+    if x.lower() == 'y':
+        browser.quit()
