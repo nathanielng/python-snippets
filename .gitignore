@@ -3,6 +3,7 @@ __pycache__
 .DS_Store
 
 .vscode
+*.code-workspace
 *.swp
 *.zip
 
@@ -11,3 +12,5 @@ cloud/webscrape*.sh
 cloud/webscrape_inputs*.txt
 cloud/webscrape_results.html
 plotting/sample*
+plotting/wireframe.svg
+remote/remote_host_test*
