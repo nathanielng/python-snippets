@@ -56,20 +56,25 @@ def open_browser(browser_name):
 
 # ----- Subroutines -----
 def access_url(browser, url, xpath=None, timeout=10):
-    browser.get(url)
+    try:
+       browser.get(url)
+    except Exception as e:
+        print(f'Exception: {e}')
+        return False
+
     if xpath is None:
-        return
+        return True
 
     try:
         WebDriverWait(browser, timeout).until(
             expected_conditions.visibility_of_element_located(
             (By.XPATH, xpath))
         )
-        return
+        return True
     except TimeoutException as e:
         print(f'Failed to access url: {url}')
         print(f"Exception: {e}")
-        return
+        return False
 
 
 def create_expected_condition(method, variable):
@@ -134,15 +139,131 @@ def split_value(value, split_char='>'):
     return '>'.join(assignment[:-1]), assignment[-1]
 
 
-def parse_code(browser, codes):
+def parse_line(browser, i, line: list):
     """
-    Browse to a website using selenium webdriver
-    Follows a list of codes for the actions to take
+    Parses a single line of code
 
-    - `browseto|url|xpath`: browse to a url until xpath is detected
-    - `input|attribute|value>input_value`: fill input element with input_value
-    - `click|attribute|value`: click an element
+    - `browseto|url|xpath`: browse to {url} until {xpath} is detected
+    - `click|method|value`: click an element
+    - `exec|method|variable>command`: execute script {command}
+    - `input|method|variable>input_value`: fill input element with input_value
+    - `select|method|variable>count`: go to dropdown element & scroll down by `count`
+    - `setwindowsize|x|y`: set the window size to (x,y)
+    - `scrollto|x|y`: scroll to (x,y)
     - `submit`: submit a form
+    - `wait`: wait until element is available
+    """
+    tag, attribute, value = line
+
+    if tag == 'browseto':
+        if value == 'None':
+            value = None
+        print(f'{i}. Browsing to "{attribute}" until xpath="{value}" is detected"...')
+        return access_url(browser, url=attribute, xpath=value)
+
+    elif tag == 'click':
+        print(f'{i}. Clicking on "{attribute}={value}"...')
+        element = find_element(method=attribute, variable=value)
+        # assert element.get_attribute('type') == 'radio'
+        if element is None:
+            return False
+        try:
+            element.click()
+        except selenium.common.exceptions.ElementNotInteractableException as e:
+            print("Exception: selenium.common.exceptions.ElementNotInteractableException")
+            print(e)
+            return False
+
+    elif tag[:4] == 'exec':
+        variable, command = split_value(value, '>')
+        print(f'{i}. Executing script {command} on element ({attribute}: {variable})')
+        element = find_element(method=attribute, variable=variable)
+        if element is None:
+            return False
+        browser.execute_script(command, element)
+
+    elif tag == 'input':
+        variable, input_val = split_value(value, '>')
+        print(f'{i}. Looking for "<{tag} {attribute}={variable}>"... textbox to fill with {input_val}')
+
+        element = find_element(method=attribute, variable=variable)
+        if element is None:
+            return False
+        try:
+            if input_val == 'tab':
+                element.send_keys(Keys.TAB)
+            else:
+                element.send_keys(input_val)
+        except Exception as e:
+            print(f'Exception: {e}')
+            return False
+
+    elif tag == 'select':
+        variable, match_str = split_value(value, '>')
+        print(f'{i}. Looking for "<{tag} {attribute}={variable}>"... dropdown with {match_str}')
+        time.sleep(3)
+        elements = find_elements(method=attribute, variable=variable)
+        if len(elements) == 0:
+            print('Element not found')
+            return False
+
+        for ii, element in enumerate(elements):
+            print(f' - {ii}: element.text={element.text}')
+            if element.text == match_str:
+                element.click()
+                print('(CLICK)')
+                return True
+
+        print('Failed to find a matching element')
+        return False
+
+    elif tag == 'scrollto':
+        x = int(attribute)
+        y = int(value)
+        print(f'{i}. Scrolling to ({x},{y})...')
+        browser.execute_script(f'window.scrollTo({x},{y})')
+
+    elif tag == 'setwindowsize':
+        x = int(attribute)
+        y = int(value)
+        print(f'{i}. Setting window size to ({x},{y})...')
+        browser.set_window_size(x, y)
+
+    elif tag == 'submit':
+        print(f'{i}. Submitting "{attribute}={value}"...')
+        element = find_element(method=attribute, variable=value)
+        x = input('Submit? (y/n) ')
+        if x.lower() == 'y':
+            try:
+                element.submit()
+                print('Form was submitted')
+            except Exception as e:
+                print(f'Submission error: {e}')
+                return False
+        else:
+            print('Submission cancelled by user')
+            return False
+
+    elif tag == 'wait':
+        ec = create_expected_condition(method=attribute, variable=value)
+        try:
+            WebDriverWait(browser, 10).until(
+                expected_conditions.visibility_of_element_located(ec)
+            )
+        except TimeoutException:
+            print('TimeoutException')
+            return False
+
+    else:
+        print(f'{i}. Invalid tag: {tag}, attribute={attribute}, value={value}')
+        return False
+
+    return True
+
+
+def parse_code_block(browser, codes):
+    """
+    Parses a block of code
     """
 
     for i, code in enumerate(codes):
@@ -150,101 +271,19 @@ def parse_code(browser, codes):
         if line[0] == '#' or line[0] == '':
             # Skip commented lines and blank lines
             continue
-        elif line[0] == 'pause':
+        elif line[0] == 'sleep':
             t = int(line[1])
-            print(f'{i}: Pause for {t} seconds')
+            print(f'{i}: Sleep for {t} seconds')
             time.sleep(t)
             continue
         elif len(line) != 3:
             print(f'Error: line #{i} does not have 3 elements:')
             print(line)
             continue
-        tag, attribute, value = line
 
-        if tag == 'browseto':
-            if value == 'None':
-                value = None
-            print(f'{i}. Browsing to "{attribute}" until xpath="{value}" is detected"...')
-            access_url(browser, url=attribute, xpath=value)
+        r = parse_line(browser, i, line)
 
-        elif tag == 'click':
-            print(f'{i}. Clicking on "{attribute}={value}"...')
-            element = find_element(method=attribute, variable=value)
-            # assert element.get_attribute('type') == 'radio'
-            if element is None:
-                return False
-            try:
-                element.click()
-            except selenium.common.exceptions.ElementNotInteractableException as e:
-                print("Exception: selenium.common.exceptions.ElementNotInteractableException")
-                print(e)
-                return False
-
-        elif tag == 'execute':
-            variable, input_val = split_value(value, '>')
-            element = find_element(method=attribute, variable=variable)
-            if element is None:
-                return False
-            browser.execute_script(input_val, element)
-
-        elif tag == 'input':
-            variable, input_val = split_value(value, '>')
-            print(f'{i}. Looking for "<{tag} {attribute}={variable}>"... textbox to fill with {input_val}')
-
-            element = find_element(method=attribute, variable=variable)
-            if element is None:
-                return False
-            if input_val == 'tab':
-                element.send_keys(Keys.TAB)
-            else:
-                element.send_keys(input_val)
-
-        elif tag == 'select':
-            variable, input_val = split_value(value, '>')
-            print(f'{i}. Looking for "<{tag} {attribute}={variable}>"... dropdown with {input_val}')
-            time.sleep(3)
-            elements = find_elements(method=attribute, variable=variable)
-            if len(elements) == 0:
-                print('Element not found')
-                return False
-
-            for ii, element in enumerate(elements):
-                print(f' - {ii}: element.text={element.text}')
-                if element.text == input_val:
-                    element.click()
-                    print('(CLICK)')
-                    break
-
-        elif tag == 'scrollto':
-            x = int(attribute)
-            y = int(value)
-            print(f'{i}. Scrolling to ({x},{y})...')
-            browser.execute_script(f'window.scrollTo({x},{y})')
-
-        elif tag == 'setwindowsize':
-            x = int(attribute)
-            y = int(value)
-            print(f'{i}. Setting window size to ({x},{y})...')
-            browser.set_window_size(x, y)
-
-        elif tag == 'submit':
-            print(f'{i}. Submitting "{attribute}={value}"...')
-            element = find_element(method=attribute, variable=value)
-            element.submit()
-
-        elif tag == 'wait':
-            ec = create_expected_condition(method=attribute, variable=value)
-            try:
-                WebdriverWait(browser, 10).until(
-                    expected_conditions.visibility_of_element_located(ec)
-                )
-            except TimeoutException:
-                print('TimeoutException')
-
-        else:
-            print(f'{i}. Invalid tag: {tag}, attribute={attribute}, value={value}')
-
-    return True
+    return r
 
 
 if __name__ == "__main__":
@@ -258,7 +297,7 @@ if __name__ == "__main__":
     codes = codes.split('\n')
 
     browser = open_browser(args.browser.lower())
-    success = parse_code(browser, codes)
+    success = parse_code_block(browser, codes)
     x = input('Quit browser? (y/n) ')
     if x.lower() == 'y':
         browser.quit()
