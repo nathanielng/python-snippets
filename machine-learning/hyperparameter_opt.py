@@ -131,11 +131,26 @@ def plot_data(X, Y, Z, opt):
 plot_data(X, Y, Z, optimum)
 
 
+# In[8]:
+
+
+def plot_data_contour(X, Y, Z, opt):
+    fig, ax = plt.subplots(1, 1, figsize=(8,7))
+    CS = ax.contour(X, Y, Z, 20)
+    ax.plot([opt['x']], [opt['y']], 'x',
+            markerfacecolor='black', markeredgecolor='black',
+            markersize=12, markeredgewidth=3)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    
+plot_data_contour(X, Y, Z, optimum)
+
+
 # ### 2.4 Show Sampling
 # 
 # Actual sampling during hyperparameter optimization
 
-# In[8]:
+# In[9]:
 
 
 df[['x', 'y']].plot.hist(bins=20, edgecolor='black', alpha=0.5, stacked=False);
@@ -143,7 +158,7 @@ df[['x', 'y']].plot.hist(bins=20, edgecolor='black', alpha=0.5, stacked=False);
 
 # Default sampling
 
-# In[9]:
+# In[10]:
 
 
 samples = pd.DataFrame(
