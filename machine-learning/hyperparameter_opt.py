@@ -120,7 +120,7 @@ def plot_data(X, Y, Z, opt):
         X, Y, Z, rstride=5, cstride=5, cmap=matplotlib.cm.coolwarm,
         linewidth=0.3, antialiased=True, alpha=0.9)
     
-    ax.plot([opt['x']], [opt['y']], 'x',
+    ax.plot([opt['x']], [opt['y']], [opt['loss']], 'x',
             markerfacecolor='black', markeredgecolor='black',
             markersize=12, markeredgewidth=5)
 
