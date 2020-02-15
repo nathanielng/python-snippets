@@ -15,8 +15,12 @@ class GoogleSpreadsheet():
         self._credentials = ServiceAccountCredentials.from_json_keyfile_name(
             self._credential_file, self._scope)
         self._gc = gspread.authorize(self._credentials)
-        self._sh = self._gc.open(spreadsheet_name)
-        self._ws = self._sh.sheet1
+
+        try:
+            self._sh = self._gc.open(spreadsheet_name)
+            self._ws = self._sh.sheet1
+        except gspread.exceptions.APIError as e:
+            print(f'API Error: {e}')
 
 
     def switch_worksheet(self, worksheet_name=None):
