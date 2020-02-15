@@ -18,9 +18,17 @@ class GoogleSpreadsheet():
 
         try:
             self._sh = self._gc.open(spreadsheet_name)
+        except gspread.exceptions.SpreadsheetNotFound as e:
+            print(f'Spreadsheet not found: {spreadsheet_name}')
+            print(f'Error: {e}')
+            self._sh = None
+            return
+
+        try:
             self._ws = self._sh.sheet1
         except gspread.exceptions.APIError as e:
             print(f'API Error: {e}')
+            self._ws = None
 
 
     def switch_worksheet(self, worksheet_name=None):
@@ -57,6 +65,9 @@ def main(args):
         args.credential_file,
         args.spreadsheet,
         args.worksheet)
+    if GS._sh is None or GS._ws is None:
+        return
+
     print(f"Worksheets: {','.join(GS.get_worksheets())}")
 
     cell_data = GS.get_all_cells()
