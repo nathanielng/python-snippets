@@ -204,7 +204,7 @@ def parse_line(browser, i, line: list):
         time.sleep(3)
         elements = find_elements(method=attribute, variable=variable)
         if len(elements) == 0:
-            print('Element not found')
+            print('select failed: element not found')
             return False
 
         for ii, element in enumerate(elements):
@@ -231,11 +231,17 @@ def parse_line(browser, i, line: list):
 
     elif tag == 'submit':
         print(f'{i}. Submitting "{attribute}={value}"...')
-        element = find_element(method=attribute, variable=value)
+        try:
+            element = find_element(method=attribute, variable=value)
+        except Exception as e:
+            print('submit failed: element not found')
+            print(f'Exception: {e}')
+            return False
+
         x = input('Submit? (y/n) ')
         if x.lower() == 'y':
             try:
-                element.submit()
+                element.click()
                 print('Form was submitted')
             except Exception as e:
                 print(f'Submission error: {e}')
@@ -261,43 +267,74 @@ def parse_line(browser, i, line: list):
     return True
 
 
+def sanitize_line_input(line):
+    line = code.split('|')
+    if line[0] == '#' or line[0] == '':
+        # Skip commented lines and blank lines
+        return None
+    elif line[0] == 'sleep':
+        t = int(line[1])
+        print(f'{i}: Sleep for {t} seconds')
+        time.sleep(t)
+        return None
+    elif len(line) != 3:
+        print(f'Error: line #{i} does not have 3 elements:')
+        print(line)
+        return None
+
+    return line
+
+
 def parse_code_block(browser, codes):
     """
     Parses a block of code
     """
 
     for i, code in enumerate(codes):
-        line = code.split('|')
-        if line[0] == '#' or line[0] == '':
-            # Skip commented lines and blank lines
+        line = sanitize_line_input(line)
+        if line is None:
             continue
-        elif line[0] == 'sleep':
-            t = int(line[1])
-            print(f'{i}: Sleep for {t} seconds')
-            time.sleep(t)
-            continue
-        elif len(line) != 3:
-            print(f'Error: line #{i} does not have 3 elements:')
-            print(line)
-            continue
-
-        r = parse_line(browser, i, line)
+        else:
+            r = parse_line(browser, i, line)
 
     return r
+
+
+def parse_prompt(browser):
+    """
+    User enters instructions at a prompt
+    """
+    while True:
+        line = input('webscrape> ')
+        if line in ['break', 'exit', 'quit']:
+            break
+
+        line = sanitize_line_input(line)
+        if line is None:
+            continue
+        else:
+            r = parse_line(browser, i, line)
+
+
+def run_code_file(browser, code_file):
+    with open(code_file) as f:
+        codes = f.read()
+    codes = codes.split('\n')
+    return parse_code_block(browser, codes)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--browser', default='chrome', help='Browser')
-    parser.add_argument('--code_file', help="Code File")
+    parser.add_argument('--code_file', default='', help="Code File")
     args = parser.parse_args()
 
-    with open(args.code_file) as f:
-        codes = f.read()
-    codes = codes.split('\n')
-
     browser = open_browser(args.browser.lower())
-    success = parse_code_block(browser, codes)
+    if args.code_file == '':
+        parse_prompt(browser)
+    else:
+        r = run_code_file(browser, args.code_file)
+
     x = input('Quit browser? (y/n) ')
     if x.lower() == 'y':
         browser.quit()
