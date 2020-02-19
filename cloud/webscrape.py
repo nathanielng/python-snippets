@@ -251,6 +251,7 @@ def parse_line(browser, i, line: list):
             return False
 
     elif tag == 'wait':
+        print(f'{i}. Waiting for expected condition: "{attribute}={value}"...')
         ec = create_expected_condition(method=attribute, variable=value)
         try:
             WebDriverWait(browser, 10).until(
@@ -267,8 +268,7 @@ def parse_line(browser, i, line: list):
     return True
 
 
-def sanitize_line_input(line):
-    line = code.split('|')
+def sanitize_line_input(i, line):
     if line[0] == '#' or line[0] == '':
         # Skip commented lines and blank lines
         return None
@@ -291,7 +291,8 @@ def parse_code_block(browser, codes):
     """
 
     for i, code in enumerate(codes):
-        line = sanitize_line_input(line)
+        line = code.split('|')
+        line = sanitize_line_input(i, line)
         if line is None:
             continue
         else:
@@ -304,12 +305,14 @@ def parse_prompt(browser):
     """
     User enters instructions at a prompt
     """
+    i = 0
     while True:
         line = input('webscrape> ')
         if line in ['break', 'exit', 'quit']:
             break
 
-        line = sanitize_line_input(line)
+        i += 1
+        line = sanitize_line_input(i, line)
         if line is None:
             continue
         else:
