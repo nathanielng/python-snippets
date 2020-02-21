@@ -4,6 +4,7 @@ __pycache__
 
 .vscode
 *.code-workspace
+*.pkl
 *.swp
 *.zip
 
@@ -14,3 +15,4 @@ cloud/webscrape_results.html
 plotting/sample*
 plotting/wireframe.svg
 remote/remote_host_test*
+
