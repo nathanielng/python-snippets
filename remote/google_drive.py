@@ -43,6 +43,16 @@ class G_Drive():
                 print(f'Failed to delete file_id={file_id}')
                 print(f'Error: {e}')
 
+    def create_folder(self, folder_name):
+        file_obj = self._service.files()
+        body = {
+            'name': folder_name,
+            'mimeType': 'application/vnd.google-apps.folder'
+        }
+        file = file_obj.create(body=body, fields='id').execute()
+        folder_id = file.get('id')
+        return folder_id
+
 
 if __name__ == "__main__":
     GD = G_Drive(GDRIVE_CREDENTIALS)
