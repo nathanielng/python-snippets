@@ -34,6 +34,28 @@ class G_Drive():
             print(f"{i}: {item['name']} (id = {item['id']})")
 
 
+    def move_files(self, file_ids, new_folder_id):
+        """
+        Moves file_ids to new_folder_id
+        Adapted from: https://developers.google.com/drive/api/v3/folder
+        """
+        file_obj = self._service.files()
+        for file_id in file_ids:
+            try:
+                file = file_obj.get(
+                    fileId=file_id,
+                    fields='parents').execute()
+                previous_parents = ",".join(file.get('parents'))
+                file = file_id.update(
+                    fileId=file_id,
+                    addParents=new_folder_id,
+                    removeParents=previous_parents,
+                    fields='id, parents').execute()
+            except Exception as e:
+                print(f"Failed to move file_id: {', '.join(file_ids)} to folder_id: {new_folder_id}")
+                return
+
+
     def delete_files(self, file_ids):
         file_obj = self._service.files()
         for file_id in file_ids:
@@ -43,7 +65,12 @@ class G_Drive():
                 print(f'Failed to delete file_id={file_id}')
                 print(f'Error: {e}')
 
+
     def create_folder(self, folder_name):
+        """
+        Creates a new folder
+        Adapted from: https://developers.google.com/drive/api/v3/folder
+        """
         file_obj = self._service.files()
         body = {
             'name': folder_name,
