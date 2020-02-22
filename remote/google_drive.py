@@ -34,6 +34,16 @@ class G_Drive():
             print(f"{i}: {item['name']} (id = {item['id']})")
 
 
+    def delete_files(self, file_ids):
+        file_obj = self._service.files()
+        for file_id in file_ids:
+            try:
+                file_obj.delete(fileId=file_id).execute()
+            except apiclient.errors.HttpError as e:
+                print(f'Failed to delete file_id={file_id}')
+                print(f'Error: {e}')
+
+
 if __name__ == "__main__":
     GD = G_Drive(GDRIVE_CREDENTIALS)
     GD.print_files()
