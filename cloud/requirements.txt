@@ -1,2 +1,4 @@
+connexion
+flask
 selenium
 
