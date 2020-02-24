@@ -157,6 +157,32 @@ class DropboxHost:
                  self._dbx.files_list_folder(folder).entries]
         return files
 
+    def get_file_list_as_df(self, folder=''):
+        files = [entry for entry in
+                 self._dbx.files_list_folder(folder).entries]
+        file_list = []
+        for file in files:
+            if isinstance(file, dropbox.files.FolderMetadata):
+                d = {
+                    'name': file.name,
+                    'id': file.id,
+                    'path_lower': file.path_lower,
+                    'path_display': file.path_display,
+                }
+            elif isinstance(file, dropbox.files.FileMetadata):
+                d = {
+                    'name': file.name,
+                    'id': file.id,
+                    'client_modified': file.client_modified,
+                    'server_modified': file.server_modified,
+                    'rev': file.rev,
+                    'size': file.size,
+                    'path_lower': file.path_lower,
+                    'path_display': file.path_display,
+                }
+            file_list.append(d)
+        return pd.DataFrame(file_list)
+
     def print_file_list(self, path):
         file_list = self.get_file_list(path)
         for filename in file_list:
