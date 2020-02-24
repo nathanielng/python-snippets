@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import apiclient
+import argparse
 import os
 
 from oauth2client.service_account import ServiceAccountCredentials
@@ -56,10 +57,12 @@ class G_Drive():
                 return
 
 
-    def delete_files(self, file_ids):
+    def delete_files(self, file_ids, verbose=True):
         file_obj = self._service.files()
-        for file_id in file_ids:
+        for i, file_id in enumerate(file_ids):
             try:
+                if verbose is True:
+                    print(f'{i}. Attempting to delete {file_id}...')
                 file_obj.delete(fileId=file_id).execute()
             except apiclient.errors.HttpError as e:
                 print(f'Failed to delete file_id={file_id}')
@@ -82,5 +85,12 @@ class G_Drive():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--delete', default=None)
+    args = parser.parse_args()
+
     GD = G_Drive(GDRIVE_CREDENTIALS)
+    if args.delete is not None:
+        file_ids = args.delete.split(',')
+        GD.delete_files(file_ids)
     GD.print_files()
