@@ -35,6 +35,18 @@ class G_Drive():
             print(f"{i}: {item['name']} (id = {item['id']})")
 
 
+    def get_matching_file_ids(self, filename):
+        """
+        Returns list of file_ids that match filename
+        """
+        file_ids = []
+        items = self.get_files()
+        for item in items:
+            if item['name'] == filename:
+                file_ids.append(item['id'])
+        return file_ids
+
+
     def move_files(self, file_ids, new_folder_id):
         """
         Moves file_ids to new_folder_id
@@ -87,10 +99,17 @@ class G_Drive():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--delete', default=None)
+    parser.add_argument('--search', default=None, help='Search for matching file ids')
     args = parser.parse_args()
 
     GD = G_Drive(GDRIVE_CREDENTIALS)
     if args.delete is not None:
         file_ids = args.delete.split(',')
         GD.delete_files(file_ids)
+    elif args.search is not None:
+        file_ids = GD.get_matching_file_ids(args.search)
+        if len(file_ids) > 0:
+            for i, file_id in enumerate(file_ids):
+                print(f'{i}: {file_id}')
+
     GD.print_files()
