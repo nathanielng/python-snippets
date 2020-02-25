@@ -91,6 +91,18 @@ class G_Drive():
                 print(f'Error: {e}')
 
 
+    def share_file(self, file_id, email):
+        """
+        Shares a file with an email
+        Adapted from: https://developers.google.com/drive/api/v2/reference/permissions/update
+        See also: https://developers.google.com/drive/api/v3/manage-sharing
+        """
+        permissions_obj = self._service.permissions()
+        permissions_obj.create(
+            body={'type': 'user', 'role': 'reader', 'emailAddress': email},
+            fileId=file_id).execute()
+
+
     def create_folder(self, folder_name):
         """
         Creates a new folder
@@ -110,6 +122,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--delete', default=None)
     parser.add_argument('--search', default=None, help='Search for matching file ids')
+    parser.add_argument('--email', default=None, help='Specify an email to share (use together with --search)')
     args = parser.parse_args()
 
     GD = G_Drive(GDRIVE_CREDENTIALS)
@@ -121,5 +134,7 @@ if __name__ == "__main__":
         if len(file_ids) > 0:
             for i, file_id in enumerate(file_ids):
                 print(f'{i}: {file_id}')
+                if args.email is not None:
+                    GD.share_file(file_id, args.email)
 
     GD.print_files()
