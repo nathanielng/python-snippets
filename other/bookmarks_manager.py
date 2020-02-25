@@ -15,6 +15,7 @@ import emlx
 import glob
 import os
 import pandas as pd
+import re
 
 from bs4 import BeautifulSoup
 
@@ -30,6 +31,28 @@ def extract_links_from_html(filename):
     soup = BeautifulSoup(html_txt, 'html.parser')
     links = soup.find_all('a')
     return links
+
+
+def extract_links_from_txt(txt: str):
+    """
+    Try to find links from text data in the forms:
+    1. <a href = "..." ...>
+    2. http://... or https://...
+    """
+    if not isinstance(txt, str):
+        print(f'Expected string, but input txt={txt}')
+        return []
+
+    m = re.findall(r'<a href="(.*?)".*>', txt)
+    if len(m) > 0:
+        urls = m
+    else:
+        urls = re.findall(r'https?\://.*', txt)
+    
+    if len(urls) == 1:
+        return urls[0]
+    else:
+        return urls
 
 
 def links2df(links):
@@ -70,9 +93,15 @@ def read_emlx(filename):
         title = msg.headers['Subject']
     else:
         title = '(no title)'
-        print(f'Message.headers has not title: {msg.headers}')
+        print(f'Message.headers has no title: {msg.headers}')
         print(f'{msg.as_string()}')
-    body = msg.get_payload()
+    payload = msg.get_payload()
+    if isinstance(payload, list):
+        body = ''
+        for x in payload:
+            body += x.get_payload() + '\n'
+    else:
+        body = payload
     return title, body, msg.flags, msg.plist
 
 
@@ -86,7 +115,9 @@ def load_emlx_folder(emlx_folder):
         print(f'{i}: {basename}')
         title, body, _, _ = read_emlx(filename)
         items.append([title, body])
-    return pd.DataFrame(items, columns=['Title', 'body'])
+    df = pd.DataFrame(items, columns=['Title', 'body'])
+    df['url'] = df['body'].apply(extract_links_from_txt)
+    return df
 
 
 def main(args):
