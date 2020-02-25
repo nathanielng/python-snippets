@@ -117,7 +117,7 @@ def load_emlx_folder(emlx_folder):
         items.append([title, body])
     df = pd.DataFrame(items, columns=['Title', 'body'])
     df['url'] = df['body'].apply(extract_links_from_txt)
-    return df
+    return df[['Title', 'url', 'body']]
 
 
 def main(args):
@@ -130,7 +130,7 @@ def main(args):
         df = df.append(
             load_emlx_folder(emlx_folder=args.emlx)
         )
-        print(df.head())
+        print(df.head(1).T)
 
     df.to_csv(args.output, index=False)
 
