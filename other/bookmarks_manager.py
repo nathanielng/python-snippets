@@ -33,6 +33,12 @@ def extract_links_from_html(filename):
     return links
 
 
+def clean_txt(txt: str):
+    txt = re.sub(r'=3D', r'=', txt)    # Replace '=3D' with '='
+    txt = re.sub(r'=\r?\n', r'', txt)  # Replace '=\r?\n' with ''
+    return txt
+
+
 def extract_links_from_txt(txt: str):
     """
     Try to find links from text data in the forms:
@@ -42,10 +48,12 @@ def extract_links_from_txt(txt: str):
     if not isinstance(txt, str):
         print(f'Expected string, but input txt={txt}')
         return []
+    txt = clean_txt(txt)
 
-    m = re.findall(r'<a href="(.*?)".*>', txt)
-    if len(m) > 0:
-        urls = m
+    soup = BeautifulSoup(txt, 'html.parser')  # m = re.findall(r'<a href="(.*?)".*>', txt)
+    links = soup.find_all('a')
+    if len(links) > 0:
+        urls = [link['href'] for link in links]
     else:
         urls = re.findall(r'https?\://.*', txt)
     
