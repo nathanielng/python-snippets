@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 import argparse
+import google_drive
 import gspread
 import os
 
 from oauth2client.service_account import ServiceAccountCredentials
 
+
+GDRIVE_CREDENTIALS = os.getenv('GDRIVE_CREDENTIALS', None)
 
 class GoogleSpreadsheet():
 
@@ -59,6 +62,15 @@ class GoogleSpreadsheet():
     def update_cell(self, row, col, value):
         self._ws.update_cell(row, col, value)
 
+    
+    def print_cell_data(self):
+        cell_data = self.get_all_cells()
+        for i, row_data in enumerate(cell_data):
+            print(f'{i}: ', end='')
+            for data in row_data:
+                print(data, end='|')
+            print()
+
 
 def main(args):
     GS = GoogleSpreadsheet(
@@ -68,20 +80,16 @@ def main(args):
     if GS._sh is None or GS._ws is None:
         return
 
+    print(f"Spreadsheet: {args.spreadsheet} (id={GS._sh.id})")
     print(f"Worksheets: {','.join(GS.get_worksheets())}")
-
-    cell_data = GS.get_all_cells()
-    for i, row_data in enumerate(cell_data):
-        print(f'{i}: ', end='')
-        for data in row_data:
-            print(data, end='|')
-        print()
+    GS.print_cell_data()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--credential_file')
+    parser.add_argument('--credential_file', default=GDRIVE_CREDENTIALS)
     parser.add_argument('--spreadsheet')
     parser.add_argument('--worksheet')
+    parser.add_argument('--upload_csv', help='Specify csv file to upload')
     args = parser.parse_args()
     main(args)
