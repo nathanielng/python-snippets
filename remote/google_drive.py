@@ -35,16 +35,26 @@ class G_Drive():
             print(f"{i}: {item['name']} (id = {item['id']})")
 
 
-    def get_matching_file_ids(self, filename):
+    def search_files(self, search_str, **kwargs):
         """
-        Returns list of file_ids that match filename
+        Returns list of file_ids that match a search criteria
+        such as q="name='file.txt'"
+        Adapted from: https://developers.google.com/drive/api/v3/search-files
         """
-        file_ids = []
-        items = self.get_files()
-        for item in items:
-            if item['name'] == filename:
-                file_ids.append(item['id'])
-        return file_ids
+        file_obj = self._service.files()
+
+        page_token = None
+        while True:
+            results = file_obj.list(
+                q=search_str,
+                spaces='drive',
+                fields='nextPageToken, files(id, name)',
+                pageToken=page_token,
+                **kwargs).execute()
+            page_token = results.get('nextPageToken', None)
+            if page_token is None:
+                break
+        return [ item['id'] for item in results.get('files', []) ]
 
 
     def move_files(self, file_ids, new_folder_id):
@@ -107,7 +117,7 @@ if __name__ == "__main__":
         file_ids = args.delete.split(',')
         GD.delete_files(file_ids)
     elif args.search is not None:
-        file_ids = GD.get_matching_file_ids(args.search)
+        file_ids = GD.search_files(args.search)
         if len(file_ids) > 0:
             for i, file_id in enumerate(file_ids):
                 print(f'{i}: {file_id}')
