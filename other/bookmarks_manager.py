@@ -53,11 +53,15 @@ def extract_links_from_txt(txt: str):
     soup = BeautifulSoup(txt, 'html.parser')  # m = re.findall(r'<a href="(.*?)".*>', txt)
     links = soup.find_all('a')
     if len(links) > 0:
-        urls = [link['href'] for link in links]
+        links2 = [link['href'] for link in links]
+        urls = [link for link in links2 if ('http://flip.it' not in link and 'https://flipboard.com' not in link) ]
     else:
         urls = re.findall(r'https?\://.*', txt)
     
-    if len(urls) == 1:
+    if len(urls) == 0:
+        print(f'No URLs found in txt:\n{txt}')
+        return []
+    elif len(urls) == 1:
         return urls[0]
     else:
         return urls
