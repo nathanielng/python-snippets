@@ -12,6 +12,8 @@ cloud/chromedriver*
 cloud/webscrape*.sh
 cloud/webscrape_inputs*.txt
 cloud/webscrape_results.html
+other/bookmarks_manager.csv
+other/bookmarks_manager.sh
 plotting/sample*
 plotting/wireframe.svg
 remote/remote_host_test*
