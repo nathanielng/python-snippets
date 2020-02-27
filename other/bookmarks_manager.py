@@ -104,6 +104,7 @@ def read_emlx(filename):
     if 'Subject' in msg.headers:
         title = msg.headers['Subject']
     else:
+        print(f'----- {filename} -----')
         title = '(no title)'
         print(f'Message.headers has no title: {msg.headers}')
         print(f'{msg.as_string()}')
@@ -126,10 +127,10 @@ def load_emlx_folder(emlx_folder):
         basename = os.path.basename(filename)
         print(f'{i}: {basename}')
         title, body, _, _ = read_emlx(filename)
-        items.append([title, body])
-    df = pd.DataFrame(items, columns=['Title', 'body'])
+        items.append([title, body, basename])
+    df = pd.DataFrame(items, columns=['Title', 'body', 'basename'])
     df['url'] = df['body'].apply(extract_links_from_txt)
-    return df[['Title', 'url', 'body']]
+    return df[['Title', 'url', 'body', 'basename']]
 
 
 def main(args):
