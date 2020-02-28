@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# Requirements:
+# pip install google-api-python-client oauth2client
+
 import apiclient
 import argparse
 import os
