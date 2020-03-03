@@ -17,4 +17,7 @@ other/bookmarks_manager.sh
 plotting/sample*
 plotting/wireframe.svg
 remote/remote_host_test*
+remote/google_drive.sh
+remote/google_sheets.sh
+web_examples/
 
