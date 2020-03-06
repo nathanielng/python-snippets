@@ -62,10 +62,26 @@ class GoogleSpreadsheet():
     def update_cell(self, row, col, value):
         self._ws.update_cell(row, col, value)
 
-    
-    def print_cell_data(self):
+
+    def append(self, values: list):
+        rows = self._ws.row_count
+        self._ws.add_rows(1)
+        for i, value in enumerate(values):
+            self._ws.update_cell(rows+1, i+1, value)
+
+
+    def print_cell_data(self, i_start=0, i_end=-1):
+        """
+        Prints cell data between i_start and i_end (inclusive)
+        """
         cell_data = self.get_all_cells()
+        if i_end < 0:
+            i_end = len(cell_data) + i_end + 1
+        if i_start < 0:
+            i_start = len(cell_data) + i_start + 1
         for i, row_data in enumerate(cell_data):
+            if i < i_start or i > i_end:
+                continue
             print(f'{i}: ', end='')
             for data in row_data:
                 print(data, end='|')
@@ -80,8 +96,9 @@ def main(args):
     if GS._sh is None or GS._ws is None:
         return
 
+    worksheets = GS.get_worksheets()
     print(f"Spreadsheet: {args.spreadsheet} (id={GS._sh.id})")
-    print(f"Worksheets: {','.join(GS.get_worksheets())}")
+    print(f"Worksheets: {','.join(worksheets)}")
     GS.print_cell_data()
 
 
