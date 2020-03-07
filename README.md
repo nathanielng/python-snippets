@@ -1,16 +1,19 @@
-# Python Snippets
+## Python Snippets
 
-This is repository serves as a quick-reference of frequently-used snippets,
-written in Python. The purpose of the repository is to avoid having to
-find equivalent snippets on Google or Stack Overflow, and also to have
-snippets written in a preferred coding style. A number of them will
-also have unit tests, something that usually won't be available in many
-code snippets on the web.
-
+This is repository serves as a quick-reference of Python code snippets that are likely to
+be frequently-used.  While it is likely that many equivalent snippets would be easily found
+on Google, Stack Overflow, or a Python library documentation, these snippets are written in
+a preferred coding style and some of them may be designed to work together. Also, a number
+of them have (or eventually will have) unit tests, which typically are not available in many
+code snippets on the internet.
 
 ## Current Scope
 
 - Python 3
 - APIs
+- Databases
 - Machine Learning
+- Remote Storage (Dropbox, Google Drive / Google Sheets)
+- Remote Servers (AWS, SSH, PBS)
 - Visualization
+- Web scraping
