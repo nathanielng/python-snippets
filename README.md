@@ -1,4 +1,4 @@
-## Python Snippets
+## [Python Snippets](https://nathanielng.github.io/python-snippets/)
 
 This is repository serves as a quick-reference of Python code snippets that are likely to
 be frequently-used.  While it is likely that many equivalent snippets would be easily found
@@ -16,4 +16,4 @@ code snippets on the internet.
 - Remote Storage (Dropbox, Google Drive / Google Sheets)
 - Remote Servers (AWS, SSH, PBS)
 - Visualization
-- Web scraping
+- [Web Scraping](https://nathanielng.github.io/python-snippets/cloud)
