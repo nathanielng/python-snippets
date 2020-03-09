@@ -7,6 +7,7 @@
 #### 1.1.1 Links
 
 - **Github**: https://github.com/SeleniumHQ/selenium
+- **Documentation**: https://www.selenium.dev/selenium/docs/api/py/ (Python)
 
 #### 1.1.2 Setup
 
@@ -22,6 +23,7 @@ pip install selenium
 
 #### 1.2.1 Links
 
+- **Github**: https://github.com/python-mechanize/mechanize
 - **Documentation**: https://mechanize.readthedocs.io/en/latest/
 
 #### 1.2.2 Setup
