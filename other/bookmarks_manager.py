@@ -18,6 +18,7 @@ import pandas as pd
 import re
 
 from bs4 import BeautifulSoup
+from email.parser import BytesParser
 
 
 def print_links(links):
@@ -55,6 +56,8 @@ def extract_links_from_txt(txt: str):
     if len(links) > 0:
         links2 = [link['href'] for link in links]
         urls = [link for link in links2 if ('http://flip.it' not in link and 'https://flipboard.com' not in link) ]
+        urls = [link for link in urls if (
+            'http://zite.com' not in link and 'http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=419752338&mt=8' not in link)]
     else:
         urls = re.findall(r'https?\://.*', txt)
     
@@ -118,16 +121,42 @@ def read_emlx(filename):
     return title, body, msg.flags, msg.plist
 
 
-def load_emlx_folder(emlx_folder):
-    path = os.path.expanduser(emlx_folder)
-    filenames = glob.glob(f'{path}/*.emlx')
+def read_eml(filename):
+    with open(filename, 'rb') as f:
+        data = BytesParser().parse(f)
+    body = data.get_payload()
+    if isinstance(body, list):
+        payload = ''
+        for x in body:
+            payload += x.get_payload()
+        body = payload
+
+    items = dict(data.items())
+    title, _ = os.path.splitext(os.path.basename(filename))
+    # title = items.get('Subject', '(no title)')
+    msg_flags = data.get_params()
+    # msg_date = items.get('Date', default='')
+    # msg.plist
+    return title, body, msg_flags, items
+
+
+def load_email_folder(folder):
+    path = os.path.expanduser(folder)
+    eml_files = glob.glob(f'{path}/*.eml')
+    emlx_files = glob.glob(f'{path}/*.emlx')
+    filenames = eml_files + emlx_files
 
     items = []
     for i, filename in enumerate(filenames):
         basename = os.path.basename(filename)
         print(f'{i}: {basename}')
-        title, body, _, _ = read_emlx(filename)
+        _, ext = os.path.splitext(basename)
+        if ext == '.emlx':
+            title, body, _, _ = read_emlx(filename)
+        elif ext == '.eml':
+            title, body, _, _ = read_eml(filename)
         items.append([title, body, basename])
+
     df = pd.DataFrame(items, columns=['Title', 'body', 'basename'])
     df['url'] = df['body'].apply(extract_links_from_txt)
     return df[['Title', 'url', 'body', 'basename']]
@@ -139,9 +168,9 @@ def main(args):
         df = df.append(
             load_html_files(html_files=args.html.split(','))
         )
-    if args.emlx is not None:
+    if args.folder is not None:
         df = df.append(
-            load_emlx_folder(emlx_folder=args.emlx)
+            load_email_folder(folder=args.folder)
         )
         print(df.head(1).T)
 
@@ -151,7 +180,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--html', default=None, help='Comma-separated list of html files containing bookmarks')
-    parser.add_argument('--emlx', default=None, help='Folder containing emlx files')
+    parser.add_argument('--folder', default=None, help='Folder containing eml/emlx files')
     parser.add_argument('--output', default='bookmarks_manager.csv', help='Csv file for output dataframe')
     args = parser.parse_args()
     main(args)
