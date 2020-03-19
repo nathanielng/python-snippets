@@ -11,6 +11,7 @@ class SqliteDB:
 
     def __init__(self, filename):
         self._dbfile = filename
+        self._response = None
         try:
             self._conn = sqlite3.connect(self._dbfile)
         except Exception as e:
@@ -28,17 +29,20 @@ class SqliteDB:
             return
 
 
-    def query(self, query, fetch='fetchall'):
+    def query(self, query, action='fetchall'):
         try:
-            self._cur.execute(query)  # sqlite3.Cursor object
+            self._response = self._cur.execute(query)
+            # self._response.rowcount() contains rows retrieved from query
         except Exception as e:
             print(f'Exception: {e}')
             return None
 
-        if fetch == 'fetchone':
+        if action == 'fetchone':
             result = self._cur.fetchone()
-        elif fetch == 'fetchall':
+        elif action == 'fetchall':
             result = self._cur.fetchall()
+        elif action == 'commit':
+            self._conn.commit()
         return result
 
 
@@ -92,6 +96,7 @@ class SqliteDB:
 
 
     def close():
+        self._cur.close()
         self._conn.close()
 
 
