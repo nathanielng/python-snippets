@@ -20,12 +20,21 @@ objs = [
 ]
 
 class MyObject(flask_restful.Resource):
+
     def get(self, name):
         for obj in objs:
             if obj['name'] == name:
                 print(obj)
                 return obj
         return {'error': 'Resource not found'}
+
+    def post(self):
+        data = flask.request.get_json()
+        for obj in objs:
+             if obj['name'] == name:
+                 return {'error': 'Resource already exists'}
+        objs.append(data)
+
 
 api.add_resource(MyObject, '/object/<string:name>')
 
