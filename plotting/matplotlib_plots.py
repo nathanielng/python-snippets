@@ -9,7 +9,14 @@ import pandas as pd
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
+from matplotlib.ticker import FormatStrFormatter, MultipleLocator
 from pandas.plotting import scatter_matrix
+
+
+def area_under_curve(x, y):
+    n = x.shape[0]
+    area = np.trapz(y[:(n-1)//2+1], dx=x[1]).item()
+    return area
 
 
 def plot_xy(x, y, imgfile=None, figsize=(7, 5)):
@@ -29,11 +36,12 @@ def plot_xy2(x, y, title, label, imgfile=None, figsize=(10, 7)):
     plt.ylabel('$y$',fontsize=16,color='black')
     plt.xlim(x.min(),x.max())
     plt.ylim(y.min(),y.max())
-    lines = plt.plot(x,y,c='g',marker='o',lw=2,linestyle='--',label=label)
+    lines = plt.plot(x, y, c='g', marker='o', lw=2, linestyle='--', label=label)
 
     area = area_under_curve(x,y)
     plt.annotate(r"Area $\approx$ %.4f / $\pi$" % (area*np.pi),xy=(0.3,0.2), fontsize=14, color='white')
-    ax.fill_between(x,y,0.0,where=y>0.0,interpolate=True)
+    ax.fill_between(x, y, 0.0, where=y>0.0, interpolate=True,
+        facecolor='pink', alpha=0.5)
 
     plt.legend(loc=1,fontsize=14)
     ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
@@ -80,15 +88,15 @@ def create_sample(noise=0.05, n_pts=100, filename=None):
 def main(args):
     df = create_sample(filename=args.samplefile)
     if args.mode == '2d':
-        plot_xy(df.x, df.y, args.imgfile)
+        plot_xy2(df.x, df.y, title='2D Plot', label='sin(x) + noise', imgfile=args.imgfile)
     else:
-        plot_xyz(df.x,df.y,df.z,imgfile=args.imgfile)
+        plot_xyz(df.x, df.y, df.z, imgfile=args.imgfile)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--imgfile', help='Output image')
-    parser.add_argument('--samplefile', help='Sample datafile')
+    parser.add_argument('--imgfile', default='sample.png', help='Output image')
+    parser.add_argument('--samplefile', default=None, help='Sample datafile')
     parser.add_argument('--mode', default='2d', help='2d or 3d')
     args = parser.parse_args()
     main(args)
