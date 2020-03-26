@@ -2,7 +2,11 @@
 
 ## 1. Repository Creation
 
-### 1.1 New Repository
+### 1.1 New Local+Remote Repository
+
+Instructions for creating a new *local* repository,
+and pushing it to Github, thereby also creating a
+new *remote* repository.
 
 #### 1.1.1 First Commit
 
@@ -30,6 +34,31 @@ git tag v0.2
 git remote add origin https://github.com/{userid}/{reponame}.git
 git push origin --all
 git push origin --tags
+```
+
+### 1.2 Existing Local Repository, New Remote Repository
+
+Instructions for creating a new remote repository,
+from the contents of an existing local repository.
+
+#### 1.2.1 Add remote to an existing local git repository
+
+First create an empty repository on Github,
+then add the remote address to your existing local git repository.
+
+```bash
+git remote add {remote_name} git@github.com:{userid}/{reponame}.git
+```
+
+For *remote_name*, a typical choice is `origin` (this will not work
+if the git repo already has a remote named `origin`, in which case
+another choice will be necessary).
+
+
+#### 1.2.2 Pushing the local git repository to Github
+
+```bash
+git push -u {remote_name} master
 ```
 
 ## 2. Repository Management
