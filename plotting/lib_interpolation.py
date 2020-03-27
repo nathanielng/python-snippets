@@ -47,5 +47,34 @@ def create_x_for_interpolation(x):
     return min_x + np.arange(x_range+1)
 
 
+def extract_skip(x, y, skip):
+    return x.values[::skip], y.values[::skip]
+
+
+def interpolate_xy_lagrange(x, y):
+    new_x = create_x_for_interpolation(x.values)
+    fn = lagrange(x.values[::skip], y.values[::skip])
+    return new_x, fn(new_x)
+
+
+def interpolate_xy_interp1d(x, y):
+    new_x = create_x_for_interpolation(x.values[::skip])
+    fn = interp1d(x.values[::skip], y.values[::skip], kind=kind)
+    return new_x, fn(new_x)
+
+
+def interpolate_xy_lowess(x, y, frac):
+    new_x = create_x_for_interpolation(x.values)
+    new_xy = sm.nonparametric.lowess(y, x, frac=frac)
+    return new_xy[:, 0], new_xy[:, 1]
+
+
+def interpolate_xy_kernelreg(x, y):
+    new_x = create_x_for_interpolation(x.values)
+    kr = KernelReg(y, x, 'c')
+    new_y, _ = kr.fit(new_x)
+    return new_x, new_y
+
+
 if __name__ == "__main__":
     pass
