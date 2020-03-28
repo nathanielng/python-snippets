@@ -3,16 +3,26 @@
 import argparse
 import os
 import pandas as pd
+import warnings
 
 from sklearn import datasets, linear_model, svm
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
 
+
+warnings.filterwarnings('ignore')
 
 models = {
+    'dtr': DecisionTreeRegressor(),
     'linear': linear_model.LinearRegression(),
     'logistic': linear_model.LogisticRegression(),
-    'svr': svm.SVR()
+    'knr': KNeighborsRegressor(),
+    'svr': svm.SVR(),
+    'gbr': GradientBoostingRegressor(),
+    'rf': RandomForestRegressor(n_estimators=100, criterion='mse')
 }
 
 scores = {
@@ -74,6 +84,13 @@ if __name__ == "__main__":
     cols = ['fold', 'method'] + list(scores.keys())
     df = df[cols]
 
-    print('----- Results -----')
+    print('----- results.csv (raw) -----')
     print(df)
     df.to_csv('results.csv')
+
+    print('----- summary.csv (data averaged across k-folds) -----')
+    df_summary = df.groupby('method').agg(
+        {'MSE': 'mean', 'MAE': 'mean', 'r2': 'mean'})
+    print(df_summary)
+    df_summary.to_csv('summary.csv')
+    df_summary.sort_values('MSE', ascending=True).to_excel('summary.xlsx')
