@@ -21,6 +21,9 @@ models = {
     'logistic': linear_model.LogisticRegression(),
     'knr': KNeighborsRegressor(),
     'svr': svm.SVR(),
+    'svr_rbf': svm.SVR(kernel='rbf', C=100, gamma=0.1, epsilon=.1),
+    'svr_lin': svm.SVR(kernel='linear', C=100, gamma='auto'),
+    'svr_poly': svm.SVR(kernel='poly', C=100, gamma='auto', degree=3, epsilon=.1, coef0=1)
     'gbr': GradientBoostingRegressor(),
     'rf': RandomForestRegressor(n_estimators=100, criterion='mse')
 }
