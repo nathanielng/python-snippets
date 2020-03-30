@@ -8,6 +8,8 @@ __pycache__
 *.swp
 *.zip
 
+google_sheets_bookmarks.json
+
 cloud/chromedriver*
 cloud/webscrape*.sh
 cloud/webscrape_inputs*.txt
