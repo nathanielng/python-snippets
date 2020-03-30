@@ -3,6 +3,7 @@
 import argparse
 import os
 import pandas as pd
+import pickle
 import warnings
 
 from sklearn import datasets, linear_model, svm
@@ -11,6 +12,7 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
+from sklearn import preprocessing
 
 
 warnings.filterwarnings('ignore')
@@ -76,6 +78,17 @@ def run_kfold(X, y, n_splits=10):
     return pd.DataFrame(results)
 
 
+def create_single_model(model_name, X, y, filename=None):
+    model = models[model_name]
+    obj = model.fit(X, y)
+
+    if filename is None:
+        filename = f'{model_name}.pickle'
+    with open(filename, 'wb') as f:
+        pickle.dump(obj, f)
+    print(f'Saved: {filename}')
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--file')
@@ -92,8 +105,15 @@ if __name__ == "__main__":
     df.to_csv('results.csv')
 
     print('----- summary.csv (data averaged across k-folds) -----')
-    df_summary = df.groupby('method').agg(
-        {'MSE': 'mean', 'MAE': 'mean', 'r2': 'mean'})
+    df_summary = df.groupby('method').agg({
+        'MSE': ['mean', 'std'],
+        'MAE': ['mean', 'std'],
+        'r2': ['mean', 'std']
+    })
     print(df_summary)
     df_summary.to_csv('summary.csv')
-    df_summary.sort_values('MSE', ascending=True).to_excel('summary.xlsx')
+    df_summary = df_summary.sort_values(('MSE', 'mean'), ascending=True)
+    df_summary.to_excel('summary.xlsx')
+
+    best_model = df_summary.index[0]
+    create_single_model(best_model)
