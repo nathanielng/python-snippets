@@ -21,53 +21,19 @@ from bs4 import BeautifulSoup
 from email.parser import BytesParser
 
 
+# ----- Utilities Subroutines -----------------------------------------
 def print_links(links):
     for i, link in enumerate(links):
         print(f'{i}: {link}')
 
 
+# ----- HTML file handling --------------------------------------------
 def extract_links_from_html(filename):
     with open(filename) as f:
         html_txt = f.read()
     soup = BeautifulSoup(html_txt, 'html.parser')
     links = soup.find_all('a')
     return links
-
-
-def clean_txt(txt: str):
-    txt = re.sub(r'=3D', r'=', txt)    # Replace '=3D' with '='
-    txt = re.sub(r'=\r?\n', r'', txt)  # Replace '=\r?\n' with ''
-    return txt
-
-
-def extract_links_from_txt(txt: str):
-    """
-    Try to find links from text data in the forms:
-    1. <a href = "..." ...>
-    2. http://... or https://...
-    """
-    if not isinstance(txt, str):
-        print(f'Expected string, but input txt={txt}')
-        return []
-    txt = clean_txt(txt)
-
-    soup = BeautifulSoup(txt, 'html.parser')  # m = re.findall(r'<a href="(.*?)".*>', txt)
-    links = soup.find_all('a')
-    if len(links) > 0:
-        links2 = [link['href'] for link in links]
-        urls = [link for link in links2 if ('http://flip.it' not in link and 'https://flipboard.com' not in link) ]
-        urls = [link for link in urls if (
-            'http://zite.com' not in link and 'http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=419752338&mt=8' not in link)]
-    else:
-        urls = re.findall(r'https?\://.*', txt)
-    
-    if len(urls) == 0:
-        print(f'No URLs found in txt:\n{txt}')
-        return []
-    elif len(urls) == 1:
-        return urls[0]
-    else:
-        return urls
 
 
 def links2df(links):
@@ -101,8 +67,50 @@ def load_html_files(html_files):
     return df.drop_duplicates()
 
 
+# ----- EML Handling --------------------------------------------------
+def clean_txt(txt: str):
+    txt = re.sub(r'=3D', r'=', txt)    # Replace '=3D' with '='
+    txt = re.sub(r'=\r?\n', r'', txt)  # Replace '=\r?\n' with ''
+    return txt
+
+
+def extract_links_from_txt(txt: str):
+    """
+    Try to find links from text data in the forms:
+    1. <a href = "..." ...>
+    2. http://... or https://...
+    """
+    if not isinstance(txt, str):
+        print(f'Expected string, but input txt={txt}')
+        return []
+    txt = clean_txt(txt)
+
+    # m = re.findall(r'<a href="(.*?)".*>', txt)
+    soup = BeautifulSoup(txt, 'html.parser')
+    links = soup.find_all('a')
+    if len(links) > 0:
+        links2 = [link['href'] for link in links]
+        urls = [link for link in links2 if (
+            'http://flip.it' not in link and 'https://flipboard.com' not in link)]
+        urls = [link for link in urls if (
+            'http://zite.com' not in link and 'http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=419752338&mt=8' not in link)]
+    else:
+        urls = re.findall(r'https?\://.*', txt)
+
+    if len(urls) == 0:
+        print(f'No URLs found in txt:\n{txt}')
+        return []
+    elif len(urls) == 1:
+        return urls[0]
+    else:
+        return urls
+
+
 def read_emlx(filename):
-    # See also: https://github.com/mikez/emlx
+    """
+    Reads a .emlx file and returns the title, body, message flags/plist
+    See also: https://github.com/mikez/emlx
+    """
     msg = emlx.read(filename)
     if 'Subject' in msg.headers:
         title = msg.headers['Subject']
@@ -122,6 +130,9 @@ def read_emlx(filename):
 
 
 def read_eml(filename):
+    """
+    Reads a .eml file and returns the title, body, params, items
+    """
     with open(filename, 'rb') as f:
         data = BytesParser().parse(f)
     body = data.get_payload()
@@ -141,6 +152,10 @@ def read_eml(filename):
 
 
 def load_email_folder(folder):
+    """
+    Loads a folder containing .eml or .emlx files
+    and parses them for URLs
+    """
     path = os.path.expanduser(folder)
     eml_files = glob.glob(f'{path}/*.eml')
     emlx_files = glob.glob(f'{path}/*.emlx')
