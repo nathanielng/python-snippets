@@ -27,6 +27,18 @@ def print_links(links):
         print(f'{i}: {link}')
 
 
+# ----- HTML bookmarks file handling --------------------------------------------
+def load_safari_bookmarks(filename):
+    with open(filename) as f:
+        html_txt = f.read()
+    soup = BeautifulSoup(html_txt, 'html.parser')
+    h3_list = [h3.text for h3 in soup.find_all('h3')]
+    print(f"Categories: {', '.join(h3_list)}")
+    df = links2df(links=soup.find_all('a'))
+    print(df)
+    return df
+
+
 # ----- HTML file handling --------------------------------------------
 def extract_links_from_html(filename):
     with open(filename) as f:
@@ -188,14 +200,20 @@ def main(args):
             load_email_folder(folder=args.folder)
         )
         print(df.head(1).T)
+    if args.safari_bookmarks is not None:
+        df = df.append(
+            load_safari_bookmarks(filename=args.safari_bookmarks)
+        )
 
     df.to_csv(args.output, index=False)
+    print(f"Created file: {args.output}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--html', default=None, help='Comma-separated list of html files containing bookmarks')
     parser.add_argument('--folder', default=None, help='Folder containing eml/emlx files')
+    parser.add_argument('--safari_bookmarks', default=None, help='Safari-exported HTML bookmarks file')
     parser.add_argument('--output', default='bookmarks_manager.csv', help='Csv file for output dataframe')
     args = parser.parse_args()
     main(args)
