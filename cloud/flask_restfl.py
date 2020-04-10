@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+# Description:
+# - this is a demo project showing how flask-restful can be used.
+#
+# Requirements:
+# pip install Flask flask_restful
+
 import flask
 import flask_restful
 import webbrowser
@@ -19,12 +25,11 @@ objs = [
     }
 ]
 
-class MyObject(flask_restful.Resource):
+class MyObject(flask_restful. Resource):
 
     def get(self, name):
         for obj in objs:
             if obj['name'] == name:
-                print(obj)
                 return obj
         return {'error': 'Resource not found'}
 
@@ -40,6 +45,6 @@ api.add_resource(MyObject, '/object/<string:name>')
 
 
 if __name__ == "__main__":
-    webbrowser.open_new('http://127.0.0.1:5000/object/another_object')
+    webbrowser.open_new('http://127.0.0.1:5000/object/my_object')
     app.run(host='0.0.0.0', port=5000, debug=True)
 
