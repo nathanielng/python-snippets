@@ -62,13 +62,15 @@ def url_to_title(url):
     r = requests.get(url)
     html_txt = r.content.decode()
     soup = BeautifulSoup(html_txt, 'html5lib')
-    title = soup.title.string
-    if title is None:
+    if soup.title is None:
         title = '[Title not found]'
+    else:
+        title = soup.title.string
     return title.strip()
 
 
 def upload_clipboard():
+    print('Retrieving clipboard contents...')
     clipboard_txt = clipboard_get()
     if clipboard_txt.startswith('http'):
         print(f'Loading url: {clipboard_txt}')
