@@ -6,6 +6,9 @@
 # 3. Extracts title from the web page
 # 4. Appends [category, title, url] to a Google Drive Spreadsheet
 
+from pandas.io.clipboard import clipboard_get
+print(f'Clipboard text:\n{clipboard_get()}')
+
 import argparse
 import json
 import os
@@ -15,7 +18,6 @@ import sys
 
 from bs4 import BeautifulSoup
 from google_sheets import GoogleSpreadsheet
-from pandas.io.clipboard import clipboard_get
 
 
 HOME = os.getenv('HOME')
@@ -70,7 +72,6 @@ def url_to_title(url):
 
 
 def upload_clipboard():
-    print('Retrieving clipboard contents...')
     clipboard_txt = clipboard_get()
     if clipboard_txt.startswith('http'):
         print(f'Loading url: {clipboard_txt}')
@@ -84,10 +85,8 @@ def upload_clipboard():
         return None
 
 
-GS = open_spreadsheet()
-
-
 if __name__ == "__main__":
+    GS = open_spreadsheet()
     r = upload_clipboard()
     if r is None:
         GS.print_cell_data(i_start=-5)
