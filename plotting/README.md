@@ -1,8 +1,18 @@
 # Plotting
 
-## 1. Matplotlib
+## 1. Background
 
-### 1.1 Color Maps
+This folder contains code for data visualization using libraries such as
+`matplotlib`, `seaborn`, `bokeh` (for plotting with hover tools), and
+`drawille` (for ASCII plots).
+
+The file `azure_plots.py` is for use with Azure Machine Learning Studio
+projects. Azure automatically creates a visualization if
+custom code is added to a project, and that code generates a .png file.
+
+## 2. Matplotlib Snippets
+
+### 2.1 Color Maps
 
 ```python
 import matplotlib.pyplot as plt
@@ -14,7 +24,7 @@ cmap = plt.get_cmap("tab10")
 df.plot(..., color=cmap(i), ...)
 ```
 
-### 1.2 Annotation
+### 2.2 Annotation
 
 [`matplotlib.axes.Axes.annotate`](https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.annotate.html)`(self, s, xy, *args, **kwargs)`
 
