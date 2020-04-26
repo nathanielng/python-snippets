@@ -21,5 +21,5 @@ respository will serve as one of the places to put that code.
 - Machine Learning
 - Remote Storage (Dropbox, Google Drive / Google Sheets)
 - Remote Servers (AWS, SSH, PBS)
-- Visualization
+- [Visualization](https://nathanielng.github.io/python-snippets/plotting)
 - [Web Scraping](https://nathanielng.github.io/python-snippets/cloud)
