@@ -6,12 +6,13 @@ the psycopg2 library
 """
 
 import os
+import pandas as pd
 import psycopg2
 
 from psycopg2 import Error
 
 
-DATABASE_URL = os.getenv('DATABASE_URL', default=None)
+DATABASE_URL = os.getenv('DATABASE_URL', default='postgresql://localhost')
 
 
 class PostgresDB:
@@ -24,7 +25,9 @@ class PostgresDB:
             print(f'Unable to connect to {DATABASE_URL}')
             print(e)
     
-    
+    def __str__(self):
+        return f'PostgresDB connected at {DATABASE_URL}'
+
     def execute(self, cmd, action):
         cursor = self._conn.cursor()
         try:
@@ -43,11 +46,20 @@ class PostgresDB:
         cursor.close()
         return r
 
-
     def version(self):
         return self.execute('SELECT version();', action='fetchone')[0]
+
+    def pandas_query(self, query):
+        return pd.read_sql_query(query, self._conn)
+
+    def tables(self):
+        query = """SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema'"""
+        return self.pandas_query(query)
 
 
 if __name__ == "__main__":
     PDB = PostgresDB(DATABASE_URL)
+    print(PDB)
     print(PDB.version())
+    print(PDB.tables())
+
