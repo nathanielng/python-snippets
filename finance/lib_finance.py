@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Requirements:
-# pip install yfinance
+# pip install pandas-datareader yfinance
 
 # Parameter file in json format with the following keys:
 # - watch_list: list of stock symbols to watch
@@ -37,9 +37,17 @@ def main():
     stock_file = data["portfolio"]["stock_file"]
     dividend_file = data["portfolio"]["dividend_file"]
 
+    stocks = pd.read_csv(stock_file, header=1)
+    dividends = pd.read_csv(dividend_file, header=0).dropna(how='all')
+    earliest_date = stocks['Contract Date'].min()
+    print(f'Earliest date: {earliest_date}')
+
     print(json.dumps(watch_list, indent=2))
     print(json.dumps(ticker2name, indent=2))
     print(json.dumps(name2ticker, indent=2))
+
+    print(stocks)
+    print(dividends)
 
 
 if __name__ == "__main__":
