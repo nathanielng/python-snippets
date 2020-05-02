@@ -12,7 +12,17 @@ ps -f -u postgres
 netstat -nap | grep postgres
 ```
 
+Check for `psql`:
+
+```bash
+which psql
+```
+
 ### 1.2 User Setup
+
+```bash
+psql
+```
 
 From the PostgreSQL prompt
 
@@ -46,8 +56,9 @@ replace `database_name` with the name of the database.
 psql -U userid -d database_name
 psql -d database_name -U userid -h localhost -W
 psql -d database_name -U userid -h 127.0.0.1 -W
-psql -d postgresql://userid@hostname:5432/database_name
+psql -d postgresql://userid:password@hostname:5432/database_name
 psql -d "user=userid host=localhost port=5432 dbname=database_name"
+PGPASSWORD=password psql -h hostname -d database_name -U user_id
 ```
 
 **Note**: the `-W` option is to force the prompt for the password
