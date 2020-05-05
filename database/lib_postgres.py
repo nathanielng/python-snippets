@@ -39,11 +39,11 @@ class PostgresDB:
                 r = cursor.fetchmany()
             elif action == 'fetchall':
                 r = cursor.fetchall()
-        except Exception as e:
+        except (Exception, psycopg2.DatabaseError) as e:
             print(f'Failed to execute "{cmd}"')
             print(f'Exception: {e}')
-        
-        cursor.close()
+        finally:        
+            cursor.close()
         return r
 
     def version(self):
