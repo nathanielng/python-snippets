@@ -8,6 +8,7 @@ __pycache__
 *.swp
 *.zip
 
+databases.json
 google_sheets_bookmarks.json
 
 cloud/chromedriver*
