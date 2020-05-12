@@ -15,8 +15,10 @@ cloud/chromedriver*
 cloud/webscrape*.sh
 cloud/webscrape_inputs*.txt
 cloud/webscrape_results.html
+finance/s*.json
 other/bookmarks_manager.csv
 other/bookmarks_manager.sh
+other/*bookmarks.csv
 other/*Bookmarks.html
 plotting/sample*
 plotting/wireframe.svg
