@@ -36,3 +36,23 @@ df.plot(..., color=cmap(i), ...)
 
 - `horizontalalignment='left|center|right'`
 - `verticalalignment='top|center|bottom'`
+
+### 2.3 Plot backgrounds
+
+Matplotlib plot with a background image. Figure size is adjusted based on the size
+of the background image (note that the adjustment calculation does not take the
+space for axis labels and ticks into account).
+
+```python
+def plot_background_image(background_image, output_image, extent, h_pad=0.2, w_pad=0.2):
+    img = plt.imread(background_image)
+    img_height, img_width, _ = img.shape
+    dpi = plt.gcf().get_dpi()
+    fig, ax = plt.subplots(1, 1, figsize=(img_width/dpi + w_pad, img_height/dpi + h_pad))
+    ax.imshow(img, extent=extent, aspect='auto', alpha=0.7)
+    ax.grid(True, ls=':', alpha=0.5)
+    if output_image is not None:
+        plt.savefig(output_image, bbox_inches='tight', h_pad=0.2, w_pad=0.2)
+
+plot_background_image(img1, img2, extent=[-2.72, 8.39, 13.7, 1770])
+```
