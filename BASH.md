@@ -1,4 +1,4 @@
-## Bash
+## Bash & Command Line Tools
 
 ### 1. Clipboard tricks
 
@@ -58,3 +58,34 @@ curl -L -o 'outputfile' -C - [url]
 ```
 
 where `-L` is to follow redirects (HTTP 3xx status code)
+
+
+### 3. Tools for Video
+
+#### 3.1 ffmpeg
+
+Video file conversion (to make the video viewable on Mac OS X / Ubuntu)
+
+```bash
+ffmpeg -i input_video.mp4 -qscale 0 -pix_fmt yuv420p output_video.mp4
+```
+
+Image series to video conversion
+(if image sequence is `m01.png`, `m02.png`, ...)
+
+```bash
+ffmpeg -f image2 -i m%d.png -r [frame_rate] -b [bit_rate] -s [dimensions] video.avi
+ffmpeg -f image2 -i m%d.png -sameq -vcodec mjpeg video.avi
+ffmpeg -f image2 -i m%d.png -sameq video.mpeg
+ffmpeg -f image2 -i m%d.png -sameq video.mp4
+ffmpeg -f image2 -r 5 -i image-%04d.png -sameq -r 25 animation.mpeg
+ffmpeg -f image2 -r 5 -i image-%04d.png -qscale 0 -r 25 -vcodec libx264 -pix_fmt yuv420p animation.mp4
+ffmpeg -y -f image2 -i image%03d.png -q:v 0 -vcodec libx264 -pix_fmt yuv420p anim_loop.mp4
+```
+
+Video conversion to image series or gif file
+
+```bash
+ffmpeg -i animation.mp4 -r 10 output%05d.png
+convert output*.png output.gif
+```
