@@ -1,6 +1,10 @@
 # Remote
 
-## Remote file copy
+This folder deals with remote servers (AWS / GCP / Azure),
+remote services (Google Drive / Sheets), and
+remote computation (Google Colab)
+
+## 1. Remote file copy
 
 ### Option 1
 
@@ -22,4 +26,20 @@ Host my_remote_aws_instance
 
 ```bash
 rsync -avz $LOCALFILES my_remote_aws_instance:$REMOTE_FOLDER
+```
+
+## 2. Google Colaboratory
+
+### 2.1 Opening Github Jupyter notebooks on Colab
+
+For a Jupyter notebook, in a Github repository at the following location:
+
+```
+https://github.com/username/repo/blob/master/my_notebook.ipynb
+```
+
+Open the notebook in Colab using
+
+```
+http://colab.research/google.com/github/username/repo/blob/master/my_notebook.ipynb
 ```
