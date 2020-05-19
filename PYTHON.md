@@ -24,3 +24,33 @@ Examples (tuples and dictionaries)
 def my_function(xy: Tuple[int, int]=(0, 0), d: Dict[str, np.ndarray]):
     pass
 ```
+
+## 2. Jupyter Notebooks
+
+### 2.1 IPython magic - selected commands
+
+```python
+%cd
+%debug
+%env
+%load_ext
+%lsmagic
+%matplotlib inline
+%pip install [package]
+%precision
+%time
+%timeit
+%who, %whos, %who_ls
+%xmode
+```
+
+```python
+%%bash
+%%html
+%%javascript
+%%latex
+%%perl
+%%ruby
+%%svg
+%%writefile [-a] filename
+```
