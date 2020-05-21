@@ -16,6 +16,7 @@ cloud/webscrape*.sh
 cloud/webscrape_inputs*.txt
 cloud/webscrape_results.html
 finance/s*.json
+machine-learning/kaggle/leaderboard.sh
 other/bookmarks_manager.csv
 other/bookmarks_manager.sh
 other/*bookmarks.csv

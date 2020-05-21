@@ -59,6 +59,31 @@ curl -L -o 'outputfile' -C - [url]
 
 where `-L` is to follow redirects (HTTP 3xx status code)
 
+#### 2.3 ssh
+
+SSH to a remote server:
+
+```bash
+ssh hostname
+ssh user@hostname
+```
+
+Running commands on a remote server:
+
+```bash
+ssh hostname "command1; command2"
+ssh hostname ls -al
+ssh hostname "df -h; free -h"
+ssh hostname "ps aux"
+ssh hostname "netstat -natp"
+ssh hostname "sudo apt update && sudo apt -y upgrade"
+```
+
+Copying files from a remote server
+
+```bash
+rsync -avz hostname:filename .
+```
 
 ### 3. Tools for Video
 
