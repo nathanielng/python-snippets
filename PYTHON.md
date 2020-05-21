@@ -1,15 +1,25 @@
 # Python
 
-## 1. Type Hinting
+## 1. Lists
 
-### 1.1 Declarations
+1. Check that two lists, `l1`, `l2` are the same:
+   `assert set(l1) == set(l2)`
+
+## 2. Dictionaries
+
+1. Combine dictionaries `d1`, `d2` into `d3`:
+   `d3 = {**d1, **d2}`
+
+## 3. Type Hinting
+
+### 3.1 Declarations
 
 ```python
 from typing import Dict, List, Optional, Set, Tuple
 from typing import Callable, Iterator, Union
 ```
 
-### 1.2 Functions
+### 3.2 Functions
 
 Examples (basic types)
 
@@ -25,9 +35,9 @@ def my_function(xy: Tuple[int, int]=(0, 0), d: Dict[str, np.ndarray]):
     pass
 ```
 
-## 2. Jupyter Notebooks
+## 4. Jupyter Notebooks
 
-### 2.1 IPython magic - selected commands
+### 4.1 IPython magic - selected commands
 
 ```python
 %cd
