@@ -8,6 +8,8 @@ __pycache__
 *.swp
 *.zip
 
+sqlite_data.db
+
 databases.json
 google_sheets_bookmarks.json
 
