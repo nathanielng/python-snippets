@@ -23,3 +23,11 @@ respository will serve as one of the places to put that code.
 - Remote Servers (AWS, SSH, PBS)
 - [Visualization](https://nathanielng.github.io/python-snippets/plotting)
 - [Web Scraping](https://nathanielng.github.io/python-snippets/cloud)
+
+### Links Notes and Code Snippets
+
+- [Apps](https://nathanielng.github.io/python-snippets/APPS) to write Python code on mobile devices
+- [Bash & Command Line Tools](https://nathanielng.github.io/python-snippets/BASH)
+- [Search](https://nathanielng.github.io/python-snippets/FIND) tips to search for files and patterns in files
+
+
