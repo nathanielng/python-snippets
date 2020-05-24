@@ -24,10 +24,12 @@ respository will serve as one of the places to put that code.
 - [Visualization](https://nathanielng.github.io/python-snippets/plotting)
 - [Web Scraping](https://nathanielng.github.io/python-snippets/cloud)
 
-### Links Notes and Code Snippets
+### Miscellaneous Notes, Links and Code Snippets
 
 - [Apps](https://nathanielng.github.io/python-snippets/APPS) to write Python code on mobile devices
 - [Bash & Command Line Tools](https://nathanielng.github.io/python-snippets/BASH)
+- [Git](https://nathanielng.github.io/python-snippets/GIT) introduction & guide
+- [GNU Parallel](https://nathanielng.github.io/python-snippets/GNU_PARALLEL) - guide to a tool for running independent scripts concurrently, leveraging on multi-core processors
+- [Monitoring](https://nathanielng.github.io/python-snippets/MONITORING) - tools for profiling Python code
+- [Python](https://nathanielng.github.io/python-snippets/PYTHON) - general Python tips
 - [Search](https://nathanielng.github.io/python-snippets/FIND) tips to search for files and patterns in files
-
-
