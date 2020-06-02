@@ -1,2 +1,3 @@
+asyncpg
 psycopg2
 sqlalchemy

@@ -17,7 +17,9 @@ async def exec_query(query_str):
     conn = await asyncpg.connect(DATABASE_URL)
     values = await conn.fetch(query_str)
     await conn.close()
-    print(values)
+    for i, value in enumerate(values):
+        x = list(value.values())
+        print(f"{i}: {x}")
     return values
 
 

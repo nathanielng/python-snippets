@@ -1,4 +1,5 @@
 connexion
 flask
 selenium
+tweepy
 
