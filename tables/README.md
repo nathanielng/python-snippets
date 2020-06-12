@@ -28,3 +28,22 @@ df = pd.DataFrame(
           ['i', 'j', 'k']],
     columns=['a', 'b', 'c'], index=[1, 2, 3])
 ```
+
+3. Exploding a column
+
+
+```python
+df = pd.DataFrame({'A': ['1, 2, 3', 'X, Y', 'ZZZ'], 'B': [-1, -2, -3]})
+df.A = df.A.str.split(',')
+```
+
+```python
+>>> print(df.explode('A))
+     A  B
+0    1 -1
+0    2 -1
+0    3 -1
+1    X -2
+1    Y -2
+2  ZZZ -3
+```
