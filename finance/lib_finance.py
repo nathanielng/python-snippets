@@ -29,25 +29,37 @@ def invert_dictionary(d):
     return new_dict
 
 
+class Portfolio():
+
+    def __init__(self, parameter_file):
+        data = load_params(parameter_file)
+        self.watch_list = data['watch_list']
+        self.ticker2name = data['ticker2name']
+        self.name2ticker = invert_dictionary(self.ticker2name)
+        self.stock_file = data['portfolio']['stock_file']
+        self.dividend_file = data['portfolio']['dividend_file']
+
+    def load_csv_data(self):
+        self.stocks = pd.read_csv(self.stock_file, header=1)
+        self.dividends = pd.read_csv(self.dividend_file, header=0).dropna(how='all')
+
+    def info(self):
+        earliest_date = self.stocks['Contract Date'].min()
+        print(f'Earliest date: {earliest_date}')
+        print(json.dumps(self.ticker2name, indent=2))
+        print(json.dumps(self.name2ticker, indent=2))
+        print(self.stocks)
+        print(self.dividends)
+
+    def print_watch_list(self):
+        for ticker in self.watch_list:
+            print(ticker)
+
 def main():
-    data = load_params("stocks.json")
-    watch_list = data['watch_list']
-    ticker2name = data['ticker2name']
-    name2ticker = invert_dictionary(ticker2name)
-    stock_file = data["portfolio"]["stock_file"]
-    dividend_file = data["portfolio"]["dividend_file"]
-
-    stocks = pd.read_csv(stock_file, header=1)
-    dividends = pd.read_csv(dividend_file, header=0).dropna(how='all')
-    earliest_date = stocks['Contract Date'].min()
-    print(f'Earliest date: {earliest_date}')
-
-    print(json.dumps(watch_list, indent=2))
-    print(json.dumps(ticker2name, indent=2))
-    print(json.dumps(name2ticker, indent=2))
-
-    print(stocks)
-    print(dividends)
+    P = Portfolio("stocks.json")
+    P.load_csv_data()
+    P.info()
+    P.print_watch_list()
 
 
 if __name__ == "__main__":
