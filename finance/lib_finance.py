@@ -10,6 +10,7 @@
 #   - stock_file: file containing stock data
 #   - dividend_file: file containing dividend data
 
+import datetime
 import json
 import pandas as pd
 import pandas_datareader as pdr
@@ -27,6 +28,39 @@ def invert_dictionary(d):
     for k, v in d.items():
         new_dict[v] = k
     return new_dict
+
+
+def retrieve_ticker(ticker, start, end, src='yahoo'):
+    df = pdr.data.DataReader(ticker, src, start, end)
+    return df
+
+
+def retrieve_last_week(ticker, **kwargs):
+    end = datetime.datetime.now()
+    start = end - datetime.timedelta(days=7)
+    df = retrieve_ticker(ticker, start, end, **kwargs)
+    return df
+
+
+def retrieve_last_time_periods(ticker, periods={'last month': 30, 'last quarter': 90, 'last 6 months': 182, 'last year': 365, 'last 2 years': 730, 'last 5 years': 1825},
+                               **kwargs):
+    """
+    Retrieves data from 1 month, 3 months, 6 months,
+    1 year, 2 years, and 5 years ago.
+    Uses a 5 day window (in case of holidays)
+    """
+    now = datetime.datetime.now()
+    df = pd.DataFrame()
+    for label, days in periods.items():
+        dt1 = now - datetime.timedelta(days=days+2)
+        dt2 = now - datetime.timedelta(days=days-2)
+        df_temp = retrieve_ticker(ticker, dt1, dt2, **kwargs)
+        df_temp = df_temp.sort_values('Volume', ascending=False).iloc[0]
+        df_temp['Period'] = label
+        df = df.append(
+            df_temp
+        )
+    return df
 
 
 class Portfolio():
@@ -53,7 +87,13 @@ class Portfolio():
 
     def print_watch_list(self):
         for ticker in self.watch_list:
-            print(ticker)
+            stock_name = self.ticker2name[ticker]
+            print(f'----- {stock_name} ({ticker}) -----')
+            df = retrieve_last_week(ticker)
+            print(df)
+            df = retrieve_last_time_periods(ticker)
+            print(df)
+
 
 def main():
     P = Portfolio("stocks.json")
