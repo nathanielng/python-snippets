@@ -71,3 +71,28 @@ df['Day'] = df_DOB[2]
 0  Dog  2020-04-03  2020    04  03
 1  Cat  2020-05-04  2020    05  04
 ```
+
+### 1.4 Reading in data
+
+#### 1.4.1 CSV files
+
+```python
+df = pd.read_csv(csv_file)
+df = pd.read_csv(csv_file, delimiter=None, header='infer', names=None, index_col=None, usecols=None, dtype=None, skiprows=None, nrows=None, na_values=None, parse_dates=False, date_parser=None, comment=None, delim_whitespace=False, ...)
+```
+
+#### 1.4.2 Zip files
+
+To read in a csv that is inside a zip file
+
+```python
+import pandas as pd
+import zipfile
+
+with zipfile.ZipFile('my_file.zip') as z:
+    files = [ f.filename for f in z.filelist]
+    print('\n'.join(files))
+    df = pd.read_csv(
+        z.extract('file_to_extract.csv', path='folder_to_extract/'),
+    )
+```
