@@ -35,6 +35,23 @@ def my_function(xy: Tuple[int, int]=(0, 0), d: Dict[str, np.ndarray]):
     pass
 ```
 
+## 4. Functools
+
+### 4.1 Partials
+
+```python
+from functools import partial
+
+def my_function(x, a):
+    return x + a
+
+# Same as my_function(), but a = 2:
+new_function = partial(my_function, 2)
+
+# This assertion should be true
+assert new_function(100) == 102
+```
+
 ## 4. Jupyter Notebooks
 
 ### 4.1 IPython magic - selected commands
