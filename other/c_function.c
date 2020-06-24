@@ -15,17 +15,17 @@ double cfunc_double(double x, double a, double b)
 }
 
 int main(int argc, char *argv[]) {
-    float a = 2.0;
-    float b = 5.0;
-    float x = M_PI;
-    float y = cfunc_float(x, a, b);
-    printf("y = %.2f*cos(%f*%.2f) = %f\n", b, x, a, y);
+    float a1 = 2.0;
+    float b1 = 5.0;
+    float x1 = M_PI;
+    float y1 = cfunc_float(x1, a1, b1);
+    printf("y = %.2f*cos(%f*%.2f) = %f\n", b1, x1, a1, y1);
 
-    double c = 2.0;
-    double d = 5.0;
-    double v = M_PI;
-    double w = cfunc_double(x, a, b);
-    printf("y = %.2f*cos(%f*%.2f) = %f\n", d, v, c, w);
+    double a2 = 2.0;
+    double b2 = 5.0;
+    double x2 = M_PI;
+    double y2 = cfunc_double(x2, a2, b2);
+    printf("y = %.2f*cos(%f*%.2f) = %f\n", b2, x2, a2, y2);
 
     return 0;
 }
