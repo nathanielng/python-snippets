@@ -52,9 +52,9 @@ new_function = partial(my_function, 2)
 assert new_function(100) == 102
 ```
 
-## 4. Jupyter Notebooks
+## 5. Jupyter Notebooks
 
-### 4.1 IPython magic - selected commands
+### 5.1 IPython magic - selected commands
 
 ```python
 %cd
