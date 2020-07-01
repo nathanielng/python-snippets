@@ -16,10 +16,18 @@ Assign the last S3 bucket listed to an environment variable
 S3_BUCKET=`aws s3 ls | tail -1 | cut -d ' ' -f 3`
 ```
 
-### 1.2 List files in an S3 Bucket
+### 1.2 S3 Bucket Files - listing, copying & synchronising
 
+Listing files in an S3 Bucket
 ```bash
 aws s3 ls s3://$S3_BUCKET
+```
+
+Copying files to an S3 Bucket
+
+```bash
+aws s3 cp filename s3://$S3_BUCKET
+aws s3 sync path/to/folder s3://$S3_BUCKET
 ```
 
 ### 1.3 Boto3 - Presigned URLs
