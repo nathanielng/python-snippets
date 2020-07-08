@@ -47,10 +47,10 @@ class TZTable():
 
 if __name__ == "__main__":
     TZT = TZTable({
-        'Person A': -7,
-        'Person B': 0,
-        'Person C': 2,
-        'Person D': 8
+        'UTC-7': -7,
+        'UTC+0': 0,
+        'UTC+2': 2,
+        'UTC+8': 8
     })
     df = TZT.generate_dataframe()
     print(df)
