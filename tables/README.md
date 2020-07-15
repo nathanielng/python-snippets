@@ -96,3 +96,21 @@ with zipfile.ZipFile('my_file.zip') as z:
         z.extract('file_to_extract.csv', path='folder_to_extract/'),
     )
 ```
+
+#### 1.4.3 Excel files
+
+To read in the first sheet of a single Excel file:
+
+```python
+xl_file = 'filename.xlsx'
+df = pd.read_excel(xl_file)
+```
+
+To read in multiple sheets of an Excel file:
+
+```python
+with pd.ExcelFile(xl_file) as f:
+    df1 = pd.read_excel(f, sheet_name='Sheet1')
+    df2 = pd.read_excel(f, sheet_name='Sheet2')
+    ...
+```
