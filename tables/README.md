@@ -114,3 +114,21 @@ with pd.ExcelFile(xl_file) as f:
     df2 = pd.read_excel(f, sheet_name='Sheet2')
     ...
 ```
+
+### 1.5 Finding NAs
+
+To return the count and fraction of NAs in a Pandas DataFrame
+
+```python
+def find_NAs(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Return the count and fraction of NAs in a DataFrame
+    """
+    n = len(df)
+    NAs = df.isna().sum()
+    NAs = NAs[NAs > 0].sort_values(ascending=False)
+    return pd.DataFrame({
+        'Count': NAs.values,
+        'Fraction': NAs.values / n
+    }, index=NAs.index)
+```
