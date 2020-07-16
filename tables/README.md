@@ -72,13 +72,21 @@ df['Day'] = df_DOB[2]
 1  Cat  2020-05-04  2020    05  04
 ```
 
-### 1.4 Reading in data
+### 1.4 Reading / Writing Data
 
 #### 1.4.1 CSV files
+
+Reading from CSV files
 
 ```python
 df = pd.read_csv(csv_file)
 df = pd.read_csv(csv_file, delimiter=None, header='infer', names=None, index_col=None, usecols=None, dtype=None, skiprows=None, nrows=None, na_values=None, parse_dates=False, date_parser=None, comment=None, delim_whitespace=False, ...)
+```
+
+To write to a CSV file, with the index dropped
+
+```python
+df.to_csv(csv_file, index=False)
 ```
 
 #### 1.4.2 Zip files
@@ -99,19 +107,34 @@ with zipfile.ZipFile('my_file.zip') as z:
 
 #### 1.4.3 Excel files
 
-To read in the first sheet of a single Excel file:
+To read in the first sheet of a single Excel file
 
 ```python
 xl_file = 'filename.xlsx'
 df = pd.read_excel(xl_file)
 ```
 
-To read in multiple sheets of an Excel file:
+To read in multiple sheets of an Excel file
 
 ```python
 with pd.ExcelFile(xl_file) as f:
     df1 = pd.read_excel(f, sheet_name='Sheet1')
     df2 = pd.read_excel(f, sheet_name='Sheet2')
+    ...
+```
+
+To write to a single Excel file, with the index dropped:
+
+```python
+df.to_excel(xl_file, index=False)
+```
+
+To write multiple Pandas DataFrames to an Excel file:
+
+```python
+with pd.ExcelWriter(xl_file) as f:
+    df1.to_excel(f, 'Sheet1')
+    df2.to_excel(f, 'Sheet2')
     ...
 ```
 
