@@ -155,3 +155,25 @@ def find_NAs(df: pd.DataFrame) -> pd.DataFrame:
         'Fraction': NAs.values / n
     }, index=NAs.index)
 ```
+
+### 1.6 Duplicated Rows
+
+```python
+def get_duplicated_rows(df):
+    return df[df.duplicated(keep='first')]
+
+def count_duplicated_rows(df):
+    return df.duplicated(keep='first').sum()
+
+def drop_duplicated_rows(df):
+    return df[~df.duplicated(keep='first')]
+```
+
+### 1.7 Correlation Matrix
+
+To obtain the correlation matrix for a dataframe
+
+```python
+df = df.drop(columns=...)  # Remove all the columns that you don't need
+correlation_matrix = df.corr()
+```
