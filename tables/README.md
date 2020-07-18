@@ -177,3 +177,14 @@ To obtain the correlation matrix for a dataframe
 df = df.drop(columns=...)  # Remove all the columns that you don't need
 correlation_matrix = df.corr()
 ```
+
+### 1.8 Profiling
+
+To use Pandas Profiler, for output within a Jupyter Notebook
+
+```python
+from pandas_profiling import ProfileReport
+
+profile = ProfileReport(df, title="Report Title", explorative=True, minimal=False)
+profile.to_notebook_iframe()
+```
