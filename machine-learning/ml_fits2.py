@@ -7,11 +7,17 @@ import pickle
 import warnings
 
 from sklearn import datasets, linear_model, svm
-from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier. RandomForestRegressor
+from sklearn.linear_model import SGDClassifier, LogisticRegression, RidgeClassifier
 from sklearn.model_selection import KFold
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+from sklearn.neural_network import MLPClassifier
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import accuracy_score, average_precision_score, f1_score, precision_score, recall_score, roc_auc_score
+
 from sklearn import preprocessing
 
 
@@ -25,7 +31,7 @@ models = {
     'svr': svm.SVR(),
     'svr_rbf': svm.SVR(kernel='rbf', C=100, gamma=0.1, epsilon=.1),
     'svr_lin': svm.SVR(kernel='linear', C=100, gamma='auto'),
-    'svr_poly': svm.SVR(kernel='poly', C=100, gamma='auto', degree=3, epsilon=.1, coef0=1)
+    'svr_poly': svm.SVR(kernel='poly', C=100, gamma='auto', degree=3, epsilon=.1, coef0=1),
     'gbr': GradientBoostingRegressor(),
     'rf': RandomForestRegressor(n_estimators=100, criterion='mse')
 }
@@ -36,6 +42,25 @@ scores = {
     'r2': r2_score
 }
 
+classification_models = {
+    'sgd': SGDClassifier(),
+    'ridge': RidgeClassifier(),
+    'logistic': LogisticRegression(multi_class='multinomial'),
+    'gnb': GaussianNB(),
+    'knr': KNeighborsClassifier(),
+    'mlp': MLPClassifier(),
+    'dtc': DecisionTreeClassifier(),
+    'rf': RandomForestClassifier()
+}
+
+classification_scores = {
+    'acc': accuracy_score,
+    'avg_precision': average_precision_score,
+    'f1': f1_score,
+    'precision': precision_score,
+    'recall': recall_score,
+    'roc': roc_auc_score
+}
 
 def load_xy(filename):
     prefix, ext = os.path.splitext(filename)
@@ -89,12 +114,8 @@ def create_single_model(model_name, X, y, filename=None):
     print(f'Saved: {filename}')
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--file')
-    args = parser.parse_args()
-
-    X, y = load_xy(args.file)
+def get_summary(filename: str):
+    X, y = load_xy(filename)
     df = run_kfold(X, y, 10)
 
     cols = ['fold', 'method'] + list(scores.keys())
@@ -116,4 +137,14 @@ if __name__ == "__main__":
     df_summary.to_excel('summary.xlsx')
 
     best_model = df_summary.index[0]
-    create_single_model(best_model)
+    create_single_model(best_model, X, y)
+
+    return df_summary
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--file', help='Input .csv file')
+    args = parser.parse_args()
+
+    df_summary = get_summary(args.file)
