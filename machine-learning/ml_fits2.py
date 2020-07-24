@@ -6,7 +6,7 @@ import pandas as pd
 import pickle
 import warnings
 
-from sklearn import datasets, linear_model, svm
+from sklearn import datasets, linear_model, preprocessing, svm
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier. RandomForestRegressor
 from sklearn.linear_model import SGDClassifier, LogisticRegression, RidgeClassifier
 from sklearn.model_selection import KFold
@@ -18,7 +18,7 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.metrics import accuracy_score, average_precision_score, f1_score, precision_score, recall_score, roc_auc_score
 
-from sklearn import preprocessing
+from typing import Any, Dict, Optional
 
 
 warnings.filterwarnings('ignore')
@@ -62,18 +62,22 @@ classification_scores = {
     'roc': roc_auc_score
 }
 
-def load_xy(filename):
+def load_xy(filename: str):
     prefix, ext = os.path.splitext(filename)
     if ext == '.xlsx':
         df = pd.read_excel(filename, index_col=0)
     elif ext == '.csv':
         df = pd.read_csv(filename, index_col=0)
+    else:
+        print('Unable to load file with unknown extension')
+        return None, None
     X = df.iloc[:, :-1]
     y = df.iloc[:, -1]
     return X.values, y.values
 
 
-def evaluate(model, X_train, y_train, X_test, y_test, scores):
+def evaluate(model: Any, X_train: np.ndarray, y_train: np.ndarray,
+             X_test: np.ndarray, y_test: np.ndarray, scores: Dict[str, Any]):
     obj = model.fit(X_train, y_train)
     y_pred = obj.predict(X_test)
 
@@ -83,7 +87,7 @@ def evaluate(model, X_train, y_train, X_test, y_test, scores):
     return results
 
 
-def run_kfold(X, y, n_splits=10):
+def run_kfold(X: np.ndarray, y: np.ndarray, n_splits: int = 10):
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=12345)
 
     results = []
@@ -103,7 +107,8 @@ def run_kfold(X, y, n_splits=10):
     return pd.DataFrame(results)
 
 
-def create_single_model(model_name, X, y, filename=None):
+def create_single_model(model_name: str, X: np.ndarray, y: np.ndarray,
+                        filename: Optional[str] = None):
     model = models[model_name]
     obj = model.fit(X, y)
 
