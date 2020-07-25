@@ -178,7 +178,27 @@ df = df.drop(columns=...)  # Remove all the columns that you don't need
 correlation_matrix = df.corr()
 ```
 
-### 1.8 Profiling
+### 1.8 Replace column with one-hot-encoded columns
+
+```python
+def create_dummies_fn(series: pd.Series,
+                      new_columns: Dict[int, str]) -> pd.DataFrame:
+    return pd.get_dummies(series).rename(
+        columns=new_columns
+    })
+
+def replace_column_with_dummies(df: pd.DataFrame,
+                                column_to_replace: str,
+                                new_columns: Dict[int, str],
+                                create_dummies_fn: Callable[..., pd.DataFrame]) -> pd.DataFrame:
+    df_dummies = create_dummies_fn(df[column_to_replace], new_columns)
+    return pd.concat(
+        (df.drop(columns=[col]), df_dummies),
+        axis=1
+    )
+```
+
+### 1.9 Profiling
 
 To use Pandas Profiler, for output within a Jupyter Notebook
 
