@@ -18,12 +18,12 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.metrics import accuracy_score, average_precision_score, f1_score, precision_score, recall_score, roc_auc_score
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Literal, Optional
 
 
 warnings.filterwarnings('ignore')
 
-models = {
+regression_models = {
     'dtr': DecisionTreeRegressor(),
     'linear': linear_model.LinearRegression(),
     'logistic': linear_model.LogisticRegression(),
@@ -36,7 +36,7 @@ models = {
     'rf': RandomForestRegressor(n_estimators=100, criterion='mse')
 }
 
-scores = {
+regression_scores = {
     'MSE': mean_squared_error,
     'MAE': mean_absolute_error,
     'r2': r2_score
@@ -87,7 +87,8 @@ def evaluate(model: Any, X_train: np.ndarray, y_train: np.ndarray,
     return results
 
 
-def run_kfold(X: np.ndarray, y: np.ndarray, n_splits: int = 10):
+def run_kfold(X: np.ndarray, y: np.ndarray, models: Dict[str, Any],
+              n_splits: int = 10):
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=12345)
 
     results = []
@@ -107,23 +108,30 @@ def run_kfold(X: np.ndarray, y: np.ndarray, n_splits: int = 10):
     return pd.DataFrame(results)
 
 
-def create_single_model(model_name: str, X: np.ndarray, y: np.ndarray,
+def create_single_model(model: Any, X: np.ndarray, y: np.ndarray,
                         filename: Optional[str] = None):
-    model = models[model_name]
     obj = model.fit(X, y)
 
     if filename is None:
-        filename = f'{model_name}.pickle'
+        filename = f'model.pickle'
     with open(filename, 'wb') as f:
         pickle.dump(obj, f)
     print(f'Saved: {filename}')
 
 
-def get_summary(filename: str):
-    X, y = load_xy(filename)
-    df = run_kfold(X, y, 10)
+def get_summary(filename: str, task: Literal['classification', 'regression']):
+    global models_regression
+    global models_classification
 
-    cols = ['fold', 'method'] + list(scores.keys())
+    if task == 'regression':
+        models = regression_models
+        cols = ['fold', 'method'] + list(regression_scores.keys())
+    else:
+        models = classification_models
+        cols = ['fold', 'method'] + list(classification_scores.keys())
+
+    X, y = load_xy(filename)
+    df = run_kfold(X, y, models, n_splits=10)    
     df = df[cols]
 
     print('----- results.csv (raw) -----')
@@ -131,17 +139,35 @@ def get_summary(filename: str):
     df.to_csv('results.csv')
 
     print('----- summary.csv (data averaged across k-folds) -----')
-    df_summary = df.groupby('method').agg({
-        'MSE': ['mean', 'std'],
-        'MAE': ['mean', 'std'],
-        'r2': ['mean', 'std']
-    })
-    print(df_summary)
-    df_summary.to_csv('summary.csv')
-    df_summary = df_summary.sort_values(('MSE', 'mean'), ascending=True)
-    df_summary.to_excel('summary.xlsx')
+    if task == 'regression':
+        df_summary = df.groupby('method').agg({
+            'MSE': ['mean', 'std'],
+            'MAE': ['mean', 'std'],
+            'r2': ['mean', 'std']
+        })
+    else:
+        df_summary = df.groupby('method').agg({
+            'acc': ['mean', 'std'],
+            'avg_precision': ['mean', 'std'],
+            'f1': ['mean', 'std'],
+            'precision': ['mean', 'std'],
+            'recall': ['mean', 'std'],
+            'roc': ['mean', 'std']
+        })
 
     best_model = df_summary.index[0]
+
+    print(df_summary)
+    df_summary.to_csv('summary.csv')
+
+    if task == 'regression':
+        df_summary = df_summary.sort_values(('MSE', 'mean'), ascending=True)
+        best_model = regression_models[best_model]
+    else:
+        df_summary = df_summary.sort_values(('acc', 'mean'), ascending=False)
+        best_model = classification_models[best_model]
+    df_summary.to_excel('summary.xlsx')
+
     create_single_model(best_model, X, y)
 
     return df_summary
@@ -150,6 +176,10 @@ def get_summary(filename: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', help='Input .csv file')
+    parser.add_argument('--task', choice=['regresssion', 'classification'])
     args = parser.parse_args()
 
-    df_summary = get_summary(args.file)
+    df_summary = get_summary(
+        filename=args.file,
+        task=args.task
+    )
