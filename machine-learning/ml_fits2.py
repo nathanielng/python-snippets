@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
 import argparse
+import numpy as np
 import os
 import pandas as pd
 import pickle
 import warnings
 
-from sklearn import datasets, linear_model, preprocessing, svm
-from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier. RandomForestRegressor
+from sklearn import linear_model, preprocessing, svm
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import SGDClassifier, LogisticRegression, RidgeClassifier
 from sklearn.model_selection import KFold
 from sklearn.naive_bayes import GaussianNB
@@ -18,7 +19,7 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.metrics import accuracy_score, average_precision_score, f1_score, precision_score, recall_score, roc_auc_score
 
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 
 warnings.filterwarnings('ignore')
@@ -42,6 +43,12 @@ regression_scores = {
     'r2': r2_score
 }
 
+regression_summary = {
+    'MSE': ['mean', 'std'],
+    'MAE': ['mean', 'std'],
+    'r2': ['mean', 'std']
+}
+
 classification_models = {
     'sgd': SGDClassifier(),
     'ridge': RidgeClassifier(),
@@ -62,16 +69,25 @@ classification_scores = {
     'roc': roc_auc_score
 }
 
+classification_summary = {
+    'acc': ['mean', 'std'],
+    'avg_precision': ['mean', 'std'],
+    'f1': ['mean', 'std'],
+    'precision': ['mean', 'std'],
+    'recall': ['mean', 'std'],
+    'roc': ['mean', 'std']
+}
+
 def load_xy(filename: str):
     prefix, ext = os.path.splitext(filename)
     if ext == '.xlsx':
-        df = pd.read_excel(filename, index_col=0)
+        df = pd.read_excel(filename, index_col=0).dropna()
     elif ext == '.csv':
-        df = pd.read_csv(filename, index_col=0)
+        df = pd.read_csv(filename, index_col=0).dropna()
     else:
         print('Unable to load file with unknown extension')
         return None, None
-    X = df.iloc[:, :-1]
+    X = df.iloc[:, :-1]._get_numeric_data()
     y = df.iloc[:, -1]
     return X.values, y.values
 
@@ -88,7 +104,7 @@ def evaluate(model: Any, X_train: np.ndarray, y_train: np.ndarray,
 
 
 def run_kfold(X: np.ndarray, y: np.ndarray, models: Dict[str, Any],
-              n_splits: int = 10):
+              scores: Dict[str, Any], n_splits: int = 10):
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=12345)
 
     results = []
@@ -119,67 +135,58 @@ def create_single_model(model: Any, X: np.ndarray, y: np.ndarray,
     print(f'Saved: {filename}')
 
 
-def get_summary(filename: str, task: Literal['classification', 'regression']):
-    global models_regression
-    global models_classification
+def run_ML(csv_file: str,
+           models: Dict[str, Callable[..., float]],
+           scores: Dict[str, Callable[..., float]],
+           summary: Dict[str, List[str]]):
+    X, y = load_xy(csv_file)
 
-    if task == 'regression':
-        models = regression_models
-        cols = ['fold', 'method'] + list(regression_scores.keys())
-    else:
-        models = classification_models
-        cols = ['fold', 'method'] + list(classification_scores.keys())
+    scaler = preprocessing.MinMaxScaler()
+    X_scaled = scaler.fit_transform(X)
+    df_raw = run_kfold(X_scaled, y, models, scores, 10)
 
-    X, y = load_xy(filename)
-    df = run_kfold(X, y, models, n_splits=10)    
-    df = df[cols]
+    cols = ['fold', 'method'] + list(scores.keys())
+    df_raw = df_raw[cols]
 
     print('----- results.csv (raw) -----')
-    print(df)
-    df.to_csv('results.csv')
+    print(df_raw)
+    df_raw.to_csv('results.csv')
 
     print('----- summary.csv (data averaged across k-folds) -----')
-    if task == 'regression':
-        df_summary = df.groupby('method').agg({
-            'MSE': ['mean', 'std'],
-            'MAE': ['mean', 'std'],
-            'r2': ['mean', 'std']
-        })
-    else:
-        df_summary = df.groupby('method').agg({
-            'acc': ['mean', 'std'],
-            'avg_precision': ['mean', 'std'],
-            'f1': ['mean', 'std'],
-            'precision': ['mean', 'std'],
-            'recall': ['mean', 'std'],
-            'roc': ['mean', 'std']
-        })
-
-    best_model = df_summary.index[0]
-
+    df_summary = df_raw.groupby('method').agg(summary)
     print(df_summary)
+    return df_summary
+
+
+def run_classification(df: pd.DataFrame, sort_by: str = 'acc'):
+    df_summary = run_ML(df, classification_models, classification_scores, classification_summary)
     df_summary.to_csv('summary.csv')
-
-    if task == 'regression':
-        df_summary = df_summary.sort_values(('MSE', 'mean'), ascending=True)
-        best_model = regression_models[best_model]
-    else:
-        df_summary = df_summary.sort_values(('acc', 'mean'), ascending=False)
-        best_model = classification_models[best_model]
+    df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=True)
     df_summary.to_excel('summary.xlsx')
+    return df_summary
 
-    create_single_model(best_model, X, y)
 
+def run_regression(df: pd.DataFrame, sort_by: str = 'MSE'):
+    df_summary = run_ML(df, regression_models, regression_scores, regression_summary)
+    df_summary.to_csv('summary.csv')
+    df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=True)
+    df_summary.to_excel('summary.xlsx')
     return df_summary
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', help='Input .csv file')
-    parser.add_argument('--task', choice=['regresssion', 'classification'])
+    parser.add_argument('--task', choices=['regression', 'classification'])
     args = parser.parse_args()
 
-    df_summary = get_summary(
-        filename=args.file,
-        task=args.task
-    )
+    if args.task == 'regression':
+        df_summary = run_regression(args.file)
+    elif args.task == 'classification':
+        df_summary = run_classification(args.file)
+    else:
+        quit()
+
+    best_model = df_summary.index[0]
+    print(best_model)
+    # create_single_model(best_model, X, y)
