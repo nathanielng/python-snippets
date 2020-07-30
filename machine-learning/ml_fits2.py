@@ -78,8 +78,9 @@ classification_summary = {
     'roc': ['mean', 'std']
 }
 
-def load_xy(filename: str):
-    prefix, ext = os.path.splitext(filename)
+
+def load_xy(filename: str, target_col: int):
+    _, ext = os.path.splitext(filename)
     if ext == '.xlsx':
         df = pd.read_excel(filename, index_col=0).dropna()
     elif ext == '.csv':
@@ -87,8 +88,13 @@ def load_xy(filename: str):
     else:
         print('Unable to load file with unknown extension')
         return None, None
-    X = df.iloc[:, :-1]._get_numeric_data()
-    y = df.iloc[:, -1]
+    if target_col == -1:
+        X = df.iloc[:, :-1]._get_numeric_data()
+        y = df.iloc[:, -1]
+    else:
+        feature_cols = [x for x in df.columns if x != df.columns[target_col]]
+        X = df.loc[:, feature_cols]._get_numeric_data()
+        y = df.iloc[:, target_col]
     return X.values, y.values
 
 
@@ -99,7 +105,12 @@ def evaluate(model: Any, X_train: np.ndarray, y_train: np.ndarray,
 
     results = {}
     for score_name, score_fn in scores.items():
-        results[score_name] = score_fn(y_test, y_pred)
+        try:
+            results[score_name] = score_fn(y_test, y_pred)
+        except ValueError as e:
+            # if e == 'multiclass format is not supported':
+            print(e)
+            results[score_name] = np.nan
     return results
 
 
@@ -135,11 +146,11 @@ def create_single_model(model: Any, X: np.ndarray, y: np.ndarray,
     print(f'Saved: {filename}')
 
 
-def run_ML(csv_file: str,
+def run_ML(csv_file: str, target_col: int,
            models: Dict[str, Callable[..., float]],
            scores: Dict[str, Callable[..., float]],
            summary: Dict[str, List[str]]):
-    X, y = load_xy(csv_file)
+    X, y = load_xy(csv_file, target_col)
 
     scaler = preprocessing.MinMaxScaler()
     X_scaled = scaler.fit_transform(X)
@@ -158,16 +169,16 @@ def run_ML(csv_file: str,
     return df_summary
 
 
-def run_classification(df: pd.DataFrame, sort_by: str = 'acc'):
-    df_summary = run_ML(df, classification_models, classification_scores, classification_summary)
+def run_classification(csv_file: str, target_col: int, sort_by: str = 'acc'):
+    df_summary = run_ML(csv_file, target_col, classification_models, classification_scores, classification_summary)
     df_summary.to_csv('summary.csv')
     df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=True)
     df_summary.to_excel('summary.xlsx')
     return df_summary
 
 
-def run_regression(df: pd.DataFrame, sort_by: str = 'MSE'):
-    df_summary = run_ML(df, regression_models, regression_scores, regression_summary)
+def run_regression(csv_file: str, target_col: int, sort_by: str = 'MSE'):
+    df_summary = run_ML(csv_file, target_col, regression_models, regression_scores, regression_summary)
     df_summary.to_csv('summary.csv')
     df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=True)
     df_summary.to_excel('summary.xlsx')
@@ -176,17 +187,19 @@ def run_regression(df: pd.DataFrame, sort_by: str = 'MSE'):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--file', help='Input .csv file')
-    parser.add_argument('--task', choices=['regression', 'classification'])
+    parser.add_argument('--file', type=str, help='Input .csv file')
+    parser.add_argument('--target_col', type=int, default=-1, help='Target Column')
+    parser.add_argument('--task', type=str, choices=['regression', 'classification'])
     args = parser.parse_args()
 
     if args.task == 'regression':
-        df_summary = run_regression(args.file)
+        df_summary = run_regression(args.file, args.target_col)
     elif args.task == 'classification':
-        df_summary = run_classification(args.file)
+        df_summary = run_classification(args.file, args.target_col)
     else:
         quit()
 
+    print(df_summary)
     best_model = df_summary.index[0]
     print(best_model)
     # create_single_model(best_model, X, y)
