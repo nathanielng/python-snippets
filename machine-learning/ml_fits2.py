@@ -7,17 +7,13 @@ import pandas as pd
 import pickle
 import warnings
 
-from sklearn import linear_model, preprocessing, svm
-from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier, RandomForestRegressor
-from sklearn.linear_model import SGDClassifier, LogisticRegression, RidgeClassifier
+from sklearn import ensemble, linear_model, naive_bayes, neighbors, neural_network
+from sklearn import preprocessing, svm, tree
 from sklearn.model_selection import KFold
-from sklearn.naive_bayes import GaussianNB
-from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
-from sklearn.neural_network import MLPClassifier
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.metrics import accuracy_score, average_precision_score, f1_score, precision_score, recall_score, roc_auc_score
+from sklearn.metrics import accuracy_score, average_precision_score, f1_score, precision_score
+from sklearn.metrics import recall_score, roc_auc_score
 
 from typing import Any, Callable, Dict, List, Optional
 
@@ -25,16 +21,16 @@ from typing import Any, Callable, Dict, List, Optional
 warnings.filterwarnings('ignore')
 
 regression_models = {
-    'dtr': DecisionTreeRegressor(),
+    'dtr': tree.DecisionTreeRegressor(),
     'linear': linear_model.LinearRegression(),
     'logistic': linear_model.LogisticRegression(),
-    'knr': KNeighborsRegressor(),
+    'knr': neighbors.KNeighborsRegressor(),
     'svr': svm.SVR(),
     'svr_rbf': svm.SVR(kernel='rbf', C=100, gamma=0.1, epsilon=.1),
     'svr_lin': svm.SVR(kernel='linear', C=100, gamma='auto'),
     'svr_poly': svm.SVR(kernel='poly', C=100, gamma='auto', degree=3, epsilon=.1, coef0=1),
-    'gbr': GradientBoostingRegressor(),
-    'rf': RandomForestRegressor(n_estimators=100, criterion='mse')
+    'gbr': ensemble.GradientBoostingRegressor(),
+    'rf': ensemble.RandomForestRegressor(n_estimators=100, criterion='mse')
 }
 
 regression_scores = {
@@ -50,14 +46,14 @@ regression_summary = {
 }
 
 classification_models = {
-    'sgd': SGDClassifier(),
-    'ridge': RidgeClassifier(),
-    'logistic': LogisticRegression(multi_class='multinomial'),
-    'gnb': GaussianNB(),
-    'knr': KNeighborsClassifier(),
-    'mlp': MLPClassifier(),
-    'dtc': DecisionTreeClassifier(),
-    'rf': RandomForestClassifier()
+    'sgd': linear_model.SGDClassifier(),
+    'ridge': linear_model.RidgeClassifier(),
+    'logistic': linear_model.LogisticRegression(multi_class='multinomial'),
+    'gnb': naive_bayes.GaussianNB(),
+    'knr': neighbors.KNeighborsClassifier(),
+    'mlp': neural_network.MLPClassifier(),
+    'dtc': tree.DecisionTreeClassifier(),
+    'rf': ensemble.RandomForestClassifier()
 }
 
 classification_scores = {
@@ -154,7 +150,7 @@ def run_ML(csv_file: str, target_col: int,
 
     scaler = preprocessing.MinMaxScaler()
     X_scaled = scaler.fit_transform(X)
-    df_raw = run_kfold(X_scaled, y, models, scores, 10)
+    df_raw = run_kfold(X_scaled, y, models, scores, n_splits=5)
 
     cols = ['fold', 'method'] + list(scores.keys())
     df_raw = df_raw[cols]
