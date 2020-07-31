@@ -33,3 +33,9 @@ respository will serve as one of the places to put that code.
 - [Monitoring](https://nathanielng.github.io/python-snippets/MONITORING) - tools for profiling Python code
 - [Python](https://nathanielng.github.io/python-snippets/PYTHON) - general Python tips
 - [Search](https://nathanielng.github.io/python-snippets/FIND) tips to search for files and patterns in files
+
+<br>
+
+View this repository's Jupyter Notebooks in Colab
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nathanielng/python-snippets)
