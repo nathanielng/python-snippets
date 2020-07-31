@@ -41,5 +41,13 @@ https://github.com/username/repo/blob/master/my_notebook.ipynb
 Open the notebook in Colab using
 
 ```
-http://colab.research/google.com/github/username/repo/blob/master/my_notebook.ipynb
+http://colab.research.google.com/github/username/repo/blob/master/my_notebook.ipynb
 ```
+
+Create an **Open in Colab** badge for a notebook using
+
+```
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/username/repo/blob/master/my_notebook.ipynb)
+```
+
+Source: https://colab.research.google.com/github/googlecolab/colabtools/blob/master/notebooks/colab-github-demo.ipynb
