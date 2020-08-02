@@ -12,7 +12,7 @@ from sklearn import preprocessing, svm, tree
 from sklearn.model_selection import KFold
 
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.metrics import accuracy_score, average_precision_score, f1_score, precision_score
+from sklearn.metrics import accuracy_score, average_precision_score, f1_score, matthews_corrcoef, precision_score
 from sklearn.metrics import recall_score, roc_auc_score
 
 from typing import Any, Callable, Dict, List, Optional
@@ -60,6 +60,7 @@ classification_scores = {
     'acc': accuracy_score,
     'avg_precision': average_precision_score,
     'f1': f1_score,
+    'mcc': matthews_corrcoef,
     'precision': precision_score,
     'recall': recall_score,
     'roc': roc_auc_score
