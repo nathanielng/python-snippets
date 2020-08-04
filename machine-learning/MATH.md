@@ -1,8 +1,50 @@
 # Math
 
-## 1. Integration
+## 1. Confusion Matrix
 
-### 1.1 Quadrature
+### 1.1 Matrix
+
+If **TN**, **FP**, **FN**, and **TP** are respectively the
+true negatives, false positives, false negatives, and true positives,
+then the confusion matrix for binary classification is:
+
+|          | Negative | Positive |
+|----------|:--------:|:--------:|
+| Negative |    TN    |    FP    |
+| Positive |    FN    |    TP    |
+
+Here, the vertical axis represents the **true labels**
+and the horizontal axis represents the **predicted labels**
+
+### 1.2 Accuracy Score
+
+The accuracy score is the sum over the correctly classified instances (ie. the diagonals) divided by the total
+
+Accuracy = $\frac{TN+TP}{TN+FP+TP+FN}$
+
+Accuracy should not be used on imbalanced problems.
+
+### 1.3 Precision (Postive Predictive Value)
+
+Precision is maximized when the **false positives** are minimized.
+
+Precision = $\frac{TP}{TP+FP}$
+
+### 1.4 Recall (also Sensitivity, True Positive Rate)
+
+Recall is maximized with the **false negatives** are minimized
+
+Recall = $\frac{TP}{TP+FN}$
+
+### 1.5 F1-Score
+
+F1-Score is the harmonic mean of precision and recall, and is maximized when both precision and recall are maximized
+
+F1-Score = $2 \times \frac{Precision \times Recall}{Precision + Recall}$
+
+## 2. Integration
+
+### 2.1 Quadrature
 
 - [`scipy.integrate()`](https://docs.scipy.org/doc/scipy/reference/integrate.html) - `quad`, `fixed_quad`, `quadrature`
 
