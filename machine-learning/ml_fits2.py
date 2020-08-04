@@ -7,6 +7,8 @@ import pandas as pd
 import pickle
 import warnings
 
+from hyperopt import hp
+
 from sklearn import ensemble, linear_model, naive_bayes, neighbors, neural_network
 from sklearn import preprocessing, svm, tree
 from sklearn.model_selection import KFold
@@ -73,6 +75,17 @@ classification_summary = {
     'precision': ['mean', 'std'],
     'recall': ['mean', 'std'],
     'roc': ['mean', 'std']
+}
+
+
+space_xgboost = {
+    'max_depth': hp.choice('max_depth', range(5, 20, 1)),
+    'learning_rate': hp.quniform('learning_rate', 0.01, 0.3, 0.005),
+    'n_estimators': hp.choice('n_estimators', range(20, 150, 5)),
+    'gamma': hp.quniform('gamma', 0, 0.50, 0.005),
+    'min_child_weight': hp.quniform('min_child_weight', 1, 10, 1),
+    'subsample': hp.quniform('subsample', 0.1, 1, 0.005),
+    'colsample_bytree': hp.quniform('colsample_bytree', 0.1, 1.0, 0.005)
 }
 
 
