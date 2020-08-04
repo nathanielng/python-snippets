@@ -2,6 +2,8 @@
 
 import pandas as pd
 
+from typing import Dict
+
 
 # ----- Find NAs -----
 def find_NAs(df: pd.DataFrame) -> pd.DataFrame:
@@ -18,15 +20,15 @@ def find_NAs(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # ----- Duplicate Rows -----
-def get_duplicated_rows(df):
+def get_duplicated_rows(df: pd.DataFrame) -> pd.DataFrame:
     return df[df.duplicated(keep='first')]
 
 
-def count_duplicated_rows(df):
+def count_duplicated_rows(df: pd.DataFrame) -> pd.DataFrame:
     return df.duplicated(keep='first').sum()
 
 
-def drop_duplicated_rows(df):
+def drop_duplicated_rows(df: pd.DataFrame) -> pd.DataFrame:
     return df[~df.duplicated(keep='first')]
 
 
@@ -44,8 +46,8 @@ def replace_column_with_dummies(df: pd.DataFrame,
                                 create_dummies_fn: Callable[..., pd.DataFrame]) -> pd.DataFrame:
     df_dummies=create_dummies_fn(df[column_to_replace], new_columns)
     return pd.concat(
-        (df.drop(columns=[col]), df_dummies),
-        axis=1
+        [df.drop(columns=[column_to_replace]), df_dummies],
+        axis='columns'
     )
 
 
