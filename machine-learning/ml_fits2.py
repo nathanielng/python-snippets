@@ -7,15 +7,15 @@ import pandas as pd
 import pickle
 import warnings
 
-from hyperopt import hp
+from hyperopt import hp, fmin, tpe, STATUS_OK, Trials
 
 from sklearn import ensemble, linear_model, naive_bayes, neighbors, neural_network
 from sklearn import preprocessing, svm, tree
-from sklearn.model_selection import KFold
+from sklearn.model_selection import cross_val_score, KFold
 
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.metrics import accuracy_score, average_precision_score, f1_score, matthews_corrcoef, precision_score
-from sklearn.metrics import recall_score, roc_auc_score
+from sklearn.metrics import recall_score, roc_auc_score, make_scorer
 
 from typing import Any, Callable, Dict, List, Optional
 
@@ -77,6 +77,38 @@ classification_summary = {
     'roc': ['mean', 'std']
 }
 
+space_knn = {
+    'n_neighbors': hp.choice('n_neighbors', range(2, 80)),
+    'scale': hp.choice('scale', [0, 1]),
+    'normalize': hp.choice('normalize', [0, 1]),
+}
+
+space_lr = {
+    'warm_start': hp.choice('warm_start', [True, False]),
+    'fit_intercept': hp.choice('fit_intercept', [True, False]),
+    'tol': hp.uniform('tol', 0.00001, 0.0001),
+    'C': hp.uniform('C', 0.05, 3),
+    'max_iter': hp.choice('max_iter', range(80, 200)),
+    'scale': hp.choice('scale', [0, 1]),
+    'normalize': hp.choice('normalize', [0, 1]),
+    'multi_class': 'auto',
+    'class_weight': 'balanced'
+}
+
+space_rf = {
+    'max_depth': hp.choice('max_depth', range(5, 20)),
+    'max_features': hp.choice('max_features', range(1, 5)),
+    'n_estimators': hp.choice('n_estimators', range(15, 120, 5)),
+    'criterion': hp.choice('criterion', ["gini", "entropy"]),
+}
+
+space_svc = {
+    'C': hp.uniform('C', 0, 100),
+    'kernel': hp.choice('kernel', ['linear', 'sigmoid', 'poly', 'rbf']),
+    'gamma': hp.uniform('gamma', 0, 20),
+    'scale': hp.choice('scale', [0, 1]),
+    'normalize': hp.choice('normalize', [0, 1]),
+}
 
 space_xgboost = {
     'max_depth': hp.choice('max_depth', range(5, 20, 1)),
@@ -143,6 +175,53 @@ def run_kfold(X: np.ndarray, y: np.ndarray, models: Dict[str, Any],
             results.append(temp_results)
 
     return pd.DataFrame(results)
+
+
+def get_model_from_params(params):
+    model = XGBClassifier(
+        # silent=False,
+        # scale_pos_weight=1,
+        max_depth=params['max_depth'],
+        learning_rate=params['learning_rate'],
+        # tree_method = 'gpu_hist',
+        # gpu_id=0,
+        n_estimators=params['n_estimators'],
+        gamma=params['gamma'],
+        min_child_weight=params['min_child_weight'],
+        subsample=params['subsample'],
+        colsample_bytree=params['colsample_bytree']
+        # objective='binary:logistic',
+        # reg_alpha = 0.3,
+    )
+    return model
+
+
+def loss_metric(params):
+    global X_train, y_train, X_valid, y_valid, metric
+
+    cv_scores = cross_val_score(
+        get_model_from_params(params),
+        X_train, y_train,
+        scoring=make_scorer(metric), cv=5)
+    return {'loss': -cv_scores.mean(), 'status': STATUS_OK}
+
+
+def tune(my_fn, search_space, algo=tpe.suggest, max_evals=100, seed=12345):
+    global metric
+
+    trials = Trials()
+    result = fmin(
+        fn=my_fn,
+        space=search_space,
+        algo=algo,
+        trials=trials,
+        max_evals=max_evals,
+        rstate=np.random.RandomState(seed=seed)
+    )
+    return {
+        'result': result,
+        'trials': trials
+    }
 
 
 def create_single_model(model: Any, X: np.ndarray, y: np.ndarray,
