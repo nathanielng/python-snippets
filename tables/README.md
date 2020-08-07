@@ -174,7 +174,7 @@ def drop_duplicated_rows(df):
 To obtain the correlation matrix for a dataframe
 
 ```python
-df = df.drop(columns=...)  # Remove all the columns that you don't need
+df = df.drop(columns=...)  # Remove columns that aren't needed
 correlation_matrix = df.corr()
 ```
 
@@ -198,7 +198,28 @@ def replace_column_with_dummies(df: pd.DataFrame,
     )
 ```
 
-### 1.9 Profiling
+### 1.9 Columns with only a single value
+
+To list all the columns with only a single unique value:
+
+```python
+unique_cols = df.apply(pd.Series.nunique)
+unique_cols = unique_cols.index[unique_cols == 1]
+print(','.join(list(unique_cols)))
+```
+
+To list columns with `n` unique values, replace `unique_cols == 1` with `unique_cols == n`
+
+To plot the number of unique values per column and
+their frequency:
+
+```python
+def plot_barh(df, col):
+    df[col].value_counts().sort_values().plot.barh(
+        figsize=(8, 1), grid=True, title=col)
+```
+
+### 1.10 Profiling
 
 To use Pandas Profiler, for output within a Jupyter Notebook
 
