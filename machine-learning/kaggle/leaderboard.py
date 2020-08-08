@@ -41,7 +41,7 @@ def plot_leaderboard_data(x_midpt, y, yc, team_score, team_idx, total_teams, tea
     ax.set_title('Leaderboard')
     if outfile is not None:
         plt.savefig(outfile)
-        print(f"Saved {outfile}")
+        print(f"Plotted leaderboard to: {outfile}")
 
 
 def download_data(competition: str):
@@ -79,6 +79,7 @@ if __name__ == "__main__":
     if args.team == '':
         print(df.head())
     else:
+        print(f'----- Competition: {args.competition} -----')
         team_score, team_idx, team_total = team_stats(df, team_name=args.team)
 
         x, y, yc, x_midpt = extract_leaderboard_data(df)
