@@ -4,15 +4,17 @@ This folder deals with remote servers (AWS / GCP / Azure),
 remote services (Google Drive / Sheets), and
 remote computation (Google Colab)
 
-## 1. Remote file copy
+## 1. Remote servers
 
-### Option 1
+### 1.1 Remote file copy
+
+#### Option 1
 
 ```bash
 rsync -avz -e "ssh -i ~/.ssh/id_ed25519" $LOCAL_FILES $USERID@$HOSTNAME:$REMOTE_FOLDER
 ```
 
-### Option 2
+#### Option 2
 
 Edit `~/.ssh/config`, specifying the hostname, userid, and identity file.
 For example, for an AWS EC2 instance, this might take the form:
@@ -27,6 +29,17 @@ Host my_remote_aws_instance
 ```bash
 rsync -avz $LOCALFILES my_remote_aws_instance:$REMOTE_FOLDER
 ```
+
+### 1.2 Ping
+
+To ping a remote server, use (remove the `-c3` option to ping an unlimited number of times):
+
+```bash
+ping -c3 hostname
+```
+
+Note that inbound ICMP traffic should be enabled.  For AWS EC2 instances,
+the security groups should be [configured appropriately](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html#sg-rules-ping).
 
 ## 2. Google Colaboratory
 
