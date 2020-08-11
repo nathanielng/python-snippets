@@ -43,7 +43,16 @@ the security groups should be [configured appropriately](https://docs.aws.amazon
 
 ## 2. Google Colaboratory
 
-### 2.1 Opening Github Jupyter notebooks on Colab
+### 2.1 Introduction
+
+The **Welcome to Google Colaboratory** notebook may be accessed at
+[https://colab.research.google.com/notebooks/intro.ipynb](https://colab.research.google.com/notebooks/intro.ipynb).
+A guide to transferring data into a Google Colab notebook is provided at
+[https://colab.research.google.com/notebooks/io.ipynb](https://colab.research.google.com/notebooks/io.ipynb).
+It is also possible to use [`gdown`](https://pypi.org/project/gdown/) `--id google_drive_file_id` to
+transfer a file from Google Drive into a Colab notebook.
+
+### 2.2 Opening Github Jupyter notebooks on Colab
 
 For a Jupyter notebook, in a Github repository at the following location:
 
