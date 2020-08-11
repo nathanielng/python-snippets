@@ -215,8 +215,14 @@ their frequency:
 
 ```python
 def plot_barh(df, col):
-    df[col].value_counts().sort_values().plot.barh(
-        figsize=(8, 1), grid=True, title=col)
+    df_data = df[col].value_counts().sort_values()
+    ax = df_data.plot.barh(
+        figsize=(8, 0.8+0.2*len(df_data)), grid=True, title=col)
+    for i, (_, label) in enumerate(df_data.iteritems()):
+        ax.annotate(f'{label}', xy=(label+1, i-0.1), color='blue');
+    ax.grid(True)
+    ax.set_xlabel('Counts')
+    ax.set_ylabel('Value')
 ```
 
 ### 1.10 Profiling
