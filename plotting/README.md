@@ -56,3 +56,16 @@ def plot_background_image(background_image, output_image, extent, h_pad=0.2, w_p
 
 plot_background_image(img1, img2, extent=[-2.72, 8.39, 13.7, 1770])
 ```
+
+## 3. Seaborn Snippets
+
+### 3.1 Box Plots
+
+For a dataframe, `df`, with a categorical column, `col1`,
+and a numerical column `col2`:
+
+```python
+import seaborn as sns
+
+sns.boxplot(x='col1', y='col2', data=df)
+```
