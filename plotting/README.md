@@ -59,7 +59,7 @@ plot_background_image(img1, img2, extent=[-2.72, 8.39, 13.7, 1770])
 
 ## 3. Seaborn Snippets
 
-### 3.1 Box Plots
+### 3.1 Box Plots and Violin Plots
 
 For a dataframe, `df`, with a categorical column, `col1`,
 and a numerical column `col2`:
@@ -68,4 +68,16 @@ and a numerical column `col2`:
 import seaborn as sns
 
 sns.boxplot(x='col1', y='col2', data=df)
+sns.violinplot(x='col1', y='col2', data=df)
 ```
+
+To see the distribution of selected columns of a dataframe
+
+```python
+column_subset = ['col1', 'col2', ... ]
+sns.boxplot(data=df[column_subset])
+sns.violinplot(data=df[column_subset])
+```
+
+Note that `column_subset` may be removed, yielding a
+box plot or violin plot for all the numeric columns.
