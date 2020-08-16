@@ -16,13 +16,15 @@ respository will serve as one of the places to put that code.
 ### Current Scope
 
 - Python 3
-- APIs
-- Databases
-- Machine Learning
-- Remote Storage (Dropbox, Google Drive / Google Sheets)
-- Remote Servers (AWS, SSH, PBS)
-- [Visualization](https://nathanielng.github.io/python-snippets/plotting)
-- [Web Scraping](https://nathanielng.github.io/python-snippets/cloud)
+- [Cloud](https://nathanielng.github.io/python-snippets/cloud) - APIs, Webscraping
+- [Computer Vision](https://nathanielng.github.io/python-snippets/computer-vision) - Pillow, Scikit Image, OpenCV
+- Databases - PostgreSQL (psycopg2, asyncpg), SQLite
+- [Finance](https://nathanielng.github.io/python-snippets/finance) - Pandas Datareader, Yahoo finance
+- Machine Learning - Sklearn, Keras, Autosklearn, Hyperopt
+- [Other Utilities](https://nathanielng.github.io/python-snippets/other)
+- [Plotting and Visualization](https://nathanielng.github.io/python-snippets/plotting) - Matplotlib, Seaborn, Bokeh, Graphviz, Drawille
+- [Remote](https://nathanielng.github.io/python-snippets/remote) - Remote Storage (Dropbox, Google Drive / Google Sheets) and Remote Servers (AWS, SSH, PBS)
+- [Tables](https://nathanielng.github.io/python-snippets/tables) - Pandas tables, Tabulapy, Pandas to Excel conversion
 
 ### Miscellaneous Notes, Links and Code Snippets
 
