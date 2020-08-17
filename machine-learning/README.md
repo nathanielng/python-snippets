@@ -16,3 +16,15 @@
 ### 1.3 Learn PyTorch
 
 - **Learn in 1 hour**: start with the [Deep Learning with PyTorch: a 60 minute blitz](https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html )
+
+
+## 2. Certificates
+
+### 2.1 Coursera
+
+- [Machine Learning](https://www.coursera.org/learn/machine-learning) | Stanford | Andrew Ng
+- [Deep Learning Specialization](https://www.coursera.org/specializations/deep-learning) | deeplearning.ai | Andrew Ng
+
+### 2.2 Google
+
+- [Tensorflow Developer Certificate](https://www.tensorflow.org/certificate) (USD100)
