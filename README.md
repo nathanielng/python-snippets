@@ -20,7 +20,7 @@ respository will serve as one of the places to put that code.
 - [Computer Vision](https://nathanielng.github.io/python-snippets/computer-vision) - Pillow, Scikit Image, OpenCV
 - Databases - PostgreSQL (psycopg2, asyncpg), SQLite
 - [Finance](https://nathanielng.github.io/python-snippets/finance) - Pandas Datareader, Yahoo finance
-- Machine Learning - Sklearn, Keras, Autosklearn, Hyperopt
+- [Machine Learning](https://nathanielng.github.io/python-snippets/machine-learning) - Sklearn, Keras, Autosklearn, Hyperopt
 - [Other Utilities](https://nathanielng.github.io/python-snippets/other)
 - [Plotting and Visualization](https://nathanielng.github.io/python-snippets/plotting) - Matplotlib, Seaborn, Bokeh, Graphviz, Drawille
 - [Remote](https://nathanielng.github.io/python-snippets/remote) - Remote Storage (Dropbox, Google Drive / Google Sheets) and Remote Servers (AWS, SSH, PBS)
