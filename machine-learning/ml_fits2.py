@@ -202,7 +202,10 @@ def loss_metric(params):
     cv_scores = cross_val_score(
         get_model_from_params(params),
         X_train, y_train,
-        scoring=make_scorer(metric), cv=5)
+        scoring=make_scorer(metric),
+        cv=5,
+        n_jobs=-1  # use all cores if possible
+    )
     return {'loss': -cv_scores.mean(), 'status': STATUS_OK}
 
 
