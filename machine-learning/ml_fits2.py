@@ -196,7 +196,38 @@ def get_model_from_params(params):
     return model
 
 
+def get_regression_model_from_params(params):
+    # https://xgboost.readthedocs.io/en/latest/python/python_api.html
+    model = XGBRegressor(
+        n_estimators=params['n_estimators'],
+        max_depth=params['max_depth'],
+        learning_rate=params['learning_rate'],
+        # verbosity=3, # (0=silent, 3=debug)
+        # objective='...',
+        # booster='...', # gbtree, gblinear or dart
+        # tree_method='auto',
+        # n_jobs=...,
+        gamma=params['gamma'],
+        min_child_weight=params['min_child_weight'],
+        # max_delta_step=...,
+        subsample=params['subsample'],
+        colsample_bytree=params['colsample_bytree']
+        # colsample_bylevel=...,
+        # reg_alpha = 0.3,
+        # reg_lambda=...,
+        # scale_pos_weight=1,
+        # base_score=...,
+        # random_state=...
+    )
+    return model
+
+
 def loss_metric(params):
+    """
+    Calculates the loss metric for classification
+    Note the negation for -cv_scores.mean() as we typically wish to
+    maximize accuracy, AUC, MCC, r2, ...
+    """
     global X_train, y_train, X_valid, y_valid, metric
 
     cv_scores = cross_val_score(
@@ -207,6 +238,24 @@ def loss_metric(params):
         n_jobs=-1  # use all cores if possible
     )
     return {'loss': -cv_scores.mean(), 'status': STATUS_OK}
+
+
+def loss_metric2(params):
+    """
+    Calculates the loss metric
+    Note the postive sign for cv_scores.mean() as we typically
+    minimize MAE, MSE, RMSE (but not r2)
+    """
+    global X_train, y_train, X_valid, y_valid, metric
+
+    cv_scores = cross_val_score(
+        get_model_from_params(params),
+        X_train, y_train,
+        scoring=make_scorer(metric),
+        cv=5,
+        n_jobs=-1  # use all cores if possible
+    )
+    return {'loss': cv_scores.mean(), 'status': STATUS_OK}
 
 
 def tune(my_fn, search_space, algo=tpe.suggest, max_evals=100, seed=12345):
