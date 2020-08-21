@@ -177,7 +177,7 @@ def run_kfold(X: np.ndarray, y: np.ndarray, models: Dict[str, Any],
     return pd.DataFrame(results)
 
 
-def get_model_from_params(params):
+def get_classification_model_from_params(params):
     model = XGBClassifier(
         # silent=False,
         # scale_pos_weight=1,
@@ -217,18 +217,24 @@ def get_regression_model_from_params(params):
         # reg_lambda=...,
         # scale_pos_weight=1,
         # base_score=...,
-        # random_state=...
+        # random_state=...,
+        # gpu_id=None
     )
     return model
 
 
 def loss_metric(params):
     """
-    Calculates the loss metric for classification
-    Note the negation for -cv_scores.mean() as we typically wish to
-    maximize accuracy, AUC, MCC, r2, ...
+    Calculates a cross-validated loss metric
+    Use metric_sign=1, to get cv_scores.mean() in order to minimize
+      metric = mean_absolute_error, mean_squared_error
+    Use metric_sign=-1, to get -cv_scores.mean() in order to maximize
+      metric = accuracy_score, average_precision_score, f1_score, matthews_corrcoef, precision_score
+               recall_score, roc_auc_score, r2_score, ...
+    Set get_model_from_params to a function that takes params as an
+    input and returns a model
     """
-    global X_train, y_train, X_valid, y_valid, metric
+    global X_train, y_train, X_valid, y_valid, metric, metric_sign, get_model_from_params
 
     cv_scores = cross_val_score(
         get_model_from_params(params),
@@ -237,25 +243,10 @@ def loss_metric(params):
         cv=5,
         n_jobs=-1  # use all cores if possible
     )
-    return {'loss': -cv_scores.mean(), 'status': STATUS_OK}
-
-
-def loss_metric2(params):
-    """
-    Calculates the loss metric
-    Note the postive sign for cv_scores.mean() as we typically
-    minimize MAE, MSE, RMSE (but not r2)
-    """
-    global X_train, y_train, X_valid, y_valid, metric
-
-    cv_scores = cross_val_score(
-        get_model_from_params(params),
-        X_train, y_train,
-        scoring=make_scorer(metric),
-        cv=5,
-        n_jobs=-1  # use all cores if possible
-    )
-    return {'loss': cv_scores.mean(), 'status': STATUS_OK}
+    return {
+        'loss': metric_sign*cv_scores.mean(),
+        'status': STATUS_OK
+    }
 
 
 def tune(my_fn, search_space, algo=tpe.suggest, max_evals=100, seed=12345):
@@ -291,6 +282,10 @@ def run_ML(csv_file: str, target_col: int,
            models: Dict[str, Callable[..., float]],
            scores: Dict[str, Callable[..., float]],
            summary: Dict[str, List[str]]):
+    """
+    Runs machine learning on all models specified in the parameter: models
+    and evaluates them on all metrics in the paramter: scores
+    """
     X, y = load_xy(csv_file, target_col)
 
     scaler = preprocessing.MinMaxScaler()
