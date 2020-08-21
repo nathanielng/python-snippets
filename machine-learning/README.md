@@ -4,7 +4,8 @@
 
 ### 1.1 General
 
-- [kaggle.com/learn/](https://www.kaggle.com/learn/)
+- Kaggle Learn: [kaggle.com/learn/](https://www.kaggle.com/learn/)
+- [Machine Learning University](https://www.youtube.com/channel/UC12LqyqTQYbXatYS9AA7Nuw/videos) | [by Amazon](https://www.amazon.science/latest-news/machine-learning-course-free-online-from-amazon-machine-learning-university)
 
 ### 1.2 Learn Tensorflow
 
@@ -15,7 +16,7 @@
 
 ### 1.3 Learn PyTorch
 
-- **Learn in 1 hour**: start with the [Deep Learning with PyTorch: a 60 minute blitz](https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html )
+- **Learn in 1 hour**: start with the [Deep Learning with PyTorch: a 60 minute blitz](https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html)
 
 
 ## 2. Certificates
