@@ -14,6 +14,8 @@ new *remote* repository.
 git init
 git config --local user.name "Firstname Lastname"
 git config --local user.email "userid@hostname"
+git config --global core.editor "editor"  # Replace editor with vim, nano, etc.
+
 git add new_file
 git commit -m "First commit"
 git tag v0.1
