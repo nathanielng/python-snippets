@@ -10,11 +10,16 @@ new *remote* repository.
 
 #### 1.1.1 First Commit
 
+Set your name and email. A
+[privacy email](https://docs.github.com/en/github/setting-up-and-managing-your-github-user-account/setting-your-commit-email-address)
+of the form `userid@users.noreply.github.com` is available at
+[https://github.com/settings/emails](https://github.com/settings/emails).
+
 ```bash
 git init
 git config --local user.name "Firstname Lastname"
 git config --local user.email "userid@hostname"
-git config --global core.editor "editor"  # Replace editor with vim, nano, etc.
+git config --global core.editor "vim"  # Optional. replace vim with nano, ..., depending on the preferred editor for commits
 
 git add new_file
 git commit -m "First commit"
@@ -30,7 +35,7 @@ git commit -m "Second commit"
 git tag v0.2
 ```
 
-#### 1.1.3 First Push
+#### 1.1.3 First Push (creates new remote repository)
 
 ```bash
 git remote add origin https://github.com/{userid}/{reponame}.git
@@ -40,8 +45,8 @@ git push origin --tags
 
 ### 1.2 Existing Local Repository, New Remote Repository
 
-Instructions for creating a new remote repository,
-from the contents of an existing local repository.
+Instructions for creating a new *remote* repository,
+from the contents of an existing *local* repository.
 
 #### 1.2.1 Add remote to an existing local git repository
 
@@ -94,5 +99,5 @@ git remote set-url origin git@github.com:{userid}/{reponame}.git
 ## 3. Notes
 
 Replace `{userid}` with your user id and replace `{reponame}`
-with the name of your Github repository.  If your repository is not
-hosted on Github, replace `github.com` with the name of your server.
+with the name of your Github repository.  If the repository is not
+hosted on Github, replace `github.com` with the name of the server.
