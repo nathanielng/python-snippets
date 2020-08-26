@@ -85,9 +85,20 @@ Copying files from a remote server
 rsync -avz hostname:filename .
 ```
 
-### 3. Tools for Video
+### 3. Tools for file manipulation
 
-#### 3.1 ffmpeg
+#### 3.1 File viewing and slicing
+
+```bash
+head -5 file.csv           # first 5 lines of a file
+sed -n '10,20p' file.csv   # lines 10-20 (inclusive) of a file
+tail -5 file.csv           # last 5 lines of a file
+cut -f3 -d ',' test.csv    # view 3rd column of a comma-delimited file
+```
+
+### 4. Tools for Video
+
+#### 4.1 ffmpeg
 
 Video file conversion (to make the video viewable on Mac OS X / Ubuntu)
 
