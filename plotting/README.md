@@ -15,12 +15,19 @@ custom code is added to a project, and that code generates a .png file.
 ### 2.1 Color Maps
 
 ```python
+import matplotlib
 import matplotlib.pyplot as plt
 
 clr_maps = plt.colormaps()
-print(sorted(clr_maps))
+print(','.join(clr_maps))
 
-cmap = plt.get_cmap("tab10")
+listed_cmaps = [ x for x in plt.colormaps() if isinstance(plt.cm.get_cmap(x, 5), matplotlib.colors.ListedColormap)]
+print(','.join(listed_cmaps))
+
+linseg_cmaps = [ x for x in plt.colormaps() if isinstance(plt.cm.get_cmap(x, 5), matplotlib.colors.LinearSegmentedColormap)]
+print(','.join(linseg_cmaps))
+
+cmap = plt.get_cmap('tab10')
 df.plot(..., color=cmap(i), ...)
 ```
 
