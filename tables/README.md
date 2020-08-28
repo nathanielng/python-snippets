@@ -183,16 +183,7 @@ def drop_duplicated_rows(df):
     return df[~df.duplicated(keep='first')]
 ```
 
-### 1.7 Correlation Matrix
-
-To obtain the correlation matrix for a dataframe
-
-```python
-df = df.drop(columns=...)  # Remove columns that aren't needed
-correlation_matrix = df.corr()
-```
-
-### 1.8 Replace column with one-hot-encoded columns
+### 1.7 Replace column with one-hot-encoded columns
 
 One-hot encode columns with: `pd.get_dummies(df)`, `df[col].str.get_dummies()`
 
@@ -214,7 +205,7 @@ def replace_column_with_dummies(df: pd.DataFrame,
     )
 ```
 
-### 1.9 Columns with only a single value
+### 1.8 Columns with only a single value
 
 To list all the columns with only a single unique value:
 
@@ -244,7 +235,24 @@ def plot_barh(df: pd.DataFrame, col: str, cmap: str = 'tab10', **kwargs) -> None
     ax.set_ylabel('Value')
 ```
 
-### 1.10 Profiling
+### 1.9 Correlation Matrix
+
+To obtain the correlation matrix for a dataframe
+
+```python
+df = df.drop(columns=...)  # Optionally remove columns that aren't needed
+df.corr().style.background_gradient(cmap='RdBu', axis=None).set_precision(3)
+```
+
+### 1.10 Histogram
+
+To get a grid of histograms for each column of a dataframe
+
+```python
+df.hist()
+```
+
+### 1.11 Profiling
 
 To use Pandas Profiler, for output within a Jupyter Notebook
 
