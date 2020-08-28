@@ -105,6 +105,20 @@ with zipfile.ZipFile('my_file.zip') as z:
     )
 ```
 
+To unzip a zip file to a folder
+
+```python
+def unzip_file(file: str, dest: str: pwd: str = None) -> None:
+    """
+    Unzips `file` to an output folder `dest`
+    """
+    with zipfile.ZipFile(file, 'r') as f:
+        if isinstance(pwd, str):
+            f.extractall(dest, pwd=bytes(pwd, 'utf-8'))
+        else:
+            f.extractall(dest)
+```
+
 #### 1.4.3 Excel files
 
 To read in the first sheet of a single Excel file
@@ -180,6 +194,8 @@ correlation_matrix = df.corr()
 
 ### 1.8 Replace column with one-hot-encoded columns
 
+One-hot encode columns with: `pd.get_dummies(df)`, `df[col].str.get_dummies()`
+
 ```python
 def create_dummies_fn(series: pd.Series,
                       new_columns: Dict[int, str]) -> pd.DataFrame:
@@ -214,13 +230,16 @@ To plot the number of unique values per column and
 their frequency:
 
 ```python
-def plot_barh(df, col):
-    df_data = df[col].value_counts().sort_values()
-    ax = df_data.plot.barh(
-        figsize=(8, 0.8+0.2*len(df_data)), grid=True, title=col)
+def plot_barh(df: pd.DataFrame, col: str, cmap: str = 'tab10', **kwargs) -> None:
+    df_data = df[col].value_counts()
+    _, ax = plt.subplots(1, 1, figsize=(8,len(vc)/3.5))
+    cmap = plt.cm.get_cmap(cmap, len(df_data)).colors
+    df_data.plot.barh(
+        color=cmap, grid=True, title=col, ax=ax, **kwargs)
     for i, (_, label) in enumerate(df_data.iteritems()):
         ax.annotate(f'{label}', xy=(label+1, i-0.1), color='blue');
     ax.grid(True)
+    ax.set_title(col)
     ax.set_xlabel('Counts')
     ax.set_ylabel('Value')
 ```
