@@ -234,10 +234,10 @@ def loss_metric(params):
     Set get_model_from_params to a function that takes params as an
     input and returns a model
     """
-    global X_train, y_train, X_valid, y_valid, metric, metric_sign, get_model_from_params
+    global X_train, y_train, X_valid, y_valid, metric, metric_sign, Model
 
     cv_scores = cross_val_score(
-        get_model_from_params(params),
+        Model(**params),
         X_train, y_train,
         scoring=make_scorer(metric),
         cv=5,
@@ -249,7 +249,10 @@ def loss_metric(params):
     }
 
 
-def tune(my_fn, search_space, algo=tpe.suggest, max_evals=100, seed=12345):
+def hyp_tune(my_fn, search_space, algo=tpe.suggest, max_evals=100, seed=12345):
+    """
+    Hyperparamter tuning of a model
+    """
     global metric
 
     trials = Trials()
@@ -261,10 +264,11 @@ def tune(my_fn, search_space, algo=tpe.suggest, max_evals=100, seed=12345):
         max_evals=max_evals,
         rstate=np.random.RandomState(seed=seed)
     )
-    return {
-        'result': result,
-        'trials': trials
-    }
+
+    df_x = pd.DataFrame(trials.idxs_vals[1])
+    loss = pd.DataFrame(trials.results)
+    df_r = pd.concat((df_x, loss), axis=1)
+    return result, trials, df_r
 
 
 def create_single_model(model: Any, X: np.ndarray, y: np.ndarray,
