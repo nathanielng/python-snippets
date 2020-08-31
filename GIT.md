@@ -101,3 +101,10 @@ git remote set-url origin git@github.com:{userid}/{reponame}.git
 Replace `{userid}` with your user id and replace `{reponame}`
 with the name of your Github repository.  If the repository is not
 hosted on Github, replace `github.com` with the name of the server.
+
+## 4. Resources
+
+### 4.1 Tutorials and Labs
+
+- [lab.github.com](https://lab.github.com)
+- [Git Tutorial by Atlassian](https://www.atlassian.com/git/tutorials/git-bash)
