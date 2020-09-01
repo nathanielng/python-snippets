@@ -29,3 +29,10 @@
 ### 2.2 Google
 
 - [Tensorflow Developer Certificate](https://www.tensorflow.org/certificate) (USD100)
+
+
+## 3. Machine Learning Code Samples
+
+### 3.1 Scikit-learn
+
+- [`machine-learning/SCIKITLEARN.md`](https://nathanielng.github.io/python-snippets/machine-learning/SCIKITLEARN)
