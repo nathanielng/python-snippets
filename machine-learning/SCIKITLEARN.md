@@ -55,8 +55,35 @@ score = r2_score(y_test, y_pred)
 
 ```python
 from sklearn.metrics import make_scorer, r2_score
-from sklearn.model_selection import cross_val_score, cross_val_predict
+from sklearn.model_selection import cross_val_score, cross_validate
 
 scorer = make_scorer(r2_score, greater_is_better=True)
 cv_score = cross_val_score(rf, X_train, y_train, scoring=scorer, cv=5).mean()
+```
+
+```python
+cv_results = pd.DataFrame(cross_validate(
+    rf, X_train, y_train,
+    scoring=('r2', 'neg_mean_squared_error'),
+    return_train_score=True,
+    cv=5))
+```
+
+### 1.6 Hyperparameter search with cross validation
+
+```python
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+
+print(rf.get_params())  # view default parameters
+parameters = {
+    'n_estimators': [200, 400, 800, 1200],
+    'max_features': ['auto', 'sqrt'],
+    'max_depth': [10, 20, 50, 100, None],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4]
+}
+
+clf = RandomizedSearchCV(rf, parameters)  # or GridSearchCV(rf, parameters)
+clf.fit(X_train, y_train)
+print(clf.best_params_)
 ```
