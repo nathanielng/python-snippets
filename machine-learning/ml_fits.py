@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 """
-ml-fits.py
+ml_fits.py
 
-Example code for building models in scikit-learn and xgboost
+Basic code for building models in scikit-learn and xgboost
+For intermediate-level code, see ml_fits2.py
 """
 
 import argparse

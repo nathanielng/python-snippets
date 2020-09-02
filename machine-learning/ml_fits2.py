@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+"""
+ml_fits2.py
+
+Intermediate-level code for building models in scikit-learn and xgboost
+For basic-level code, see ml_fits.py
+"""
+
 import argparse
 import numpy as np
 import os
@@ -218,7 +225,7 @@ def get_regression_model_from_params(params):
         # scale_pos_weight=1,
         # base_score=...,
         # random_state=...,
-        # gpu_id=None
+        # gpu_id=None  # gpu_id=0 for first GPU
     )
     return model
 
@@ -244,7 +251,7 @@ def loss_metric(params):
         n_jobs=-1  # use all cores if possible
     )
     return {
-        'loss': metric_sign*cv_scores.mean(),
+        'loss': metric_sign * cv_scores.mean(),
         'status': STATUS_OK
     }
 
@@ -271,6 +278,22 @@ def hyp_tune(my_fn, search_space, algo=tpe.suggest, max_evals=100, seed=12345):
     return result, trials, df_r
 
 
+def results2df(results, trials):
+    df_x = pd.DataFrame(trials.idxs_vals[1])
+    loss = pd.DataFrame(trials.results)
+    df_r = pd.concat((df_x, loss), axis=1)
+    return df_r
+
+
+def plot_results(df_r: pd.DataFrame):
+    _, ax = plt.subplots(1, 1, figsize=(12, 5))
+    ax.semilogy(df_r.index, df_r['loss'], marker='+', markeredgecolor='red', markersize=5, markeredgewidth=1);
+    ax.set_xlabel('Iteration number');
+    ax.set_ylabel('Loss');
+    ax.grid(True);
+
+
+# ----- Machine Learning Models -----
 def create_single_model(model: Any, X: np.ndarray, y: np.ndarray,
                         filename: Optional[str] = None):
     obj = model.fit(X, y)
