@@ -131,7 +131,7 @@ convert output*.png output.gif
 #### 5.1 Bash
 
 ```bash
-cd /d  # Change to C: drive
+cd /d  # Change to D: drive
 cd     # Change to /c/Users/[Windows User Name]
 ```
 
@@ -140,10 +140,10 @@ cd     # Change to /c/Users/[Windows User Name]
 With the default installation settings (for miniconda)
 
 ```bash
-which git     # should display 
+which git     # should display /mingw64/bin/git
 which python  # should display /c/Users/[Windows User Name]/miniconda3/python
 which pip     # should display /c/Users/[Windows User Name]/miniconda3/Scripts/pip
 pip install -q jupyter
-which jupyter # should display /c/Users/[Windows User Name]/
+which jupyter # should display /c/Users/[Windows User Name]/miniconda3/Scripts/jupyter
 jupyter notebook &
 ```
