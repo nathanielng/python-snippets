@@ -28,7 +28,7 @@ titles_from_headings:
   collections: true
 
 highlighter: rouge
-markdown: kramdown
+
 kramdown:
   math_engine: katex
   input: GFM

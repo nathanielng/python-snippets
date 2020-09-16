@@ -125,3 +125,25 @@ Video conversion to image series or gif file
 ffmpeg -i animation.mp4 -r 10 output%05d.png
 convert output*.png output.gif
 ```
+
+### 5. Git Bash on Windows
+
+#### 5.1 Bash
+
+```bash
+cd /d  # Change to D: drive
+cd     # Change to /c/Users/[Windows User Name]
+```
+
+#### 5.2 Git Bash with Anaconda Python
+
+With the default installation settings (for miniconda)
+
+```bash
+which git     # should display /mingw64/bin/git
+which python  # should display /c/Users/[Windows User Name]/miniconda3/python
+which pip     # should display /c/Users/[Windows User Name]/miniconda3/Scripts/pip
+pip install -q jupyter
+which jupyter # should display /c/Users/[Windows User Name]/miniconda3/Scripts/jupyter
+jupyter notebook &
+```
