@@ -8,38 +8,55 @@ For basic-level code, see ml_fits.py
 """
 
 import argparse
+import catboost
+import lightgbm
 import numpy as np
 import os
 import pandas as pd
 import pickle
 import warnings
+import xgboost as xgb
 
 from hyperopt import hp, fmin, tpe, STATUS_OK, Trials
 
-from sklearn import ensemble, linear_model, naive_bayes, neighbors, neural_network
+from sklearn.gaussian_process.kernels import ConstantKernel, RBF
+from sklearn import ensemble, gaussian_process, kernel_ridge, linear_model, naive_bayes, neighbors, neural_network
 from sklearn import preprocessing, svm, tree
 from sklearn.model_selection import cross_val_score, KFold
 
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, make_scorer
 from sklearn.metrics import accuracy_score, average_precision_score, f1_score, matthews_corrcoef, precision_score
-from sklearn.metrics import recall_score, roc_auc_score, make_scorer
+from sklearn.metrics import recall_score, roc_auc_score
 
 from typing import Any, Callable, Dict, List, Optional
 
 
 warnings.filterwarnings('ignore')
 
+gpr_kernel = ConstantKernel(
+    1.0, (1e-3, 1e3)) * RBF(10, (1e-2, 1e2))
+
 regression_models = {
+    'cat': catboost.CatBoostRegressor(verbose=False),
     'dtr': tree.DecisionTreeRegressor(),
+    'gbr': ensemble.GradientBoostingRegressor(),
+    'gpr': gaussian_process.GaussianProcessRegressor(),
+    'gpr2': gaussian_process.GaussianProcessRegressor(kernel=gpr_kernel),
+    'knr': neighbors.KNeighborsRegressor(),
+    'krr': kernel_ridge.KernelRidge(),
+    'lasso': linear_model.Lasso(),
+    'lgbm': lightgbm.LGBMRegressor(),
     'linear': linear_model.LinearRegression(),
     'logistic': linear_model.LogisticRegression(),
-    'knr': neighbors.KNeighborsRegressor(),
+    'nb': naive_bayes.GaussianNB(),
+    'nn': neural_network.MLPRegressor(hidden_layer_sizes=(100,), activation='relu', solver='adam'),
     'svr': svm.SVR(),
     'svr_rbf': svm.SVR(kernel='rbf', C=100, gamma=0.1, epsilon=.1),
     'svr_lin': svm.SVR(kernel='linear', C=100, gamma='auto'),
     'svr_poly': svm.SVR(kernel='poly', C=100, gamma='auto', degree=3, epsilon=.1, coef0=1),
-    'gbr': ensemble.GradientBoostingRegressor(),
-    'rf': ensemble.RandomForestRegressor(n_estimators=100, criterion='mse')
+    'ridge': linear_model.Ridge(),
+    'rf': ensemble.RandomForestRegressor(n_estimators=100, criterion='mse'),
+    'xgb': xgb.XGBRegressor()
 }
 
 regression_scores = {
@@ -47,6 +64,9 @@ regression_scores = {
     'MAE': mean_absolute_error,
     'r2': r2_score
 }
+mae_scorer = make_scorer(mean_absolute_error, greater_is_better=False)
+mse_scorer = make_scorer(mean_squared_error, greater_is_better=False)
+r2_scorer = make_scorer(r2_score, greater_is_better=True)
 
 regression_summary = {
     'MSE': ['mean', 'std'],
@@ -128,6 +148,25 @@ space_xgboost = {
 }
 
 
+# ----- Scalers -----
+scalers = {
+    'box_cos': preprocessing.PowerTransformer(method='box-cox', standardize=False),
+    'max_abs': preprocessing.MaxAbsScaler(),
+    'min_max': preprocessing.MinMaxScaler(),
+    'mm_quantile': Pipeline([
+        ('min_max', preprocessing.MinMaxScaler()),
+        ('quantile', preprocessing.QuantileTransformer(
+            output_distribution='normal', random_state=RANDOM_STATE))
+    ]),
+    'normalizer': preprocessing.Normalizer(),
+    'quantile': preprocessing.QuantileTransformer(),
+    'quantile1': preprocessing.QuantileTransformer(output_distribution='normal', random_state=RANDOM_STATE),
+    'robust': preprocessing.RobustScaler(),
+    'standard': preprocessing.StandardScaler(),
+    'yeo_johnson': preprocessing.PowerTransformer(method='yeo-johnson', standardize=True)
+}
+
+
 def load_xy(filename: str, target_col: int):
     _, ext = os.path.splitext(filename)
     if ext == '.xlsx':
@@ -185,7 +224,7 @@ def run_kfold(X: np.ndarray, y: np.ndarray, models: Dict[str, Any],
 
 
 def get_classification_model_from_params(params):
-    model = XGBClassifier(
+    model = xgb.XGBClassifier(
         # silent=False,
         # scale_pos_weight=1,
         max_depth=params['max_depth'],
@@ -205,7 +244,7 @@ def get_classification_model_from_params(params):
 
 def get_regression_model_from_params(params):
     # https://xgboost.readthedocs.io/en/latest/python/python_api.html
-    model = XGBRegressor(
+    model = xgb.XGBRegressor(
         n_estimators=params['n_estimators'],
         max_depth=params['max_depth'],
         learning_rate=params['learning_rate'],
