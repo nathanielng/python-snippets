@@ -73,10 +73,11 @@ git push -u {remote_name} master
 ### 2.1 Inspecting a repository
 
 ```bash
-git status       # View repository status
-git log          # View git history
-git branch -avv  # View local & remote branches
-git remote -v    # View remote URLs
+git status                            # View repository status
+git log                               # View git history
+git log --pretty=format:'%h %ad %an'  #   in one line
+git branch -avv                       # View local & remote branches
+git remote -v                         # View remote URLs
 ```
 
 ### 2.2 Keeping a fork synchronised with an upstream repository
