@@ -19,9 +19,9 @@ import xgboost as xgb
 
 from hyperopt import hp, fmin, tpe, STATUS_OK, Trials
 
-from sklearn.gaussian_process.kernels import ConstantKernel, RBF
 from sklearn import ensemble, gaussian_process, kernel_ridge, linear_model, naive_bayes, neighbors, neural_network
-from sklearn import preprocessing, svm, tree
+from sklearn import datasets, pipeline, preprocessing, svm, tree
+from sklearn.gaussian_process.kernels import ConstantKernel, RBF
 from sklearn.model_selection import cross_val_score, KFold
 
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, make_scorer
@@ -32,6 +32,8 @@ from typing import Any, Callable, Dict, List, Optional
 
 
 warnings.filterwarnings('ignore')
+RANDOM_STATE = 12345
+
 
 gpr_kernel = ConstantKernel(
     1.0, (1e-3, 1e3)) * RBF(10, (1e-2, 1e2))
@@ -153,7 +155,7 @@ scalers = {
     'box_cos': preprocessing.PowerTransformer(method='box-cox', standardize=False),
     'max_abs': preprocessing.MaxAbsScaler(),
     'min_max': preprocessing.MinMaxScaler(),
-    'mm_quantile': Pipeline([
+    'mm_quantile': pipeline.Pipeline([
         ('min_max', preprocessing.MinMaxScaler()),
         ('quantile', preprocessing.QuantileTransformer(
             output_distribution='normal', random_state=RANDOM_STATE))
@@ -167,7 +169,7 @@ scalers = {
 }
 
 
-def load_xy(filename: str, target_col: int):
+def load_df(filename: str):
     _, ext = os.path.splitext(filename)
     if ext == '.xlsx':
         df = pd.read_excel(filename, index_col=0).dropna()
@@ -175,7 +177,11 @@ def load_xy(filename: str, target_col: int):
         df = pd.read_csv(filename, index_col=0).dropna()
     else:
         print('Unable to load file with unknown extension')
-        return None, None
+        return None
+    return df
+
+
+def df_to_xy(df: pd.DataFrame, target_col: int):
     if target_col == -1:
         X = df.iloc[:, :-1]._get_numeric_data()
         y = df.iloc[:, -1]
@@ -184,6 +190,12 @@ def load_xy(filename: str, target_col: int):
         X = df.loc[:, feature_cols]._get_numeric_data()
         y = df.iloc[:, target_col]
     return X.values, y.values
+
+
+def load_xy(filename: str, target_col: int):
+    df = load_df(filename)
+    X, y = df_to_xy(df, target_col)
+    return X, y
 
 
 def evaluate(model: Any, X_train: np.ndarray, y_train: np.ndarray,
@@ -344,7 +356,7 @@ def create_single_model(model: Any, X: np.ndarray, y: np.ndarray,
     print(f'Saved: {filename}')
 
 
-def run_ML(csv_file: str, target_col: int,
+def run_ML(X: np.array, y: np.array, target_col: int,
            models: Dict[str, Callable[..., float]],
            scores: Dict[str, Callable[..., float]],
            summary: Dict[str, List[str]]):
@@ -352,8 +364,6 @@ def run_ML(csv_file: str, target_col: int,
     Runs machine learning on all models specified in the parameter: models
     and evaluates them on all metrics in the paramter: scores
     """
-    X, y = load_xy(csv_file, target_col)
-
     scaler = preprocessing.MinMaxScaler()
     X_scaled = scaler.fit_transform(X)
     df_raw = run_kfold(X_scaled, y, models, scores, n_splits=5)
@@ -371,33 +381,35 @@ def run_ML(csv_file: str, target_col: int,
     return df_summary
 
 
-def run_classification(csv_file: str, target_col: int, sort_by: str = 'acc'):
-    df_summary = run_ML(csv_file, target_col, classification_models, classification_scores, classification_summary)
+def run_classification(X: np.array, y: np.array, target_col: int, sort_by: str = 'acc'):
+    df_summary = run_ML(X, y, target_col, classification_models, classification_scores, classification_summary)
     df_summary.to_csv('summary.csv')
     df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=True)
     df_summary.to_excel('summary.xlsx')
     return df_summary
 
 
-def run_regression(csv_file: str, target_col: int, sort_by: str = 'MSE'):
-    df_summary = run_ML(csv_file, target_col, regression_models, regression_scores, regression_summary)
+def run_regression(X: np.array, y: np.array, target_col: int, sort_by: str = 'MSE'):
+    df_summary = run_ML(X, y, target_col, regression_models, regression_scores, regression_summary)
     df_summary.to_csv('summary.csv')
     df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=True)
     df_summary.to_excel('summary.xlsx')
     return df_summary
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--file', type=str, help='Input .csv file')
-    parser.add_argument('--target_col', type=int, default=-1, help='Target Column')
-    parser.add_argument('--task', type=str, choices=['regression', 'classification'])
-    args = parser.parse_args()
+def main(args):
+    if args.demo:
+        if args.task == 'regression':
+            X, y = datasets.load_diabetes(return_X_y=True)
+        elif args.task == 'classification':
+            X, y = datasets.load_digits(return_X_y=True)
+    else:
+        X, y = load_xy(args.file, target_col)
 
     if args.task == 'regression':
-        df_summary = run_regression(args.file, args.target_col)
+        df_summary = run_regression(X, y, args.target_col)
     elif args.task == 'classification':
-        df_summary = run_classification(args.file, args.target_col)
+        df_summary = run_classification(X, y, args.target_col)
     else:
         quit()
 
@@ -405,3 +417,13 @@ if __name__ == "__main__":
     best_model = df_summary.index[0]
     print(best_model)
     # create_single_model(best_model, X, y)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--file', type=str, help='Input .csv file')
+    parser.add_argument('--target_col', type=int, default=-1, help='Target Column')
+    parser.add_argument('--task', type=str, choices=['regression', 'classification'])
+    parser.add_argument('--demo', action='store_true', help='Run classification or regression demo')
+    args = parser.parse_args()
+    main(args)
