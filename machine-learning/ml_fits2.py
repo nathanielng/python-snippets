@@ -20,7 +20,7 @@ import xgboost as xgb
 from hyperopt import hp, fmin, tpe, STATUS_OK, Trials
 
 from sklearn import ensemble, gaussian_process, kernel_ridge, linear_model, naive_bayes, neighbors, neural_network
-from sklearn import datasets, pipeline, preprocessing, svm, tree
+from sklearn import datasets, multiclass, pipeline, preprocessing, svm, tree
 from sklearn.gaussian_process.kernels import ConstantKernel, RBF
 from sklearn.model_selection import cross_val_score, KFold
 
@@ -97,16 +97,6 @@ classification_scores = {
     'roc': roc_auc_score
 }
 
-# multiclass_scores = {
-#     'acc': accuracy_score,
-#     'avg_precision': average_precision_score,
-#     'f1': f1_score,
-#     'mcc': matthews_corrcoef,
-#     'precision': precision_score,
-#     'recall': recall_score,
-#     'roc': roc_auc_score
-# }
-
 classification_summary = {
     'acc': ['mean', 'std'],
     'avg_precision': ['mean', 'std'],
@@ -114,6 +104,27 @@ classification_summary = {
     'precision': ['mean', 'std'],
     'recall': ['mean', 'std'],
     'roc': ['mean', 'std']
+}
+
+multiclass_models = {
+    'sgd': linear_model.SGDClassifier(),
+    'ridge': linear_model.RidgeClassifier(),
+    'logistic': linear_model.LogisticRegression(multi_class='multinomial'),
+    'gnb': naive_bayes.GaussianNB(),
+    'knr': neighbors.KNeighborsClassifier(),
+    'mlp': neural_network.MLPClassifier(),
+    'dtc': tree.DecisionTreeClassifier(),
+    'rf': ensemble.RandomForestClassifier()
+}
+
+multiclass_scores = {
+    'acc': accuracy_score,
+    'avg_precision': average_precision_score,
+}
+
+multiclass_summary = {
+    'acc': ['mean', 'std'],
+    'avg_precision': ['mean', 'std'],
 }
 
 space_knn = {
@@ -225,7 +236,8 @@ def evaluate(model: Any, X_train: np.ndarray, y_train: np.ndarray,
 
 
 def run_kfold(X: np.ndarray, y: np.ndarray, models: Dict[str, Any],
-              scores: Dict[str, Any], n_splits: int = 10):
+              scores: Dict[str, Any], n_splits: int = 10,
+              multiclass_strat: Optional[str] = ''):
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=12345)
 
     results = []
@@ -234,8 +246,14 @@ def run_kfold(X: np.ndarray, y: np.ndarray, models: Dict[str, Any],
         for i, (train_index, test_index) in enumerate(kf.split(X)):
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
+            model2 = model
+            if multiclass_strat == 'ovr':
+                model2 = multiclass.OneVsRestClassifier(model)
+            elif multiclass_strat == 'ovo':
+                model2 = multiclass.OneVsOneClassifier(model)
+            
             temp_results = evaluate(
-                model, X_train, y_train, X_test, y_test, scores)
+                model2, X_train, y_train, X_test, y_test, scores)
             print(f"Fold = {i}: {temp_results}")
 
             temp_results['method'] = model_name
@@ -369,14 +387,16 @@ def create_single_model(model: Any, X: np.ndarray, y: np.ndarray,
 def run_ML(X: np.array, y: np.array,
            models: Dict[str, Callable[..., float]],
            scores: Dict[str, Callable[..., float]],
-           summary: Dict[str, List[str]]):
+           summary: Dict[str, List[str]],
+           multiclass_strat: Optional[str]):
     """
     Runs machine learning on all models specified in the parameter: models
     and evaluates them on all metrics in the paramter: scores
     """
     scaler = preprocessing.MinMaxScaler()
     X_scaled = scaler.fit_transform(X)
-    df_raw = run_kfold(X_scaled, y, models, scores, n_splits=5)
+    df_raw = run_kfold(X_scaled, y, models, scores,
+                       n_splits=5, multiclass_strat=multiclass_strat)
 
     cols = ['fold', 'method'] + list(scores.keys())
     df_raw = df_raw[cols]
@@ -395,6 +415,19 @@ def run_classification(X: np.array, y: np.array, sort_by: str = 'acc'):
     global classification_models, classification_scores, classification_summary
 
     df_summary = run_ML(X, y, classification_models, classification_scores, classification_summary)
+    df_summary.to_csv('summary.csv')
+    df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=True)
+    df_summary.to_excel('summary.xlsx')
+    return df_summary
+
+
+def run_multiclass(X: np.array, y: np.array, sort_by: str = 'acc'):
+    global classification_models, multiclass_scores, classification_summary
+
+    y = preprocessing.label_binarize(y, classes=np.unique(y))
+
+    df_summary = run_ML(X, y, classification_models, multiclass_scores,
+                        classification_summary, multiclass_strat='ovr')
     df_summary.to_csv('summary.csv')
     df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=True)
     df_summary.to_excel('summary.xlsx')
@@ -424,8 +457,10 @@ def main(args):
 
     if args.task == 'regression':
         df_summary = run_regression(X, y)
-    elif args.task in ['classification', 'multiclass']:
+    elif args.task == 'classification':
         df_summary = run_classification(X, y)
+    elif args.task == 'multiclass':
+        df_summary = run_multiclass(X, y)
     else:
         quit()
 
