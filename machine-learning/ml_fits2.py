@@ -97,6 +97,16 @@ classification_scores = {
     'roc': roc_auc_score
 }
 
+# multiclass_scores = {
+#     'acc': accuracy_score,
+#     'avg_precision': average_precision_score,
+#     'f1': f1_score,
+#     'mcc': matthews_corrcoef,
+#     'precision': precision_score,
+#     'recall': recall_score,
+#     'roc': roc_auc_score
+# }
+
 classification_summary = {
     'acc': ['mean', 'std'],
     'avg_precision': ['mean', 'std'],
@@ -356,7 +366,7 @@ def create_single_model(model: Any, X: np.ndarray, y: np.ndarray,
     print(f'Saved: {filename}')
 
 
-def run_ML(X: np.array, y: np.array, target_col: int,
+def run_ML(X: np.array, y: np.array,
            models: Dict[str, Callable[..., float]],
            scores: Dict[str, Callable[..., float]],
            summary: Dict[str, List[str]]):
@@ -381,16 +391,20 @@ def run_ML(X: np.array, y: np.array, target_col: int,
     return df_summary
 
 
-def run_classification(X: np.array, y: np.array, target_col: int, sort_by: str = 'acc'):
-    df_summary = run_ML(X, y, target_col, classification_models, classification_scores, classification_summary)
+def run_classification(X: np.array, y: np.array, sort_by: str = 'acc'):
+    global classification_models, classification_scores, classification_summary
+
+    df_summary = run_ML(X, y, classification_models, classification_scores, classification_summary)
     df_summary.to_csv('summary.csv')
     df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=True)
     df_summary.to_excel('summary.xlsx')
     return df_summary
 
 
-def run_regression(X: np.array, y: np.array, target_col: int, sort_by: str = 'MSE'):
-    df_summary = run_ML(X, y, target_col, regression_models, regression_scores, regression_summary)
+def run_regression(X: np.array, y: np.array, sort_by: str = 'MSE'):
+    global regression_models, regression_scores, regression_summary
+
+    df_summary = run_ML(X, y, regression_models, regression_scores, regression_summary)
     df_summary.to_csv('summary.csv')
     df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=True)
     df_summary.to_excel('summary.xlsx')
@@ -402,14 +416,16 @@ def main(args):
         if args.task == 'regression':
             X, y = datasets.load_diabetes(return_X_y=True)
         elif args.task == 'classification':
+            X, y = datasets.load_breast_cancer(return_X_y=True)
+        elif args.task == 'multiclass':
             X, y = datasets.load_digits(return_X_y=True)
     else:
-        X, y = load_xy(args.file, target_col)
+        X, y = load_xy(args.file, args.target_col)
 
     if args.task == 'regression':
-        df_summary = run_regression(X, y, args.target_col)
-    elif args.task == 'classification':
-        df_summary = run_classification(X, y, args.target_col)
+        df_summary = run_regression(X, y)
+    elif args.task in ['classification', 'multiclass']:
+        df_summary = run_classification(X, y)
     else:
         quit()
 
@@ -423,7 +439,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', type=str, help='Input .csv file')
     parser.add_argument('--target_col', type=int, default=-1, help='Target Column')
-    parser.add_argument('--task', type=str, choices=['regression', 'classification'])
+    parser.add_argument('--task', type=str, choices=['regression', 'classification', 'multiclass'])
     parser.add_argument('--demo', action='store_true', help='Run classification or regression demo')
     args = parser.parse_args()
     main(args)
