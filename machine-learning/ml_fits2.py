@@ -112,7 +112,7 @@ multiclass_models = {
     'logistic': linear_model.LogisticRegression(multi_class='multinomial'),
     'gnb': naive_bayes.GaussianNB(),
     'knr': neighbors.KNeighborsClassifier(),
-    'mlp': neural_network.MLPClassifier(),
+    # 'mlp': neural_network.MLPClassifier(),
     'dtc': tree.DecisionTreeClassifier(),
     'rf': ensemble.RandomForestClassifier()
 }
@@ -388,7 +388,7 @@ def run_ML(X: np.array, y: np.array,
            models: Dict[str, Callable[..., float]],
            scores: Dict[str, Callable[..., float]],
            summary: Dict[str, List[str]],
-           multiclass_strat: Optional[str]):
+           multiclass_strat: Optional[str] = None):
     """
     Runs machine learning on all models specified in the parameter: models
     and evaluates them on all metrics in the paramter: scores
@@ -404,10 +404,7 @@ def run_ML(X: np.array, y: np.array,
     print('----- results.csv (raw) -----')
     print(df_raw)
     df_raw.to_csv('results.csv')
-
-    print('----- summary.csv (data averaged across k-folds) -----')
     df_summary = df_raw.groupby('method').agg(summary)
-    print(df_summary)
     return df_summary
 
 
@@ -416,20 +413,20 @@ def run_classification(X: np.array, y: np.array, sort_by: str = 'acc'):
 
     df_summary = run_ML(X, y, classification_models, classification_scores, classification_summary)
     df_summary.to_csv('summary.csv')
-    df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=True)
+    df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=False)
     df_summary.to_excel('summary.xlsx')
     return df_summary
 
 
 def run_multiclass(X: np.array, y: np.array, sort_by: str = 'acc'):
-    global classification_models, multiclass_scores, classification_summary
+    global multiclass_models, multiclass_scores, multiclass_summary
 
     y = preprocessing.label_binarize(y, classes=np.unique(y))
 
-    df_summary = run_ML(X, y, classification_models, multiclass_scores,
-                        classification_summary, multiclass_strat='ovr')
+    df_summary = run_ML(X, y, multiclass_models, multiclass_scores,
+                        multiclass_summary, multiclass_strat='ovr')
     df_summary.to_csv('summary.csv')
-    df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=True)
+    df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=False)
     df_summary.to_excel('summary.xlsx')
     return df_summary
 
@@ -464,9 +461,10 @@ def main(args):
     else:
         quit()
 
+    print('----- summary.csv (data averaged across k-folds) -----')
     print(df_summary)
     best_model = df_summary.index[0]
-    print(best_model)
+    print(f'Best model: {best_model}')
     # create_single_model(best_model, X, y)
 
 
