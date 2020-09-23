@@ -27,6 +27,7 @@ from sklearn.model_selection import cross_val_score, KFold
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, make_scorer
 from sklearn.metrics import accuracy_score, average_precision_score, f1_score, matthews_corrcoef, precision_score
 from sklearn.metrics import recall_score, roc_auc_score
+from sklearn.utils.multiclass import type_of_target
 
 from typing import Any, Callable, Dict, List, Optional
 
@@ -384,15 +385,47 @@ def create_single_model(model: Any, X: np.ndarray, y: np.ndarray,
     print(f'Saved: {filename}')
 
 
+def select_model_type(model_type, y):
+    global regression_models, regression_scores, regression_summary
+    global classification_models, classification_scores, classification_summary
+    global multiclass_models, multiclass_scores, multiclass_summary
+
+    multiclass_strat = ''
+    sort_by, ascending = 'acc', False
+
+    if model_type == 'auto':
+        model_type = type_of_target(y)
+        print(f'Automatically selected model type: {model_type}')
+
+    if model_type == 'continuous':
+        # sort_by, ascending = 'MSE', True
+        sort_by, ascending = 'r2', False
+        models = regression_models
+        scores = regression_scores
+        summary = regression_summary
+    elif model_type == 'binary':
+        models = classification_models
+        scores = classification_scores
+        summary = classification_summary
+    elif model_type == 'multiclass':
+        models = multiclass_models
+        scores = multiclass_scores
+        summary = multiclass_summary
+        multiclass_strat = 'ovr'
+        y = preprocessing.label_binarize(y, classes=np.unique(y))
+    return multiclass_strat, sort_by, ascending, models, scores, summary, multiclass_strat, y
+
+
 def run_ML(X: np.array, y: np.array,
-           models: Dict[str, Callable[..., float]],
-           scores: Dict[str, Callable[..., float]],
-           summary: Dict[str, List[str]],
+           model_type: str,
            multiclass_strat: Optional[str] = None):
     """
     Runs machine learning on all models specified in the parameter: models
     and evaluates them on all metrics in the paramter: scores
     """
+    multiclass_strat, sort_by, ascending, models, scores, summary, multiclass_strat, y \
+        = select_model_type(model_type, y)
+
     scaler = preprocessing.MinMaxScaler()
     X_scaled = scaler.fit_transform(X)
     df_raw = run_kfold(X_scaled, y, models, scores,
@@ -404,39 +437,12 @@ def run_ML(X: np.array, y: np.array,
     print('----- results.csv (raw) -----')
     print(df_raw)
     df_raw.to_csv('results.csv')
+
+    print('----- summary.csv (data averaged across k-folds) -----')
     df_summary = df_raw.groupby('method').agg(summary)
-    return df_summary
-
-
-def run_classification(X: np.array, y: np.array, sort_by: str = 'acc'):
-    global classification_models, classification_scores, classification_summary
-
-    df_summary = run_ML(X, y, classification_models, classification_scores, classification_summary)
     df_summary.to_csv('summary.csv')
-    df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=False)
-    df_summary.to_excel('summary.xlsx')
-    return df_summary
-
-
-def run_multiclass(X: np.array, y: np.array, sort_by: str = 'acc'):
-    global multiclass_models, multiclass_scores, multiclass_summary
-
-    y = preprocessing.label_binarize(y, classes=np.unique(y))
-
-    df_summary = run_ML(X, y, multiclass_models, multiclass_scores,
-                        multiclass_summary, multiclass_strat='ovr')
-    df_summary.to_csv('summary.csv')
-    df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=False)
-    df_summary.to_excel('summary.xlsx')
-    return df_summary
-
-
-def run_regression(X: np.array, y: np.array, sort_by: str = 'MSE'):
-    global regression_models, regression_scores, regression_summary
-
-    df_summary = run_ML(X, y, regression_models, regression_scores, regression_summary)
-    df_summary.to_csv('summary.csv')
-    df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=True)
+    df_summary = df_summary.sort_values((sort_by, 'mean'), ascending=ascending)
+    print(df_summary)
     df_summary.to_excel('summary.xlsx')
     return df_summary
 
@@ -453,16 +459,10 @@ def main(args):
         X, y = load_xy(args.file, args.target_col)
 
     if args.task == 'regression':
-        df_summary = run_regression(X, y)
-    elif args.task == 'classification':
-        df_summary = run_classification(X, y)
-    elif args.task == 'multiclass':
-        df_summary = run_multiclass(X, y)
+        df_summary = run_ML(X, y, model_type='continuous')
     else:
-        quit()
+        df_summary = run_ML(X, y, model_type='auto')
 
-    print('----- summary.csv (data averaged across k-folds) -----')
-    print(df_summary)
     best_model = df_summary.index[0]
     print(f'Best model: {best_model}')
     # create_single_model(best_model, X, y)
