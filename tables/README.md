@@ -235,7 +235,45 @@ def plot_barh(df: pd.DataFrame, col: str, cmap: str = 'tab10', **kwargs) -> None
     ax.set_ylabel('Value')
 ```
 
-### 1.9 Correlation Matrix
+### 1.9 Quantile-based discretisation
+
+```python
+import numpy as np
+import pandas as pd
+
+x = np.random.uniform(0, 1, 20)
+df = pd.DataFrame({'x': x})
+df['c1'] = pd.qcut(x, q=4)  # returns the actual intervals as the labels
+df['c2'] = pd.qcut(x, q=4, labels=np.arange(4))  # use labels 1,2,3,4
+df['c3'] = pd.qcut(x, q=3, labels=['lo','mid','hi'])
+```
+
+```python
+>>> df.sort_values('x')
+           x               c1 c2   c3
+1   0.020729  (0.0197, 0.149]  0   lo
+7   0.126949  (0.0197, 0.149]  0   lo
+13  0.128471  (0.0197, 0.149]  0   lo
+8   0.134889  (0.0197, 0.149]  0   lo
+6   0.139756  (0.0197, 0.149]  0   lo
+9   0.152104   (0.149, 0.243]  1   lo
+15  0.166057   (0.149, 0.243]  1   lo
+14  0.173742   (0.149, 0.243]  1  mid
+3   0.187096   (0.149, 0.243]  1  mid
+0   0.201927   (0.149, 0.243]  1  mid
+18  0.285001    (0.243, 0.61]  2  mid
+10  0.356298    (0.243, 0.61]  2  mid
+19  0.426361    (0.243, 0.61]  2  mid
+4   0.430289    (0.243, 0.61]  2   hi
+11  0.589490    (0.243, 0.61]  2   hi
+12  0.670398    (0.61, 0.974]  3   hi
+5   0.825376    (0.61, 0.974]  3   hi
+16  0.835593    (0.61, 0.974]  3   hi
+17  0.944898    (0.61, 0.974]  3   hi
+2   0.974342    (0.61, 0.974]  3   hi
+```
+
+### 1.10 Correlation Matrix
 
 To obtain the correlation matrix for a dataframe
 
@@ -244,7 +282,7 @@ df = df.drop(columns=...)  # Optionally remove columns that aren't needed
 df.corr().style.background_gradient(cmap='RdBu', axis=None).set_precision(3)
 ```
 
-### 1.10 Histogram
+### 1.11 Histogram
 
 To get a grid of histograms for each column of a dataframe
 
@@ -252,7 +290,7 @@ To get a grid of histograms for each column of a dataframe
 df.hist()
 ```
 
-### 1.11 Profiling
+### 1.12 Profiling
 
 To use Pandas Profiler, for output within a Jupyter Notebook
 
