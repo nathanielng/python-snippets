@@ -20,6 +20,9 @@ from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, shuffle=True, random_state=123)
+
+df_train, df_test = train_test_split(
+    df, test_size=0.2, shuffle=True, random_state=123)
 ```
 
 ### 1.3 Build basic model
@@ -86,4 +89,62 @@ parameters = {
 clf = RandomizedSearchCV(rf, parameters)  # or GridSearchCV(rf, parameters)
 clf.fit(X_train, y_train)
 print(clf.best_params_)
+```
+
+### 1.7 Model Pipeline
+
+**Code**
+
+```python
+from sklearn import preprocessing
+from sklearn.compose import TransformedTargetRegressor
+from sklearn.datasets import load_diabetes
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import cross_val_score, train_test_split, GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.svm import SVR
+
+RANDOM_STATE = 1234
+
+X, y = load_diabetes(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RANDOM_STATE)
+n_samples = len(y)
+
+pipe = Pipeline(steps=[
+    ('QT', preprocessing.QuantileTransformer(random_state=RANDOM_STATE)),
+    ('SVR', SVR())
+])
+
+parameters = {
+    'QT__n_quantiles': [n_samples, n_samples//2, n_samples//4],
+    'SVR__C': [.05, .5, 1, 4, 8, 16, 32],
+    'SVR__kernel': ['linear', 'rbf', 'poly'],
+    'SVR__gamma': ['scale', 'auto']
+}
+
+clf = GridSearchCV(
+    pipe,
+    param_grid=parameters,
+    cv=5,
+    n_jobs=4,
+    scoring='r2',
+    verbose=0,
+    refit=True
+)
+
+clf.fit(X_train, y_train)
+y_pred1 = clf.predict(X_train)
+train_err = r2_score(y_train, y_pred1)
+
+y_pred2 = clf.predict(X_test)
+test_err = r2_score(y_test, y_pred2)
+print(f'Error: {train_err:.4f} (training), {test_err:.4f} (test)')
+print(f'Best parameters: {clf.best_params_}')
+```
+
+**Output**
+
+```python
+Error: 0.6021 (training), 0.4430 (test)
+Best parameters: {'QT__n_quantiles': 221, 'SVR__C': 32, 'SVR__gamma': 'scale', 'SVR__kernel': 'rbf'}
 ```
