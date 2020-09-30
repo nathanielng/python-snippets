@@ -128,49 +128,6 @@ multiclass_summary = {
     'avg_precision': ['mean', 'std'],
 }
 
-space_knn = {
-    'n_neighbors': hp.choice('n_neighbors', range(2, 80)),
-    'scale': hp.choice('scale', [0, 1]),
-    'normalize': hp.choice('normalize', [0, 1]),
-}
-
-space_lr = {
-    'warm_start': hp.choice('warm_start', [True, False]),
-    'fit_intercept': hp.choice('fit_intercept', [True, False]),
-    'tol': hp.uniform('tol', 0.00001, 0.0001),
-    'C': hp.uniform('C', 0.05, 3),
-    'max_iter': hp.choice('max_iter', range(80, 200)),
-    'scale': hp.choice('scale', [0, 1]),
-    'normalize': hp.choice('normalize', [0, 1]),
-    'multi_class': 'auto',
-    'class_weight': 'balanced'
-}
-
-space_rf = {
-    'max_depth': hp.choice('max_depth', range(5, 20)),
-    'max_features': hp.choice('max_features', range(1, 5)),
-    'n_estimators': hp.choice('n_estimators', range(15, 120, 5)),
-    'criterion': hp.choice('criterion', ["gini", "entropy"]),
-}
-
-space_svc = {
-    'C': hp.uniform('C', 0, 100),
-    'kernel': hp.choice('kernel', ['linear', 'sigmoid', 'poly', 'rbf']),
-    'gamma': hp.uniform('gamma', 0, 20),
-    'scale': hp.choice('scale', [0, 1]),
-    'normalize': hp.choice('normalize', [0, 1]),
-}
-
-space_xgboost = {
-    'max_depth': hp.choice('max_depth', range(5, 20, 1)),
-    'learning_rate': hp.quniform('learning_rate', 0.01, 0.3, 0.005),
-    'n_estimators': hp.choice('n_estimators', range(20, 150, 5)),
-    'gamma': hp.quniform('gamma', 0, 0.50, 0.005),
-    'min_child_weight': hp.quniform('min_child_weight', 1, 10, 1),
-    'subsample': hp.quniform('subsample', 0.1, 1, 0.005),
-    'colsample_bytree': hp.quniform('colsample_bytree', 0.1, 1.0, 0.005)
-}
-
 
 # ----- Scalers -----
 scalers = {
@@ -395,6 +352,8 @@ def select_model_type(model_type, y):
 
     if model_type == 'auto':
         model_type = type_of_target(y)
+        if model_type == 'multiclass' and len(np.unique(y)) > 20:
+            model_type = 'continuous'
         print(f'Automatically selected model type: {model_type}')
 
     if model_type == 'continuous':
