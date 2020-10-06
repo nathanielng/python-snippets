@@ -96,6 +96,12 @@ tail -5 file.csv           # last 5 lines of a file
 cut -f3 -d ',' test.csv    # view 3rd column of a comma-delimited file
 ```
 
+#### 3.2 File compression
+
+```bash
+zip -P 'passwd' file.zip file1.txt file2.txt
+```
+
 ### 4. Tools for Video
 
 #### 4.1 ffmpeg
