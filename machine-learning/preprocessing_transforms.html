@@ -13088,7 +13088,7 @@ div#notebook {
 
 <span class="k">class</span> <span class="nc">MyTransformer</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
         <span class="bp">self</span><span class="o">.</span><span class="n">_mean_X</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_std_X</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mean_y</span> <span class="o">=</span> <span class="kc">None</span>
@@ -13436,6 +13436,265 @@ div#notebook {
 <pre>array([[-0.26726124, -1.22474487,  1.37281295],
        [ 1.33630621,  0.        , -0.39223227],
        [-1.06904497,  1.22474487, -0.98058068]])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">X0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">X1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">X2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">X3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">X4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">lam</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">X5</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">triangular</span><span class="p">(</span><span class="n">left</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">X6</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">weibull</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">X7</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">weibull</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="p">(</span><span class="n">MaxAbsScaler</span><span class="p">,</span> <span class="n">MinMaxScaler</span><span class="p">,</span> <span class="n">Normalizer</span><span class="p">,</span> <span class="n">PowerTransformer</span><span class="p">,</span>
+                                   <span class="n">QuantileTransformer</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="n">X</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+        <span class="s1">&#39;BoxCox&#39;</span><span class="p">:</span> <span class="n">PowerTransformer</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;box-cox&#39;</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+        <span class="s1">&#39;BoxCox_Std&#39;</span><span class="p">:</span> <span class="n">PowerTransformer</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;box-cox&#39;</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+        <span class="s1">&#39;MaxAbs&#39;</span><span class="p">:</span> <span class="n">MaxAbsScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+        <span class="s1">&#39;MinMax&#39;</span><span class="p">:</span> <span class="n">MinMaxScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+        <span class="s1">&#39;NormalizerL1&#39;</span><span class="p">:</span> <span class="n">Normalizer</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="s1">&#39;l1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>  <span class="c1"># Same as: preprocessing.normalize(df, norm=&#39;l1&#39;)</span>
+        <span class="s1">&#39;NormalizerL2&#39;</span><span class="p">:</span> <span class="n">Normalizer</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="s1">&#39;l2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>  <span class="c1"># Same as: preprocessing.normalize(df, norm=&#39;l2&#39;)</span>
+        <span class="s1">&#39;Quantile10&#39;</span><span class="p">:</span> <span class="n">QuantileTransformer</span><span class="p">(</span><span class="n">n_quantiles</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+        <span class="s1">&#39;Standard&#39;</span><span class="p">:</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+        <span class="s1">&#39;YeoJohnson&#39;</span><span class="p">:</span> <span class="n">PowerTransformer</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;yeo-johnson&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dfX</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">X0</span><span class="p">)</span>
+<span class="n">dfX</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[10]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>X</th>
+      <th>BoxCox</th>
+      <th>BoxCox_Std</th>
+      <th>MaxAbs</th>
+      <th>MinMax</th>
+      <th>NormalizerL1</th>
+      <th>NormalizerL2</th>
+      <th>Quantile10</th>
+      <th>Standard</th>
+      <th>YeoJohnson</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.144420</td>
+      <td>-1.034066</td>
+      <td>-1.168049</td>
+      <td>0.144851</td>
+      <td>0.133613</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.165031</td>
+      <td>-1.189005</td>
+      <td>-1.187620</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.530450</td>
+      <td>-0.507120</td>
+      <td>0.206663</td>
+      <td>0.532033</td>
+      <td>0.525884</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.512751</td>
+      <td>0.117557</td>
+      <td>0.112286</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.122155</td>
+      <td>-1.072224</td>
+      <td>-1.267598</td>
+      <td>0.122520</td>
+      <td>0.110988</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.149039</td>
+      <td>-1.264363</td>
+      <td>-1.261934</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.289276</td>
+      <td>-0.814725</td>
+      <td>-0.595827</td>
+      <td>0.290140</td>
+      <td>0.280811</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.279401</td>
+      <td>-0.698721</td>
+      <td>-0.702267</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.149916</td>
+      <td>-1.024896</td>
+      <td>-1.144125</td>
+      <td>0.150364</td>
+      <td>0.139198</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.168979</td>
+      <td>-1.170402</td>
+      <td>-1.169263</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>95</th>
+      <td>0.601572</td>
+      <td>-0.424301</td>
+      <td>0.422724</td>
+      <td>0.603368</td>
+      <td>0.598156</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.585384</td>
+      <td>0.358279</td>
+      <td>0.353891</td>
+    </tr>
+    <tr>
+      <th>96</th>
+      <td>0.562209</td>
+      <td>-0.469793</td>
+      <td>0.304043</td>
+      <td>0.563887</td>
+      <td>0.558156</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.540244</td>
+      <td>0.225050</td>
+      <td>0.220099</td>
+    </tr>
+    <tr>
+      <th>97</th>
+      <td>0.242531</td>
+      <td>-0.881345</td>
+      <td>-0.769626</td>
+      <td>0.243255</td>
+      <td>0.233311</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.238427</td>
+      <td>-0.856935</td>
+      <td>-0.859232</td>
+    </tr>
+    <tr>
+      <th>98</th>
+      <td>0.039605</td>
+      <td>-1.236476</td>
+      <td>-1.696103</td>
+      <td>0.039724</td>
+      <td>0.027104</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.052531</td>
+      <td>-1.543761</td>
+      <td>-1.536748</td>
+    </tr>
+    <tr>
+      <th>99</th>
+      <td>0.291716</td>
+      <td>-0.811331</td>
+      <td>-0.586972</td>
+      <td>0.292587</td>
+      <td>0.283290</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.281539</td>
+      <td>-0.690464</td>
+      <td>-0.694066</td>
+    </tr>
+  </tbody>
+</table>
+<p>100 rows × 10 columns</p>
+</div>
 </div>
 
 </div>
