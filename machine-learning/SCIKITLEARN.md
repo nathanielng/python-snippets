@@ -4,16 +4,37 @@
 
 ### 1.1 Load the data
 
+Load the data into a Pandas dataframe using `pd.read_csv()` or `pd.read_excel()`,
+with the first column specified as the index column (optional).  For large
+datasets, `df.sample()` may be used to use only a fraction of the dataset
+for the initial debugging.
+
 ```python
 import pandas as pd
 
 df = pd.read_csv('file.csv', index_col=0)
-df.sample(frac=0.01, inplace=True, random_state=123)  # optional sampling
+df = pd.read_excel('file.xlsx', index_col=0)
+
+# Optional sampling
+df.sample(frac=0.05, inplace=True, replace=False, random_state=123)  # based on fraction
+df.sample(n=5000, inplace=True, replace=False, random_state=123)     # based on rows
+```
+
+Split dataframe in to `X` and `y` using the last column, or by specifying a
+specific target column:
+
+```python
 X = df.iloc[:, :-1]
 y = df.iloc[:, -1]
+
+X = df.loc[:, df.columns != target_col]
+y = df.loc[:, target_col]
 ```
 
 ### 1.2 Split data into training & testing sets
+
+`X` and `y` may be split into training & test sets using `train_test_split`.
+This method also works with dataframes.
 
 ```python
 from sklearn.model_selection import train_test_split
@@ -74,8 +95,10 @@ cv_results = pd.DataFrame(cross_validate(
 
 ### 1.6 Hyperparameter search with cross validation
 
+To perform a grid search:
+
 ```python
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+from sklearn.model_selection import GridSearchCV
 
 print(rf.get_params())  # view default parameters
 parameters = {
@@ -86,12 +109,35 @@ parameters = {
     'min_samples_leaf': [1, 2, 4]
 }
 
-clf = RandomizedSearchCV(rf, parameters)  # or GridSearchCV(rf, parameters)
+clf = GridSearchCV(rf, parameters)
+```
+
+To perform a randomised search:
+
+```python
+from scipy.stats import uniform
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.utils.fixes import loguniform
+
+parameters = {
+    'n_estimators': [int(x) for x in np.linspace(start=200, stop=2000, num=10)],
+    'max_features': ['auto', 'sqrt'],
+    'max_depth': [int(x) for x in np.linspace(10, 110, num=11), None],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'bootstrap': [True, False]
+}
+clf = RandomizedSearchCV(rf, parameters)
+```
+
+To perform the hyperparameter search and to obtain the best parameters
+
+```python
 clf.fit(X_train, y_train)
 print(clf.best_params_)
 ```
 
-### 1.7 Model Pipeline
+### 1.7 Model Pipeline with hyperparameter search
 
 **Code**
 
