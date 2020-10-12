@@ -65,7 +65,13 @@ SSH to a remote server:
 
 ```bash
 ssh hostname
-ssh user@hostname
+ssh user@hostname 
+```
+
+SSH to remote server with port forwarding:
+
+```bash
+ssh -L ${LOCAL_PORT}:localhost:${REMOTE_PORT} user@hostname
 ```
 
 Running commands on a remote server:
