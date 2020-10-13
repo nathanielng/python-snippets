@@ -17,6 +17,7 @@ import sklearn.datasets
 - [`load_linnerud()`](http://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_linnerud.html#sklearn.datasets.load_linnerud) - Linnerud Dataset (*multivariate regression*)
 - [`fetch_openml()`](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_openml.html) - multiple OpenML datasets.
   Specify desired dataset with: `name=` or `data_id=`.
+  List of OpenML datasets available [here](https://www.openml.org/search?q=&type=)
 
 ## 2. Seaborn Datasets
 
