@@ -72,7 +72,7 @@ class ColSelector(BaseEstimator, TransformerMixin):
 
 class ColRemover(BaseEstimator, TransformerMixin):
     """
-    Removes specified columns
+    Removes from a dataframe, the columns that you specify
     """
 
     def __init__(self, columns_to_remove):
@@ -97,8 +97,9 @@ class ColRemover(BaseEstimator, TransformerMixin):
 
 class RowVCSelector(BaseEstimator, TransformerMixin):
     """
-    Drops rows where if the valuecount in any column is
-    lower than the minimum valuecount
+    Drops rows if the valuecount for the value in that row
+    is lower than the minimum valuecount. Do this for all
+    columns.
     """
 
     def __init__(self, min_valuecount=2):
@@ -127,7 +128,7 @@ class RowVCSelector(BaseEstimator, TransformerMixin):
 
 class RowRangeSelector(BaseEstimator, TransformerMixin):
     """
-    Drops rows where if the value in any column is
+    Drops rows where if the value in that column is
     outside a specified range
     """
 

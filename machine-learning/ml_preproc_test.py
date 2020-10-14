@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-from ml_preproc import ColSelector, RowVCSelector, RowRangeSelector
+from ml_preproc import ColSelector, ColRemover, RowVCSelector, RowRangeSelector
 
 
 df = pd.DataFrame({
@@ -24,6 +24,12 @@ def test_col_selector():
     CS3 = ColSelector(min_unique=3)
     X3 = CS3.fit_transform(df)
     assert X3.equals(df[['a']])
+
+
+def test_col_remover():
+    CR1 = ColRemover(columns_to_remove=['a','c'])
+    X1 = CR1.fit_transform(df)
+    assert X1.equals(df[['b']])
 
 
 def test_row_vc_selector():
