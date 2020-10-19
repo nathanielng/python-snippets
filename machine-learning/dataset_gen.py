@@ -69,6 +69,12 @@ def load_sk_dataset(dataset_name: str, return_X_y: bool):
 
 
 def load_sns_dataset(dataset_name: str):
+    """
+    Retrieves a Seaborn dataset with a name specified in
+    https://github.com/mwaskom/seaborn-data
+
+    Examples: anscombe, diamonds, iris, mpg, tips, titanic
+    """
     datasets = sns.get_dataset_names()
     if dataset_name not in datasets:
         return None
