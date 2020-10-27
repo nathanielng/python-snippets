@@ -36,6 +36,15 @@ respository will serve as one of the places to put that code.
 - [Python](https://nathanielng.github.io/python-snippets/PYTHON) - general Python tips
 - [Search](https://nathanielng.github.io/python-snippets/FIND) tips to search for files and patterns in files
 
+### License
+
+- **Code**: MIT License
+- **Content**: CC BY 4.0 [![CC BY 4.0][cc-by-shield]][cc-by]
+
+[cc-by]: http://creativecommons.org/licenses/by/4.0/
+[cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
+
+
 <br>
 
 View this repository's Jupyter Notebooks in Colab
