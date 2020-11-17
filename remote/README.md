@@ -41,6 +41,24 @@ ping -c3 hostname
 Note that inbound ICMP traffic should be enabled.  For AWS EC2 instances,
 the security groups should be [configured appropriately](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html#sg-rules-ping).
 
+### 1.3 SSH and Port Forwarding
+
+SSH to remote server (that has been set up in `~/.ssh/config`)
+
+```bash
+ssh my_remote_aws_instance
+ssh -X my_remote_aws_instance  # with X11 forwarding
+ssh -Y my_remote_aws_instance  # with trusted X11 forwarding
+```
+
+SSH with port forwarding
+
+```bash
+ssh -L local_port:ip_addr:remote_port hostname
+ssh -L 8080:127.0.0.1:8080 my_remote_aws_instance
+ssh -N -L 8080:127.0.0.1:8080 my_remote_aws_instance  # do not execute remote commands
+```
+
 ## 2. Google Colaboratory
 
 ### 2.1 Introduction
