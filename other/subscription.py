@@ -52,6 +52,7 @@ class Subscription:
         t_frac_30 = self._t_frac / 30
         t_percent = 100.0 * t_frac_30
         max_usage = self._qty * t_percent / 100.0
+        print()
 
         print(f'Subscription start: {txt_start}')
         print(f'Now (today)       : {txt_now}')
@@ -74,3 +75,4 @@ if __name__ == "__main__":
         qty=float(args.qty),
         unit=args.unit)
     plan.print_subscription_status()
+
