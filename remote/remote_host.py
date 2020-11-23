@@ -13,8 +13,9 @@ HOME = os.getenv('HOME')
 
 
 class SSHHost:
-    """A class to handle remote SSH connections"""
-
+    """
+    A class to handle remote SSH connections
+    """
 
     def __init__(self, userid, host, key, passwd=None):
         self._userid = userid
@@ -22,13 +23,23 @@ class SSHHost:
         self._keyfile = os.path.expanduser(key)
         if 'ed25519' in self._keyfile:
             if passwd is None:
-                self._key = paramiko.Ed25519Key.from_private_key_file(self._keyfile)
+                self._key = paramiko.Ed25519Key.from_private_key_file(
+                    self._keyfile)
             else:
-                self._key = paramiko.Ed25519Key.from_private_key_file(self._keyfile, password=passwd)
+                self._key = paramiko.Ed25519Key.from_private_key_file(
+                    self._keyfile, password=passwd)
         elif 'edcsa' in self._keyfile:
-            self._key = paramiko.ECDSAKey.from_private_key_file(self._keyfile)
+            if passwd is None:
+                self._key = paramiko.ECDSAKey.from_private_key_file(self._keyfile)
+            else:
+                self._key = paramiko.ECDSAKey.from_private_key_file(
+                    self._keyfile, password=passwd)
         else:
-            self._key = paramiko.RSAKey.from_private_key_file(self._keyfile)
+            if passwd is None:
+                self._key = paramiko.RSAKey.from_private_key_file(self._keyfile)
+            else:
+                self._key = paramiko.RSAKey.from_private_key_file(
+                    self._keyfile, password=passwd)
         self._ssh_client = self.get_remote_ssh_client()
 
 
@@ -49,8 +60,8 @@ class SSHHost:
             exit_status = stdout.channel.recv_exit_status()
             return {
                 'stdin': stdin,
-                'stdout': stdout,
-                'stderr': stderr,
+                'stdout': stdout if stdout is not None else '',
+                'stderr': stderr if stderr is not None else '',
                 'exit_status': exit_status
             }
         except Exception as e:
