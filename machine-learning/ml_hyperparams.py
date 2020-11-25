@@ -10,6 +10,8 @@ Hyperparameters for use with
 import numpy as np
 
 from hyperopt import hp
+from random import randrange as sp_randrange
+from scipy.stats import randint as sp_randint
 from sklearn.gaussian_process.kernels import ConstantKernel, DotProduct, Matern, RationalQuadratic, RBF, WhiteKernel
 
 
@@ -28,6 +30,18 @@ hp_space_lr = {
     'multi_class': 'auto',
     'class_weight': 'balanced'
 }
+rand_space_lr = {
+    'LR__warm_start': [True, False],
+    'LR__fit_intercept': [True, False],
+    'LR__tol': sp_randrange(0.00001, 0.0001),
+    'LR__C': sp_randrange(0.05, 3.0),
+    'LR__max_iter': sp_randint(80, 200),
+    'LR__scale': [0, 1],
+    'LR__normalize': [0, 1],
+    'LR__multi_class': 'auto',
+    'LR__class_weight': 'balanced'
+}
+
 params_lr = {
     'LR__warm_start': [True, False],
     'LR__fit_intercept': [True, False],
