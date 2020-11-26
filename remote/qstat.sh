@@ -2,6 +2,9 @@
 
 if [ "$1" = "help" ]; then
     echo "Runs the qstat command on a specified server"
+fi
+
+if [ "$PBS_SERVER" = "" ]; then
     echo "To set up, add the following line to ~/.bash_profile:"
     echo "export PBS_SERVER=\"userid@hostname\""
     echo "(replacing userid with your user id and hostname with the name of your server)"
