@@ -11,7 +11,7 @@ import numpy as np
 
 from hyperopt import hp
 from random import randrange as sp_randrange
-from scipy.stats import randint as sp_randint
+from scipy.stats import randint, uniform
 from sklearn.gaussian_process.kernels import ConstantKernel, DotProduct, Matern, RationalQuadratic, RBF, WhiteKernel
 
 
@@ -33,15 +33,14 @@ hp_space_lr = {
 rand_space_lr = {
     'LR__warm_start': [True, False],
     'LR__fit_intercept': [True, False],
-    'LR__tol': sp_randrange(0.00001, 0.0001),
-    'LR__C': sp_randrange(0.05, 3.0),
-    'LR__max_iter': sp_randint(80, 200),
+    'LR__tol': uniform(0.00001, 0.0001),
+    'LR__C': uniform(0.05, 3.0),
+    'LR__max_iter': randint(80, 200),
     'LR__scale': [0, 1],
     'LR__normalize': [0, 1],
     'LR__multi_class': 'auto',
     'LR__class_weight': 'balanced'
 }
-
 params_lr = {
     'LR__warm_start': [True, False],
     'LR__fit_intercept': [True, False],
@@ -78,6 +77,13 @@ hp_space_svr = {
     'gamma': hp.loguniform('gamma', np.log(1e-2), np.log(1e2)),
     'epsilon': hp.choice('epsilon', [0.1]),
     'max_iter': hp.choice('max_iter', [10000])
+}
+rand_space_svr = {
+    'SVR__C': np.logspace(0, 3, 50),
+    'SVR__kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
+    'SVR__gamma': np.logspace(-2, 2, 50),  # ['scale', 'auto'],
+    'SVR__epsilon': [0.1],
+    'SVR__max_iter': [1000]
 }
 params_svr = {
     'SVR__C': np.logspace(0, 3, 4),
