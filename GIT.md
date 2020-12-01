@@ -20,6 +20,7 @@ git init
 git config --local user.name "Firstname Lastname"
 git config --local user.email "userid@hostname"
 git config --global core.editor "vim"  # Optional. replace vim with nano, ..., depending on the preferred editor for commits
+git config --global credential.helper "cache --timeout=7200"  # Optional. save credentials for 2 hours
 
 git add new_file
 git commit -m "First commit"
