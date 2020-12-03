@@ -99,6 +99,11 @@ hp_space_krr = {
     'kernel': hp.choice('kernel', ['linear', 'rbf', 'poly', 'sigmoid']),
     'gamma': hp.loguniform('gamma', np.log(1e-2), np.log(1e2)),
 }
+rand_space_krr = {
+    'KRR__alpha': np.logspace(0, 3, 40),
+    'KRR__kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
+    'KRR__gamma': np.logspace(-2, 2, 40)
+}
 params_krr = {
     'KRR__alpha': np.logspace(0, 3, 4),
     'KRR__kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
@@ -110,6 +115,11 @@ hp_space_knn = {
     'n_neighbors': hp.choice('n_neighbors', range(2, 80)),
     'scale': hp.choice('scale', [0, 1]),
     'normalize': hp.choice('normalize', [0, 1]),
+}
+rand_space_knn = {
+    'KNN__n_neighbors': [ int(x) for x in np.logspace(np.log(2), np.log(80), 40),
+    'KNN__scale': [0, 1],
+    'KNN__normalize': [0, 1],
 }
 params_knn = {
     'KNN__n_neighbors': [2, 4, 8, 16, 32, 80],
