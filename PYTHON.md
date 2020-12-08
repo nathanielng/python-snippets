@@ -81,3 +81,12 @@ assert new_function(100) == 102
 %%svg
 %%writefile [-a] filename
 ```
+
+# Anaconda Python
+
+## 1. Update
+
+```bash
+conda update -n base conda
+conda update --all
+```
