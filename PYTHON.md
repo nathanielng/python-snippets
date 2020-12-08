@@ -89,4 +89,6 @@ assert new_function(100) == 102
 ```bash
 conda update -n base conda
 conda update --all
+conda update anaconda
+conda install python=3.9
 ```
