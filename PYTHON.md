@@ -81,3 +81,23 @@ assert new_function(100) == 102
 %%svg
 %%writefile [-a] filename
 ```
+
+# Anaconda Python
+
+## 1. Update
+
+```bash
+conda update -n base conda
+conda update --all
+conda update anaconda
+conda install python=3.9
+```
+
+## 2. Disabling Anaconda
+
+To prevent Anaconda from loading the base environment on startup
+
+```bash
+conda config --set auto_activate_base false
+```
+
