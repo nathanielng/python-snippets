@@ -100,9 +100,18 @@ head -5 file.csv           # first 5 lines of a file
 sed -n '10,20p' file.csv   # lines 10-20 (inclusive) of a file
 tail -5 file.csv           # last 5 lines of a file
 cut -f3 -d ',' test.csv    # view 3rd column of a comma-delimited file
+ls -l@ filename            # view extended attributes of file (Mac OS X)
 ```
 
-#### 3.2 File compression
+#### 3.2 File diff tools
+
+```bash
+diff file1.txt file2.txt      # Standard Diff Tool
+opendiff file1.txt file2.txt  # Diff with FileMerge
+code -d file1.txt file2.txt   # Diff with Visual Studio Code
+```
+
+#### 3.3 File compression
 
 ```bash
 zip -P 'passwd' file.zip file1.txt file2.txt
