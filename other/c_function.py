@@ -8,6 +8,7 @@ import pathlib
 HOME = pathlib.Path().absolute()
 
 
+# ----- Using ctypes -----
 def float_demo():
     c_lib = ctypes.CDLL(HOME/'c_function.so')
     c_lib.cfunc_float.restype = ctypes.c_float
@@ -28,6 +29,15 @@ def double_demo():
     print(c_lib.cfunc_double(pi, a, b))
 
 
+# ----- Using CFFI -----
+def cffi_demo():
+    import cffi
+
+    ffi = cffi.FFI()
+    pass
+
+
 if __name__ == "__main__":
     float_demo()
     double_demo()
+

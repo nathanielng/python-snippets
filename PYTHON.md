@@ -82,6 +82,14 @@ assert new_function(100) == 102
 %%writefile [-a] filename
 ```
 
+### 5.2 Jupyter Extensions
+
+```bash
+pip install jupyter_contrib_nbextensions
+jupyter contrib nbextension install --user
+```
+
+
 # Anaconda Python
 
 ## 1. Update
@@ -100,4 +108,3 @@ To prevent Anaconda from loading the base environment on startup
 ```bash
 conda config --set auto_activate_base false
 ```
-

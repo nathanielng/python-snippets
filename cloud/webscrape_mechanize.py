@@ -13,6 +13,12 @@ def get_browser():
     return browser
 
 
+def find_form(browser):
+    #for form in browser.forms():
+    #    if 
+    pass
+
+
 def browse_and_fill(url, boxes):
     """
     Browse to a website

@@ -4,7 +4,7 @@
 
 ### 1.1 Import
 
-```
+```python
 import sklearn.datasets
 ```
 
