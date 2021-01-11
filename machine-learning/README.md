@@ -5,7 +5,7 @@
 ### 1.1 General
 
 - Kaggle Learn: [kaggle.com/learn/](https://www.kaggle.com/learn/)
-- [Machine Learning University](https://www.youtube.com/channel/UC12LqyqTQYbXatYS9AA7Nuw/videos) | [by Amazon](https://www.amazon.science/latest-news/machine-learning-course-free-online-from-amazon-machine-learning-university)
+- [Machine Learning University](https://www.youtube.com/channel/UC12LqyqTQYbXatYS9AA7Nuw/videos) \| [by Amazon](https://www.amazon.science/latest-news/machine-learning-course-free-online-from-amazon-machine-learning-university)
 
 ### 1.2 Learn Tensorflow
 
@@ -23,8 +23,8 @@
 
 ### 2.1 Coursera
 
-- [Machine Learning](https://www.coursera.org/learn/machine-learning) | Stanford | Andrew Ng
-- [Deep Learning Specialization](https://www.coursera.org/specializations/deep-learning) | deeplearning.ai | Andrew Ng
+- [Machine Learning](https://www.coursera.org/learn/machine-learning) \| Stanford \| Andrew Ng
+- [Deep Learning Specialization](https://www.coursera.org/specializations/deep-learning) \| deeplearning.ai \| Andrew Ng
 
 ### 2.2 Google
 
