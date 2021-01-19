@@ -151,6 +151,15 @@ class PBSHost:
         qstat_txt = '\n'.join([stdout[0]] + stdout[2:])
         return pd.read_fwf(io.StringIO(qstat_txt), header=0)
 
+    def remote_file_upload(self, src_file, dest_file):
+        self._SSH.remote_file_upload(src_file, dest_file)
+
+    def describe(self):
+        self._SSH.describe()
+
+    def remote_execute(self, command):
+        return self._SSH.remote_execute(command)
+
     def close(self):
         self._SSH.close()
 
