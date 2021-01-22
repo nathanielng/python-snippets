@@ -20,7 +20,8 @@ git init
 git config --local user.name "Firstname Lastname"
 git config --local user.email "userid@hostname"
 git config --global core.editor "vim"    # Optional. replace vim with nano, ..., depending on the preferred editor for commits
-git config --global core.autocrlf input  # Optional. automatic handling of carriage returns
+git config --global core.autocrlf true   # Optional. for handling of line endings on Windows
+git config --global core.autocrlf input  # Optional. for handling of carriage returns on Mac/Linux
 git config --global credential.helper "cache --timeout=7200"  # Optional. save credentials for 2 hours
 
 git add new_file
