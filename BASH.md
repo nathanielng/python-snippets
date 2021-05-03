@@ -117,6 +117,33 @@ code -d file1.txt file2.txt   # Diff with Visual Studio Code
 zip -P 'passwd' file.zip file1.txt file2.txt
 ```
 
+#### 3.4 Base64 encoding
+
+**Encoding and decoding strings**
+
+```bash
+echo "Hello world" | base64                 # Output: SGVsbG8gd29ybGQK
+echo "SGVsbG8gd29ybGQK" | base64 --decode   # Output: Hello world
+```
+
+**Encoding and decoding files**
+
+```bash
+echo "Hello world" > hello_world.txt
+base64 -i hello_world.txt
+base64 -i hello_world.txt -o hello_world_base64.txt
+
+base64 -d hello_world_base64.txt
+base64 -d hello_world_base64.txt -o hello_world.txt
+```
+
+Encoding and decoding using OpenSSL
+
+```bash
+openssl base64 -in hello_world.txt -out hello_world_base64.txt
+openssl base64 -d -in hello_world_base64.txt -out hello_world.txt
+```
+
 ### 4. Tools for Video
 
 #### 4.1 ffmpeg
