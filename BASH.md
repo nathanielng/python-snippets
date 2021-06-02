@@ -122,6 +122,7 @@ code -d file1.txt file2.txt   # Diff with Visual Studio Code
 #### 4.3 File compression
 
 ```bash
+zip -r file.zip foldername
 zip -P 'passwd' file.zip file1.txt file2.txt
 ```
 
