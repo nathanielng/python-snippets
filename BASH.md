@@ -59,7 +59,9 @@ curl -L -o 'outputfile' -C - [url]
 
 where `-L` is to follow redirects (HTTP 3xx status code)
 
-#### 2.3 ssh
+### 3. Networking
+
+#### 3.1 ssh
 
 SSH to a remote server:
 
@@ -91,9 +93,15 @@ Copying files from a remote server
 rsync -avz hostname:filename .
 ```
 
-### 3. Tools for file manipulation
+#### 3.2 Netstat
 
-#### 3.1 File viewing and slicing
+```bash
+netstat -rn    # view route table & default gateway
+```
+
+### 4. Tools for file manipulation
+
+#### 4.1 File viewing and slicing
 
 ```bash
 head -5 file.csv           # first 5 lines of a file
@@ -103,7 +111,7 @@ cut -f3 -d ',' test.csv    # view 3rd column of a comma-delimited file
 ls -l@ filename            # view extended attributes of file (Mac OS X)
 ```
 
-#### 3.2 File diff tools
+#### 4.2 File diff tools
 
 ```bash
 diff file1.txt file2.txt      # Standard Diff Tool
@@ -111,13 +119,13 @@ opendiff file1.txt file2.txt  # Diff with FileMerge
 code -d file1.txt file2.txt   # Diff with Visual Studio Code
 ```
 
-#### 3.3 File compression
+#### 4.3 File compression
 
 ```bash
 zip -P 'passwd' file.zip file1.txt file2.txt
 ```
 
-#### 3.4 Base64 encoding
+#### 4.4 Base64 encoding
 
 **Encoding and decoding strings**
 
@@ -144,9 +152,9 @@ openssl base64 -in hello_world.txt -out hello_world_base64.txt
 openssl base64 -d -in hello_world_base64.txt -out hello_world.txt
 ```
 
-### 4. Tools for Video
+### 5. Tools for Video
 
-#### 4.1 ffmpeg
+#### 5.1 ffmpeg
 
 Video file conversion (to make the video viewable on Mac OS X / Ubuntu)
 
@@ -174,16 +182,16 @@ ffmpeg -i animation.mp4 -r 10 output%05d.png
 convert output*.png output.gif
 ```
 
-### 5. Git Bash on Windows
+### 6. Git Bash on Windows
 
-#### 5.1 Bash
+#### 6.1 Bash
 
 ```bash
 cd /d  # Change to D: drive
 cd     # Change to /c/Users/[Windows User Name]
 ```
 
-#### 5.2 Git Bash with Anaconda Python
+#### 6.2 Git Bash with Anaconda Python
 
 With the default installation settings (for miniconda)
 
