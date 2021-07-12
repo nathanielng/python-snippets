@@ -124,6 +124,7 @@ code -d file1.txt file2.txt   # Diff with Visual Studio Code
 ```bash
 zip -r file.zip foldername
 zip -P 'passwd' file.zip file1.txt file2.txt
+zip -rP 'passwd' file.zip folder/*
 ```
 
 #### 4.4 Base64 encoding
