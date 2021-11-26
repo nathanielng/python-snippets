@@ -59,6 +59,12 @@ curl -L -o 'outputfile' -C - [url]
 
 where `-L` is to follow redirects (HTTP 3xx status code)
 
+#### 2.3 date
+
+```bash
+date +"%Y-%M-%dT%H:%M:%SZ"
+```
+
 ### 3. Networking
 
 #### 3.1 ssh
