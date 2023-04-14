@@ -1,5 +1,16 @@
 # Python
 
+## Setup
+
+```bash
+curl -O https://bootstrap.pypa.io/get-pip.py
+python3 get-pip.py
+pip install virtualenv
+cd ~
+virtualenv pyenv
+source pyenv/bin/activate
+```
+
 ## 1. Lists
 
 1. Check that two lists, `l1`, `l2` are the same:
