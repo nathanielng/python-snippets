@@ -22,3 +22,19 @@ instance_type = instance_types.retrieve_default(
     scope="inference")
 print(instance_type)
 ```
+
+## Endpoint Configurations
+
+```python
+import boto3
+sm_client = boto3.client('sagemaker')
+
+endpoint_configs = [
+    config['EndpointConfigName'] for config
+    in sm_client.list_endpoint_configs()['EndpointConfigs']
+]
+
+# Delete all endpoint configurations
+for config in endpoint_configs:
+    response = sm_client.delete_endpoint_config(EndpointConfigName=config)
+```
