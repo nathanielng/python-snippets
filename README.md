@@ -47,6 +47,8 @@ respository will serve as one of the places to put that code.
 
 <br>
 
-View this repository's Jupyter Notebooks in Colab
+View this repository's Jupyter Notebooks in Colab [[docs](https://docs.aws.amazon.com/sagemaker/latest/dg/studio-lab-use-external.html#studio-lab-use-external-add-button)]
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nathanielng/python-snippets)
+
+[![Open In SageMaker Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/nathanielng/python-snippets)
