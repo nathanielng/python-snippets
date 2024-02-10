@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Download this file with either of the following:
+# wget https://raw.githubusercontent.com/nathanielng/python-snippets/master/setup_new_python_environment.sh
+# curl -O https://raw.githubusercontent.com/nathanielng/python-snippets/master/setup_new_python_environment.sh
+
+# Run this file with:
+# sh setup_new_python_environment.sh [env_name]
+
 if [ "$1" = "" ]; then
     echo "Usage: $0 [env_name]"
     exit 1
