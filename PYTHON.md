@@ -46,9 +46,35 @@ def my_function(xy: Tuple[int, int]=(0, 0), d: Dict[str, np.ndarray]):
     pass
 ```
 
-## 4. Functools
 
-### 4.1 Partials
+## 4. Strings
+
+### 4.1 Handling Unicode
+
+```python
+from unidecode import unidecode
+
+def convert_unicode(text):
+    return unidecode(text)
+
+def remove_unicode(text):
+    return text.encode("ascii", "ignore")
+```
+
+### 4.2 Counting Tokens
+
+```python
+import tiktoken
+
+encoding = tiktoken.get_encoding("cl100k_base")
+def get_token_count(text):
+    return len(encoding.encode(text))
+```
+
+
+## 5. Functools
+
+### 5.1 Partials
 
 ```python
 from functools import partial
@@ -63,9 +89,10 @@ new_function = partial(my_function, 2)
 assert new_function(100) == 102
 ```
 
-## 5. Jupyter Notebooks
 
-### 5.1 IPython magic - selected commands
+## 6. Jupyter Notebooks
+
+### 6.1 IPython magic - selected commands
 
 ```python
 %cd
@@ -93,7 +120,7 @@ assert new_function(100) == 102
 %%writefile [-a] filename
 ```
 
-### 5.2 Jupyter Extensions
+### 6.2 Jupyter Extensions
 
 ```bash
 pip install jupyter_contrib_nbextensions
