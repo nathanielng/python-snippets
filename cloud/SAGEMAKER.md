@@ -26,9 +26,38 @@ Deploying the JumpStart Model
 ```python
 from sagemaker.jumpstart.model import JumpStartModel
 
-model_id = "huggingface-text2text-flan-t5-xl"
-my_model = JumpStartModel(model_id=model_id)
-predictor = my_model.deploy()
+def deploy(model_id, instance_type, **kwargs):
+    model = JumpStartModel(
+        model_id=model_id,
+        instance_type=instance_type,
+        **kwargs
+    )
+    predictor = model.deploy()
+    return predictor, model
+
+def predict(predictor, payload):
+    response = predictor.predict(payload)
+    return response[0]["generated_text"]
+ 
+def delete_model(predictor):
+    predictor.delete_model()
+    predictor.delete_endpoint()
+
+if __name__ == '__main__':
+    predictor, model = deploy(
+        model_id = "huggingface-...",
+        instance_type = "ml.g4dn.12xlarge",
+    )
+    payload = {
+        "inputs": "What is SageMaker JumpStart?",
+        "parameters": {
+            "max_new_tokens": 110,
+            "no_repeat_ngram_size": 3,
+        },
+    }
+    response = predict(predictor, payload)
+    print(response)
+    delete_model(predictor)
 ```
 
 
