@@ -10,7 +10,7 @@ pip install -U sagemaker
 
 ### JumpStart models
 
-Getting the default instance type for a given `model_id`
+#### Getting the default instance type for a given `model_id`
 
 ```python
 from sagemaker import instance_types
@@ -21,7 +21,7 @@ instance_type = instance_types.retrieve_default(
 print(instance_type)
 ```
 
-Deploying the JumpStart Model
+#### Deploying a JumpStart Model
 
 ```python
 from sagemaker.jumpstart.model import JumpStartModel
@@ -58,6 +58,29 @@ if __name__ == '__main__':
     response = predict(predictor, payload)
     print(response)
     delete_model(predictor)
+```
+
+#### Retrieving a JumpStart Training Job
+
+```python
+import boto3
+
+from sagemaker.jumpstart.estimator import JumpStartEstimator
+
+REGION = 'us-west-2'
+sagemaker_client = boto3.client('sagemaker', region_name=REGION)
+
+def get_training_job_s3_bucket(training_job_name):
+    response = sagemaker_client.describe_training_job(TrainingJobName = training_job_name)
+    s3_model_artifacts = response['ModelArtifacts']['S3ModelArtifacts']
+    return response['InputDataConfig'][0]['DataSource']['S3DataSource']['S3Uri']
+
+training_job_name = '...'
+model_id = '...'
+s3_bucket = get_training_job_s3_bucket(training_job_name)
+attached_estimator = JumpStartEstimator.attach(training_job_name, model_id)
+print(attached_estimator.logs())
+predictor = attached_estimator.deploy()
 ```
 
 
