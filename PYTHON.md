@@ -1,6 +1,6 @@
 # Python
 
-## Setup
+## 0. Setup
 
 ```bash
 curl -O https://bootstrap.pypa.io/get-pip.py
@@ -10,6 +10,25 @@ cd ~
 virtualenv pyenv
 source pyenv/bin/activate
 ```
+
+SageMaker & HuggingFace `requirements.txt` setup
+
+```bash
+cat > requirements.txt << EOF
+accelerate
+einops
+huggingface_hub[cli]
+optimum
+sentencepiece
+sagemaker
+torch
+transformers
+EOF
+pip install -U pip
+pip install -r requirements.txt
+```
+
+
 
 ## 1. Lists
 
