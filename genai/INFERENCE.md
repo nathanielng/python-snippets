@@ -2,7 +2,7 @@
 
 ## 1. EC2 Deployment
 
-Example Python code
+### 1.1 EC2 with HuggingFace
 
 ```python
 #!/usr/bin/env python
@@ -53,6 +53,96 @@ if __name__ == '__main__':
     args = parser.parse_args()
     completion = invoke_hf_model(args.prompt)
     print(completion)
+```
+
+### 1.2 EC2 with Ollama
+
+```python
+cat > ollama_llama3.py << EOF
+#!/usr/bin/env python
+
+import argparse
+from langchain.llms import Ollama
+ollama = Ollama(base_url='http://localhost:11434',
+model="llama3:70b")
+
+prompts = [
+    "Tell me about machine learning",
+    "Tell me about generative AI"
+]
+
+def invoke_ollama(prompt):
+    return ollama(prompt)
+
+def test_all(csv_file, **kwargs):
+    data = []
+    for prompt in prompts:
+        completion = invoke_ollama(prompt)
+        print(f"----- Prompt -----\n{prompt}\n----- Completion -----\n{completion}\n\n\n")
+        data.append(
+            [prompt, completion]
+        )
+    import csv
+    with open(csv_file, 'w') as csvfile:
+        writer = csv.writer(csvfile, delimiter=',')
+        for x in data:
+            writer.writerow(x)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--file', default='ollama_llama3_70b.csv')
+    parser.add_argument('--test_all', action='store_true')
+    args = parser.parse_args()
+    if args.test_all:
+        test_all(args.file)
+    else:
+        completion = invoke_ollama(args.prompt)
+        print(completion)
+EOF
+python ollama_llama3.py --test_all
+```
+
+
+Source of code: https://huggingface.co/meta-llama/Meta-Llama-3-70B-Instruct
+
+```python
+import transformers
+import torch
+
+model_id = "meta-llama/Meta-Llama-3-70B-Instruct"
+
+pipeline = transformers.pipeline(
+    "text-generation",
+    model=model_id,
+    model_kwargs={"torch_dtype": torch.bfloat16},
+    device="auto",
+)
+
+messages = [
+    {"role": "system", "content": "You are a pirate chatbot who always responds in pirate speak!"},
+    {"role": "user", "content": "Who are you?"},
+]
+
+prompt = pipeline.tokenizer.apply_chat_template(
+        messages, 
+        tokenize=False, 
+        add_generation_prompt=True
+)
+
+terminators = [
+    pipeline.tokenizer.eos_token_id,
+    pipeline.tokenizer.convert_tokens_to_ids("<|eot_id|>")
+]
+
+outputs = pipeline(
+    prompt,
+    max_new_tokens=256,
+    eos_token_id=terminators,
+    do_sample=True,
+    temperature=0.6,
+    top_p=0.9,
+)
+print(outputs[0]["generated_text"][len(prompt):])
 ```
 
 ## 2. SageMaker-HuggingFace Deployment
