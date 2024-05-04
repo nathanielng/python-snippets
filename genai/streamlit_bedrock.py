@@ -209,7 +209,13 @@ def tab_chat(generator):
     col1, col2 = st.columns(2)
 
     with col2:
-        context = st.text_area(label="Context", value="", height=50)
+        if os.path.isfile("txt/context.txt"):
+            with open("txt/context.txt", "r") as f:
+                file_context = f.read()
+        else:
+            file_context = ''
+
+        context = st.text_area(label="Context", value=file_context, height=50)
         prompt_template = st.text_area(
             label="Prompt Template",
             value="Answer the question based on the following context: {context}\nThe question is: {question}")
@@ -234,6 +240,58 @@ def tab_chat(generator):
             with st.chat_message("assistant"):
                 response = st.write_stream(generator(
                     st.session_state.selected_model, st.session_state.messages1))
+
+
+
+def tab_filequery(generator):
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # context = st.text_area(label="Context", value="", height=50)
+        # File uploader
+        # file_list = st.file_uploader(
+        #     label="Upload your files here",
+        #     accept_multiple_files=True
+        # )
+
+        # File selector
+        files = [ file for file in glob.glob('txt/*.md') ]
+        basenames = [ file[4:] for file in files ]
+        md_file = st.selectbox(label="Select a file", options=basenames)
+        with open(f'txt/{md_file}', 'r') as f:
+            context = f.read()
+
+        file_prompt_template = st.text_area(
+            label="Prompt Template",
+            value="Article: {context}\nBased on the article provided, please answer the following question: {question}")
+        use_file_prompt_template = st.toggle("Use Prompt Template", value=True)
+
+        prompt_list = st.text_area(
+            label="Provide a list of questions. Each question should be on a new line",
+            value="""Express the key takeaways of the article as bullet points\nBriefly describe the sentiment of the author\nHow does the article conclude? Does the author suggest any next steps, or can any action points be inferred?"""
+        )
+        prompt_list = [ prompt.strip() for prompt in prompt_list.split('\n') ]
+
+    with col2:
+
+        with st.form("information_extraction"):
+            submit_queries = st.form_submit_button("Submit")
+
+            if submit_queries:
+                for prompt in prompt_list:
+                    if use_file_prompt_template:
+                        final_prompt = file_prompt_template.format(context=context, question=prompt)
+                    else:
+                        final_prompt = prompt
+
+                    messages = [{
+                        "role": "user",
+                        "content": final_prompt
+                    }]
+                    st.markdown(f'#### {prompt}')
+                    response = st.write_stream(generator(
+                        st.session_state.selected_model, messages))
 
 
 
@@ -288,6 +346,7 @@ def tab_multimodal(generator):
         st.session_state.use_image = st.toggle("Use Image", value=True, key="Image")
 
     with col1:
+        st.markdown("**Example prompts**\n- Provide a description of the following picture and give some recommendations\n- Write an interesting story about the picture shown")
         for message in st.session_state.messages3:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
@@ -380,11 +439,12 @@ def main():
         generator = bedrock_generator
 
     # tab1, tab2, tab3 = st.tabs(["Chat", "RAG", "Multimodal"])
-    tab1, tab3 = st.tabs(["Chat", "Multimodal"])
+    tab1, tab2, tab3 = st.tabs(["Chat", "Query a File", "Multimodal"])
     with tab1:
         tab_chat(generator)
-    # with tab2:
-    #     tab_rag(generator)
+    with tab2:
+        # tab_rag(generator)
+        tab_filequery(generator)
     with tab3:
         tab_multimodal(generator)
 
