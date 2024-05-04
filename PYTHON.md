@@ -28,6 +28,10 @@ pip install -U pip
 pip install -r requirements.txt
 ```
 
+```bash
+pip install --disable-pip-version-check -q exlibrary1==x.x.0
+pip uninstall -y --disable-pip-version-check exlibrary1==x.xx.1 exlibrary2==0.x.1 --quiet
+```
 
 
 ## 1. Lists
