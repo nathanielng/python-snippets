@@ -2,6 +2,14 @@
 
 ## 0. Setup
 
+Get Python version
+
+```bash
+python -c "import sys; print(sys.version)"
+```
+
+Setup virtualenv
+
 ```bash
 curl -O https://bootstrap.pypa.io/get-pip.py
 python3 get-pip.py
