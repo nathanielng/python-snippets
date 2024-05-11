@@ -73,7 +73,7 @@ def get_foundational_model(model_id):
 def invoke_jurrasic2_mid(prompt, **kwargs):
     body = {
         "prompt": prompt,
-        "maxTokens": 200,
+        "maxTokens": 512,
         "temperature": 0,
         "topP": 1.0,
         # "stop_sequences": [],
@@ -111,7 +111,7 @@ def invoke_jurrasic2_mid(prompt, **kwargs):
 def invoke_jurrasic2_ultra(prompt, **kwargs):
     body = {
         "prompt": prompt,
-        "maxTokens": 200,
+        "maxTokens": 512,
         "temperature": 0,
         "topP": 1.0,
         # "stop_sequences": [],
@@ -150,9 +150,9 @@ def invoke_titan_text_express(prompt, **kwargs):
     body = {
         "inputText": prompt,
         "textGenerationConfig": {
-            "maxTokenCount": 8192,
+            "maxTokenCount": 512,
             "stopSequences": [],
-            "temperature":0,
+            "temperature": 0,
             "topP": 1
          }
     }
@@ -201,7 +201,7 @@ def invoke_claude_v1_n_2(prompt, model_id, **kwargs):
     body = {
         "prompt": f"\n\nHuman: {prompt}\n\nAssistant:",
         "max_tokens_to_sample": 512,
-        "temperature": 0.5,
+        "temperature": 0,
         "top_k": 250,
         "top_p": 1,
         "stop_sequences": ["\n\nHuman:"],
@@ -236,7 +236,7 @@ def invoke_claude_v2(prompt, **kwargs):
 
 
 # ----- Anthropic Claude v3 -----
-def invoke_claude_v3(prompt, **kwargs):
+def invoke_claude_v3(prompt, model_id, **kwargs):
     messages = {
       "role": "user",
       "content": [
@@ -249,7 +249,7 @@ def invoke_claude_v3(prompt, **kwargs):
     body = {
         "messages": [messages],
         "max_tokens": 512,
-        "temperature": 0.5,
+        "temperature": 0,
         "top_k": 250,
         "top_p": 1,
         "stop_sequences": [
@@ -299,7 +299,7 @@ def invoke_claude_v3_sonnet_with_response_stream(prompt, **kwargs):
     body = {
         "messages": [messages],
         "max_tokens": 500,
-        "temperature": 0.5,
+        "temperature": 0,
         "top_k": 250,
         "top_p": 1,
         "stop_sequences": [
@@ -329,6 +329,11 @@ def invoke_claude_v3_sonnet_with_response_stream(prompt, **kwargs):
                 text = chunk_obj['completion']
                 output.append(text)
 
+    # response_body = json.loads(response.get('body').read()) #.read().decode('utf-8'))
+    # content = response_body.get("content", [])
+    # for c in content:
+    #     if c['type'] == 'text':
+    #         return c['text']
     return stream
 
 
@@ -353,8 +358,8 @@ def invoke_claude_v3_multimodal(prompt, base64_image_data, model_id="anthropic.c
     }
     body = {
         "messages": [messages],
-        "max_tokens": 500,
-        "temperature": 0.5,
+        "max_tokens": 512,
+        "temperature": 0,
         "top_k": 250,
         "top_p": 1,
         "stop_sequences": [
@@ -388,8 +393,8 @@ def invoke_claude_v3_multimodal(prompt, base64_image_data, model_id="anthropic.c
 def invoke_cohere_command(prompt, **kwargs):
     body = {
         "prompt": prompt,
-        "max_tokens": 300,
-        "temperature": 0.8
+        "max_tokens": 512,
+        "temperature": 0
         # "return_likelihood": "GENERATION"   
     }
     for parameter in ['max_tokens', 'temperature']:
@@ -409,8 +414,8 @@ def invoke_cohere_command(prompt, **kwargs):
 def invoke_cohere_command_light(prompt, **kwargs):
     body = {
         "prompt": prompt,
-        "max_tokens": 300,
-        "temperature": 0.8
+        "max_tokens": 512,
+        "temperature": 0
         # "return_likelihood": "GENERATION"   
     }
     for parameter in ['max_tokens', 'temperature']:
@@ -467,8 +472,8 @@ def invoke_llama2_chat(prompt, model_id, **kwargs):
     body = {
         "prompt": prompt,
         "max_gen_len": 512,
-        "top_p": 0.9,
-        "temperature": 0.2
+        "top_p": 1,
+        "temperature": 0
     }
     for parameter in ['max_gen_len', 'top_p', 'temperature']:
         if parameter in kwargs:
@@ -508,8 +513,8 @@ def invoke_llama3_instruct(prompt, model_id, **kwargs):
     body = {
         "prompt": prompt_template.format(prompt=prompt),
         "max_gen_len": 512,
-        "top_p": 0.9,
-        "temperature": 0.5
+        "top_p": 1,
+        "temperature": 0
     }
     for parameter in ['max_gen_len', 'top_p', 'temperature']:
         if parameter in kwargs:
@@ -518,11 +523,15 @@ def invoke_llama3_instruct(prompt, model_id, **kwargs):
     response = bedrock_runtime.invoke_model(
         modelId = model_id,
         contentType = "application/json",
-        accept = "*/*",
+        accept = "application/json",
         body = json.dumps(body)
     )
     response_body = json.loads(response.get('body').read())
-    return response_body['generation']
+    completion = response_body['generation']
+    if len(completion):
+        return completion
+    else:
+        return json.dumps(response_body)
 
 def invoke_llama3_8b_instruct(prompt, **kwargs):
     return invoke_llama3_instruct(prompt, "meta.llama3-8b-instruct-v1:0", **kwargs)
@@ -544,9 +553,9 @@ def invoke_mistral(prompt, model_id, **kwargs):
     body = {
         "prompt": prompt_template.format(prompt=prompt),
         "max_tokens": 512,
-        # "top_p": 0.9,
+        "top_p": 1,
         # "top_k": 50,
-        "temperature": 0.1,
+        "temperature": 0,
     }
     for parameter in ['max_tokens', 'top_p', 'top_k', 'temperature']:
         if parameter in kwargs:
@@ -560,8 +569,8 @@ def invoke_mistral(prompt, model_id, **kwargs):
             body=json.dumps(body)
         )
         response_body = json.loads(response["body"].read())
-        outputs = response_body.get("outputs")
-        return [output["text"] for output in outputs]
+        outputs = [ output["text"] for output in response_body.get("outputs") ]
+        return '\n'.join(outputs)
 
     except ClientError:
         logger.error(f"Couldn't invoke {model_id}")
