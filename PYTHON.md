@@ -13,10 +13,10 @@ Setup virtualenv
 ```bash
 curl -O https://bootstrap.pypa.io/get-pip.py
 python3 get-pip.py
-pip install virtualenv
+python3 -m pip install virtualenv
 cd ~
-virtualenv pyenv
-source pyenv/bin/activate
+virtualenv venv
+source venv/bin/activate
 ```
 
 SageMaker & HuggingFace `requirements.txt` setup
