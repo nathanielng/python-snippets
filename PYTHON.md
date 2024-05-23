@@ -15,7 +15,7 @@ curl -O https://bootstrap.pypa.io/get-pip.py
 python3 get-pip.py
 python3 -m pip install virtualenv
 cd ~
-virtualenv venv
+python3 -m virtualenv venv
 source venv/bin/activate
 ```
 
