@@ -8,7 +8,7 @@ Get Python version
 python -c "import sys; print(sys.version)"
 ```
 
-Setup virtualenv
+### 0.1 Setup virtualenv
 
 ```bash
 curl -O https://bootstrap.pypa.io/get-pip.py
@@ -19,7 +19,25 @@ python3 -m virtualenv venv
 source venv/bin/activate
 ```
 
-SageMaker & HuggingFace `requirements.txt` setup
+
+### 0.2 Setup pyenv
+
+
+```bash
+curl https://pyenv.run | bash
+# pyenv install --list | grep " 3\.11"  # To see available versions
+pyenv install -v 3.11.9
+pyenv virtualenv 3.11.9 venv
+```
+
+```bash
+cd /path/to/folder/
+pyenv local venv
+pip install package1 package2 package3
+```
+
+
+### 0.3 SageMaker & HuggingFace `requirements.txt` setup
 
 ```bash
 cat > requirements.txt << EOF
