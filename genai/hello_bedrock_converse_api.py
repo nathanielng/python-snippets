@@ -64,7 +64,6 @@ def generate_conversation(prompt, model_id, stream=False, **kwargs):
 
 
 def invoke_model(prompt, model_id):
-    model_id = 
     response = generate_conversation(
         prompt = prompt,
         model_id = model_id,
