@@ -22,13 +22,22 @@ source venv/bin/activate
 
 ### 0.2 Setup pyenv
 
+Install pyenv and a specific Python version
 
 ```bash
 curl https://pyenv.run | bash
 # pyenv install --list | grep " 3\.11"  # To see available versions
 pyenv install -v 3.11.9
-pyenv virtualenv 3.11.9 venv
 ```
+
+Create an environment in pyenv and activate it
+
+```bash
+pyenv virtualenv 3.11.9 venv
+pyenv activate venv
+```
+
+Go to a folder and set the environment for that folder
 
 ```bash
 cd /path/to/folder/
