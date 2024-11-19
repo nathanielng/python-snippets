@@ -185,6 +185,13 @@ pip install jupyter_contrib_nbextensions
 jupyter contrib nbextension install --user
 ```
 
+## 7. Time
+
+```python
+import datetime
+now = datetime.datetime.now()
+print(now.strftime("%Y%m%d-%H%M%S"))
+```
 
 # Anaconda Python
 
