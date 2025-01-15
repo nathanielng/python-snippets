@@ -60,6 +60,116 @@ if __name__ == '__main__':
     delete_model(predictor)
 ```
 
+### Start a JumpStart Training Job
+
+```python
+import argparse
+import datetime
+import json
+
+from sagemaker.jumpstart.estimator import JumpStartEstimator
+from sagemaker.s3 import S3Uploader
+
+def create_template():
+    template = {
+        "prompt": "{system_prompt}\n\n### Input:\n{question}",
+        "completion": " {response}",
+    }
+    with open("template.json", "w") as f:
+        json.dump(template, f)
+
+def train(s3_location, validation_s3_location, region, epoch, learning_rate, job_name, model_id, model_version, instance_type, max_input_length="1024"):
+    """
+    Reference: https://sagemaker.readthedocs.io/en/stable/api/training/estimators.html
+    """
+    estimator = JumpStartEstimator(
+        model_id = model_id,
+        model_version = model_version,
+        environment = { "accept_eula": "true" },
+        disable_output_compression = True,
+        instance_type = instance_type,
+        region=region
+    )
+    estimator.set_hyperparameters(
+        # instruction_tuned="False",
+        # chat_dataset="True",
+        instruction_tuned="True",
+        chat_dataset="False",
+        epoch=epoch,
+        learning_rate=learning_rate,
+        max_input_length=max_input_length
+    )
+    response = estimator.fit(
+        {
+            "training": s3_location,
+            "validation": validation_s3_location
+        },
+        job_name=job_name
+    )
+    return response
+
+def main(args):
+    region = args.region
+    epoch = args.epoch
+    learning_rate = args.learning_rate
+    model_id = args.model_id
+    model_version = args.model_version
+    s3_bucket = args.s3_bucket
+    s3_prefix = args.s3_prefix
+    s3_location = f"s3://{s3_bucket}/{s3_prefix}"
+    train_s3_location = f"{s3_location}/{args.train}"
+    validation_s3_location = f"{s3_location}/{args.validation}"
+    template_s3_location = f"{s3_location}/template.json"
+    instance_type = args.instance_type
+
+    # 1. Upload to S3 bucket
+    print(f"Uploading the following files to: {train_s3_location}...")
+    print(f"- Training S3 File: {train_s3_location}")
+    S3Uploader.upload(args.train, s3_location)
+    print(f"- Validation S3 File: {validation_s3_location}")
+    S3Uploader.upload(args.validation, s3_location)
+
+    create_template()
+    print(f"- Template S3 File: {template_s3_location}")
+    S3Uploader.upload("template.json", s3_location)
+    print("Upload complete.")
+    
+    # 2. Run training job
+    now = datetime.datetime.now()
+    print(f'Number of lines of data: {n} (training), {n_v} (validation)')
+    job_name = f"train-ep{epoch}-lr{learning_rate}-".replace(".", "-").replace(" ", "-") + now.strftime("%Y%m%d-%H%M%S")
+    print(f'Starting training job: `{job_name}`')
+
+    try:
+        response = train(
+            s3_location, validation_s3_location, region, epoch, learning_rate,
+            job_name, model_id, model_version, instance_type)
+    except Exception as e:
+        print('***** Training Job failed *****')
+        print(e)
+        return
+
+    print('***** Training Job completed *****')
+    print(json.dumps(response, indent=2, default=str))
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--aws_account_id')
+    parser.add_argument('--region')
+    parser.add_argument('--s3_bucket')
+    parser.add_argument('--s3_prefix', default="data")
+    parser.add_argument('--model_id', default="meta-textgeneration-llama-3-1-70b-instruct")
+    parser.add_argument('--model_version', default="2.7.0")
+    parser.add_argument('--train', default='')
+    parser.add_argument('--validation', default='')
+    parser.add_argument('--epoch', default=3, type=int)
+    parser.add_argument('--learning_rate', default=1e-4, type=float)
+    parser.add_argument('--instance_type', default="ml.g5.12xlarge", type=str)
+    args = parser.parse_args()
+    main(args)
+```
+
+
 #### Retrieving a JumpStart Training Job
 
 ```python
