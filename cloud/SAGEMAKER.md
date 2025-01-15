@@ -173,24 +173,36 @@ if __name__ == '__main__':
 #### Retrieving a JumpStart Training Job
 
 ```python
+#!/usr/bin/env python
+
+import argparse
 import boto3
 
 from sagemaker.jumpstart.estimator import JumpStartEstimator
-
-REGION = 'us-west-2'
-sagemaker_client = boto3.client('sagemaker', region_name=REGION)
 
 def get_training_job_s3_bucket(training_job_name):
     response = sagemaker_client.describe_training_job(TrainingJobName = training_job_name)
     s3_model_artifacts = response['ModelArtifacts']['S3ModelArtifacts']
     return response['InputDataConfig'][0]['DataSource']['S3DataSource']['S3Uri']
 
-training_job_name = '...'
-model_id = '...'
-s3_bucket = get_training_job_s3_bucket(training_job_name)
-attached_estimator = JumpStartEstimator.attach(training_job_name, model_id)
-print(attached_estimator.logs())
-predictor = attached_estimator.deploy()
+def print_logs(estimator):
+    print(attached_estimator.logs())
+
+def deploy(estimator):
+    predictor = estimator.deploy()
+    return predictor
+
+def main(args):
+    sagemaker_client = boto3.client('sagemaker', region_name=args.region)
+    s3_bucket = get_training_job_s3_bucket(args.training_job_name)
+    attached_estimator = JumpStartEstimator.attach(args.training_job_name, args.model_id)
+    print_logs(attached_estimator)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--region')
+    parser.add_argument('--model_id')
+    parser.add_argument('--training_job_name')
 ```
 
 
