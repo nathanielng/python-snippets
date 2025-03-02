@@ -2,12 +2,20 @@
 
 # pip3 install boto3 python-dotenv
 
+import argparse
 import boto3
 import datetime
 import os
 import uuid
 
 from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+s3_bucket = os.getenv('S3_BUCKET')
+distribution_id = os.getenv('CLOUDFRONT_DISTRIBUTION_ID')
+paths_to_invalidate = os.getenv('CLOUDFRONT_PATHS_TO_INVALIDATE').split(',')
+
 
 def create_cloudfront_invalidation(distribution_id, paths):
     """
@@ -45,17 +53,42 @@ def create_cloudfront_invalidation(distribution_id, paths):
         print(f"Error creating invalidation: {str(e)}")
         raise
 
-# Example usage
+
+def main(args):
+    # Process arguments
+    if args.distribution_id:
+        distribution_id = args.distribution_id
+    if args.paths:
+        paths_to_invalidate = args.paths
+    if args.s3_prefix:
+        s3_prefix = args.s3_prefix
+        s3_path = f"{s3_prefix}/{os.path.basename(args.file)}"
+    else:
+        s3_path = os.path.basename(args.file)
+
+    # Upload file to S3
+    if os.path.isfile(args.file):
+        print(f"Uploading file to S3: {args.file}")
+
+        try:
+            s3_client = boto3.client('s3')
+            s3_client.upload_file(args.file, s3_path, os.path.basename(args.file))
+        except Exception as e:
+            print(f"Error uploading file to S3: {str(e)}")
+            raise
+
+    # Create the CloudFront invalidation
+    result = create_cloudfront_invalidation(distribution_id, paths_to_invalidate)
+    print(f"Invalidation created successfully. ID: {result['Id']}")
+    print(f"Status: {result['Status']}")
+    print(f"Created Time: {result['CreateTime']}")
+
+
 if __name__ == "__main__":
-    try:
-        # Load environment variables from .env file
-        load_dotenv()
-        distribution_id = os.getenv('CLOUDFRONT_DISTRIBUTION_ID')
-        paths_to_invalidate = os.getenv('CLOUDFRONT_PATHS_TO_INVALIDATE').split(',')
-        result = create_cloudfront_invalidation(distribution_id, paths_to_invalidate)
-        print(f"Invalidation created successfully. ID: {result['Id']}")
-        print(f"Status: {result['Status']}")
-        print(f"Created Time: {result['CreateTime']}")
-        
-    except Exception as e:
-        print(f"Failed to create invalidation: {str(e)}")
+    parser = argparse.ArgumentParser(description="Create a CloudFront invalidation for specified paths")
+    parser.add_argument("--distribution-id", default='', help="CloudFront distribution ID")
+    parser.add_argument("--paths", nargs="+", default='', help="Paths to invalidate (e.g. /images/* /css/*)")
+    parser.add_argument("--s3-prefix", default='', help="S3 prefix to upload file")
+    parser.add_argument("--file", default='', help="File to upload to S3")
+    args = parser.parse_args() 
+    main(args)
