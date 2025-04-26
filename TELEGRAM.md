@@ -14,3 +14,8 @@
 2. Paste the following link in your browser: https://api.telegram.org/botTELEGRAM_API_TOKEN/getUpdates (replace `TELEGRAM_API_TOKEN`, with your actual API token)
    You can also run `curl https://api.telegram.org/botTELEGRAM_API_TOKEN/getUpdates` in a terminal window.
 3. In the response, look for the `id` field, e.g. `{"id":1234567,...`. The numeric digits after `id` will be your Chat ID.
+
+## 3. Setting a webhook URL
+
+Paste the following in a browser: https://api.telegram.org/botTELEGRAM_API_TOKEN/setWebhook?url=https://yourwebhookurl.
+The response should show something like `{"ok":true,"result":true,"description":"Webhook was set"}`
