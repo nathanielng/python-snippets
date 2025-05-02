@@ -8,6 +8,21 @@ pip install -U sagemaker
 
 ## SageMaker
 
+### List Endpoints
+
+```python
+import boto3
+def list_sagemaker_endpoints(region):
+    sagemaker = boto3.client('sagemaker', region_name=region)
+    r = sagemaker.list_endpoints()
+    endpoints = [{
+        'EndpointName': endpoint['EndpointName'],
+        'CreationTime': endpoint['CreationTime'],
+        'EndpointStatus': endpoint['EndpointStatus']
+    } for endpoint in r['Endpoints']]
+    return endpoints
+```
+
 ### JumpStart models
 
 #### Getting the default instance type for a given `model_id`
