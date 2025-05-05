@@ -10,7 +10,11 @@ import os
 
 logging.basicConfig(level=logging.INFO)
 
-dotenv.load_dotenv()
+DOT_ENV_PATH = os.getenv('DOT_ENV_PATH', None)
+if DOT_ENV_PATH is None:
+    config = dotenv.dotenv_values()
+else:
+    config = dotenv.dotenv_values(DOT_ENV_PATH)
 
 sts = boto3.client('sts')
 main_account_id = sts.get_caller_identity()['Account']
@@ -190,8 +194,8 @@ def main(args):
 
 
 if __name__ == '__main__':    
-    default_region_list = os.getenv('REGION_LIST', '')
-    default_account_ids = os.getenv('ACCOUNT_ID_DATA', '')
+    default_region_list = config.get('REGION_LIST', '')
+    default_account_ids = config.get('ACCOUNT_ID_DATA', '')
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--account-ids', type=str, default=default_account_ids)
