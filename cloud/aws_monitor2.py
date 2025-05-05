@@ -3,10 +3,14 @@
 import argparse
 import boto3
 import datetime
+import dotenv
 import json
 import logging
+import os
 
 logging.basicConfig(level=logging.INFO)
+
+dotenv.load_dotenv()
 
 sts = boto3.client('sts')
 main_account_id = sts.get_caller_identity()['Account']
@@ -170,7 +174,11 @@ def main(args):
         account_ids = json.loads(args.account_ids)
     else:
         account_ids = {'Main': main_account_id}
-    region_list = args.region_list.split(',')
+    if args.region_list:
+        region_list = args.region_list.split(',')
+    else:
+        region_list = ['us-east-1']
+
     for name, account_id in account_ids.items():
         print(f'----- {name} -----')
         print_report(account_id)
@@ -181,11 +189,12 @@ def main(args):
         print()
 
 
-if __name__ == '__main__':
-    default_region_list = 'us-east-1,us-west-2'
+if __name__ == '__main__':    
+    default_region_list = os.getenv('REGION_LIST', '')
+    default_account_ids = os.getenv('ACCOUNT_ID_DATA', '')
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--account-ids', type=str, default='')
+    parser.add_argument('--account-ids', type=str, default=default_account_ids)
     parser.add_argument('--region-list', type=str, default=default_region_list)
     args = parser.parse_args()
     main(args)
