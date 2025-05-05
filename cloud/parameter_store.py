@@ -183,8 +183,8 @@ def add_new_key(key_text, new_key):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=f'{BOLD}{CYAN}AWS Parameter Store Utility{RESET}')
-    parser.add_argument('--old_key', default='', help='Source parameter key')
-    parser.add_argument('--new_key', default='', help='Destination parameter key')
+    parser.add_argument('--old_key', default = config.get('KEYVALUES_PARAMETER_PATH1'), help='Source parameter key')
+    parser.add_argument('--new_key', default = config.get('KEYVALUES_PARAMETER_PATH2'), help='Destination parameter key')
     parser.add_argument('--key_text', default='', help='Text to add to parameter')
     parser.add_argument('--logins', action='store_true', help='Display login information')
     parser.add_argument('--sort', action='store_true', help='Sort keys and remove duplicates')
