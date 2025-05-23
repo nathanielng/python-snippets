@@ -1,17 +1,23 @@
 # Cloud
 
-## 1. Downloading Files
+## 1. S3
+
+### 1.1 Downloading Files & Uploading to S3
+
+The following code was generated using Amazon Q CLI
 
 ```python
 import requests
 import os
 
-def download_file(url, destination):
+def download_file(url, destination=None):
     """
     Download a file from a URL to a local destination
     """
+    if destination is None:
+        destination = os.path.basename(urlparse(url).path)
+
     try:
-        # Send GET request to the URL
         response = requests.get(url, stream=True)
         response.raise_for_status()  # Raise an exception for HTTP errors
 
@@ -21,26 +27,81 @@ def download_file(url, destination):
         # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(os.path.abspath(destination)), exist_ok=True)
 
-        # Write the content to the file
-        with open(destination, 'wb') as file:
-            if file_size == 0:
-                file.write(response.content)
-                print(f"Downloaded {destination}")
-            else:
-                downloaded = 0
-                for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:
-                        file.write(chunk)
-                        downloaded += len(chunk)
-                        # Print progress
-                        progress = int(50 * downloaded / file_size)
-                        print(f"\rDownloading: [{'#' * progress}{'.' * (50 - progress)}] {downloaded}/{file_size} bytes", end='')
-                print(f"\nDownloaded {destination}")
-
+        with open(destination, 'wb') as file, tqdm(
+            desc=destination,
+            total=file_size,
+            unit='B',
+            unit_scale=True,
+            unit_divisor=1024,
+        ) as progress_bar:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    file.write(chunk)
+                    progress_bar.update(len(chunk))
         return True
     except Exception as e:
         print(f"Error downloading file: {e}")
         return False
+```
+
+```python
+def extract_zip_file(zip_path, extract_to=None):
+    """
+    Extract a zip file to a specified directory
+
+    Args:
+        zip_path: Path to the zip file
+        extract_to: Directory to extract to (defaults to same directory as zip file)
+
+    Returns:
+        bool: True if extraction was successful, False otherwise
+    """
+    try:
+        # If extract_to is not specified, extract to the same directory as the zip file
+        if extract_to is None:
+            extract_to = os.path.dirname(os.path.abspath(zip_path))
+
+            # If zip_path is just a filename with no directory, use current directory
+            if not extract_to:
+                extract_to = '.'
+
+        # Create extraction directory if it doesn't exist
+        os.makedirs(extract_to, exist_ok=True)
+
+        # Open the zip file
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            # Get list of files for progress tracking
+            file_list = zip_ref.namelist()
+            total_files = len(file_list)
+
+            print(f"Extracting {total_files} files from {zip_path} to {extract_to}")
+
+            # Extract all files with progress bar
+            for file in tqdm(file_list, desc="Extracting"):
+                zip_ref.extract(file, extract_to)
+
+        print(f"Successfully extracted {total_files} files to {extract_to}")
+        return True
+
+    except zipfile.BadZipFile:
+        print(f"Error: {zip_path} is not a valid zip file")
+        return False
+    except Exception as e:
+        print(f"Error extracting zip file: {e}")
+        return False
+```
+
+```python
+def upload_directory(path, s3_bucket):
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            file_to_upload = os.path.join(root, file)
+            basename = os.path.basename(file_to_upload)
+            if basename == ".DS_Store":
+                print(f"Skipping file .DS_Store")
+                continue
+            print(f"uploading file {file_to_upload} to {bucket_name}")
+            s3_client.upload_file(file_to_upload,s3_bucket,file)
 ```
 
 ## 2. Lambda Functions
