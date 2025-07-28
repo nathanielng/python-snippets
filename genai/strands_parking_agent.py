@@ -41,6 +41,7 @@ from strands import Agent, tool
 from strands.models import BedrockModel
 from typing import Dict, List, Union
 
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -69,7 +70,6 @@ def get_carpark_data():
         update_datetime = item.get('update_datetime')
         if not carpark_info:
             print(f'Skipping item: {item}')
-            break
             continue
         for lots in carpark_info:
             lot_type = lots['lot_type']
@@ -113,7 +113,7 @@ def get_available_lots(carpark_number: str, lot_type: str = 'C') -> Union[List[D
             Or string 'No carparks found' if no matching data
     """
 
-    carpark_data = [item for item in carpark_data if item['carpark_number'] == carpark_number]
+    carpark_data = [item for item in all_carpark_data if item['carpark_number'] == carpark_number]
     logger.info(f'Found {len(carpark_data)} carparks for {carpark_number}')
 
     if len(carpark_data):
@@ -159,7 +159,7 @@ def get_lot_types() -> List[str]:
     return list(set(lot_types))  # return unique values
 
 
-carpark_data = get_carpark_data()
+all_carpark_data = get_carpark_data()
 
 
 SYSTEM_PROMPT = """
@@ -191,6 +191,9 @@ examples = [
 
 def main():
     # print(json.dumps(carpark_data, indent=2, default=str))
+    # response = get_available_lots('HE12', 'C')
+    # print(response)
+
     carpark_agent(examples[2])
 
 
