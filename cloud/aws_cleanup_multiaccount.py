@@ -3,21 +3,32 @@
 AWS Resource Cleanup Tool
 
 A utility script to clean up AWS resources including EC2 instances, S3 buckets,
-SageMaker endpoints, and Bedrock Knowledge Bases. Supports interactive prompting
-for each resource or force deletion mode.
+SageMaker endpoints, Bedrock Knowledge Bases, and OpenSearch Serverless collections.
+Supports both interactive prompting and force deletion modes with cross-account access.
 
 Usage:
-    python aws_cleanup.py          # Interactive mode with prompts
-    python aws_cleanup.py --force  # Force deletion without prompts
+    python aws_cleanup.py                           # Interactive mode with prompts
+    python aws_cleanup.py --force                   # Force deletion without prompts
+    python aws_cleanup.py --account_id 123456789012 # Target specific account
+
+Environment Variables:
+    AWS_ACCOUNT_ID: Target AWS account ID (optional, defaults to current account)
+    AWS_DEFAULT_REGION or AWS_REGION: AWS region for operations (required)
 
 Requirements:
     - boto3 library
     - AWS credentials configured
-    - Appropriate IAM permissions for resource operations
+    - IAM permissions for:
+      * EC2: DescribeInstances, StopInstances
+      * S3: ListBuckets, DeleteBucket, DeleteObject
+      * SageMaker: ListEndpoints, DeleteEndpoint
+      * Bedrock: ListKnowledgeBases, DeleteKnowledgeBase
+      * OpenSearch Serverless: ListCollections, DeleteCollection
+      * STS: AssumeRole (for cross-account access)
 
-To specify the target AWS Account ID & region, export the following before running this script
-    export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
-    export AWS_DEFAULT_REGION="..."
+Warning:
+    This tool performs destructive operations that cannot be undone.
+    Use with extreme caution, especially in production environments.
 """
 
 import argparse
@@ -46,7 +57,7 @@ def get_session(role_arn):
         
     Note:
         The assumed role must have the necessary permissions for the operations
-        this script performs (Cost Explorer, EC2, SageMaker access).
+        this script performs (EC2, S3, SageMaker, Bedrock, OpenSearch Serverless access).
     """
     # Assume the specified role and get temporary credentials
     resp = sts.assume_role(
@@ -354,8 +365,9 @@ def cleanup_all_resources(account_id, force=False):
         
         Requires AWS_DEFAULT_REGION or AWS_REGION environment variable to be set.
     
-    Raises:
-        SystemExit: If no AWS region is specified in environment variables
+    Warning:
+        All operations are destructive and irreversible. Ensure you have
+        proper backups before running this script.
     """
     logger.info("Starting AWS resource cleanup...")
 
