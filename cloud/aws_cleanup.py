@@ -3,17 +3,29 @@
 AWS Resource Cleanup Tool
 
 A utility script to clean up AWS resources including EC2 instances, S3 buckets,
-SageMaker endpoints, and Bedrock Knowledge Bases. Supports interactive prompting
-for each resource or force deletion mode.
+SageMaker endpoints, Bedrock Knowledge Bases, and OpenSearch Serverless collections.
+Supports both interactive prompting and force deletion modes.
 
 Usage:
     python aws_cleanup.py          # Interactive mode with prompts
     python aws_cleanup.py --force  # Force deletion without prompts
 
+Environment Variables:
+    AWS_DEFAULT_REGION or AWS_REGION: AWS region for operations (required)
+
 Requirements:
     - boto3 library
     - AWS credentials configured
-    - Appropriate IAM permissions for resource operations
+    - IAM permissions for:
+      * EC2: DescribeInstances, StopInstances
+      * S3: ListBuckets, DeleteBucket, DeleteObject
+      * SageMaker: ListEndpoints, DeleteEndpoint
+      * Bedrock: ListKnowledgeBases, DeleteKnowledgeBase
+      * OpenSearch Serverless: ListCollections, DeleteCollection
+
+Warning:
+    This tool performs destructive operations that cannot be undone.
+    Use with extreme caution, especially in production environments.
 """
 
 import argparse
@@ -43,13 +55,17 @@ def confirm_action(message, force=False):
 
 def stop_all_ec2_instances(region: str, force=False):
     """
-    Stop all running EC2 instances in the current region.
+    Stop all running EC2 instances in the specified region.
     
     Args:
-        force (bool): If True, skip confirmation prompts
+        region (str): AWS region to search for instances
+        force (bool, optional): If True, skip confirmation prompts. Defaults to False.
+    
+    Note:
+        Only stops instances in 'running' state. Terminated or stopped instances are ignored.
     
     Raises:
-        ClientError: If AWS API calls fail
+        ClientError: If AWS API calls fail due to permissions or service errors
     """
     ec2 = boto3.client('ec2', region_name=region)
     try:
@@ -77,13 +93,15 @@ def delete_all_s3_buckets(force=False):
     Delete all S3 buckets and their contents (including versioned objects).
     
     Args:
-        force (bool): If True, skip confirmation prompts
+        force (bool, optional): If True, skip confirmation prompts. Defaults to False.
     
-    Note:
-        This operation is irreversible and will delete ALL bucket contents
+    Warning:
+        This operation is irreversible and will delete ALL bucket contents,
+        including all object versions and delete markers.
     
     Raises:
-        ClientError: If AWS API calls fail
+        ClientError: If AWS API calls fail due to permissions, bucket policies,
+                    or if buckets contain objects that cannot be deleted
     """
     s3 = boto3.client('s3')
     try:
@@ -110,16 +128,18 @@ def delete_all_s3_buckets(force=False):
 
 def delete_all_sagemaker_endpoints(region, force=False):
     """
-    Delete all SageMaker endpoints in the current region.
+    Delete all SageMaker endpoints in the specified region.
     
     Args:
-        force (bool): If True, skip confirmation prompts
+        region (str): AWS region to search for endpoints
+        force (bool, optional): If True, skip confirmation prompts. Defaults to False.
     
-    Note:
-        This will terminate all active model endpoints
+    Warning:
+        This will terminate all active model endpoints, stopping inference capabilities.
+        Associated endpoint configurations and models are not deleted.
     
     Raises:
-        ClientError: If AWS API calls fail
+        ClientError: If AWS API calls fail due to permissions or service errors
     """
     sagemaker = boto3.client('sagemaker', region_name=region)
     try:
@@ -139,16 +159,18 @@ def delete_all_sagemaker_endpoints(region, force=False):
 
 def delete_all_bedrock_knowledge_bases(region, force=False):
     """
-    Delete all Bedrock Knowledge Bases in the current region.
+    Delete all Bedrock Knowledge Bases in the specified region.
     
     Args:
-        force (bool): If True, skip confirmation prompts
+        region (str): AWS region to search for knowledge bases
+        force (bool, optional): If True, skip confirmation prompts. Defaults to False.
     
-    Note:
-        This will permanently delete all knowledge bases and their data
+    Warning:
+        This will permanently delete all knowledge bases and their indexed data.
+        The underlying data sources (S3 buckets, etc.) are not affected.
     
     Raises:
-        ClientError: If AWS API calls fail
+        ClientError: If AWS API calls fail due to permissions or service errors
     """
     bedrock = boto3.client('bedrock-agent', region_name = region)
     try:
@@ -167,15 +189,57 @@ def delete_all_bedrock_knowledge_bases(region, force=False):
     except ClientError as e:
         logger.error(f"Error listing Bedrock Knowledge Bases: {e}")
 
-def cleanup_all_resources(force=False):
+def delete_opensearch_serverless_collections(region, force=False):
     """
-    Execute all cleanup operations for AWS resources.
+    Delete all OpenSearch Serverless collections in the specified region.
     
     Args:
-        force (bool): If True, skip all confirmation prompts
+        region (str): AWS region to search for collections
+        force (bool, optional): If True, skip confirmation prompts. Defaults to False.
+    
+    Warning:
+        This will permanently delete all collections and their data.
+    
+    Raises:
+        ClientError: If AWS API calls fail due to permissions or service errors
+    """
+    aoss = boto3.client('opensearchserverless', region_name=region)
+    try:
+        response = aoss.list_collections()
+        for collection in response['collectionSummaries']:
+            collection_id = collection['id']
+            collection_name = collection['name']
+            if confirm_action(f"Delete OpenSearch Serverless collection '{collection_name}' ({collection_id})?", force):
+                try:
+                    aoss.delete_collection(id=collection_id)
+                    logger.info(f"Deleted OpenSearch Serverless collection: {collection_name} ({collection_id})")
+                except ClientError as e:
+                    logger.error(f"Error deleting collection {collection_name}: {e}")
+            else:
+                logger.info(f"Skipped deleting OpenSearch Serverless collection: {collection_name}")
+    except ClientError as e:
+        logger.error(f"Error listing OpenSearch Serverless collections: {e}")
+
+def cleanup_all_resources(force=False):
+    """
+    Execute all cleanup operations for AWS resources across multiple services.
+    
+    Args:
+        force (bool, optional): If True, skip all confirmation prompts. Defaults to False.
     
     Note:
-        Runs cleanup for EC2, S3, SageMaker, and Bedrock resources
+        Performs cleanup operations in the following order:
+        1. Stop all EC2 instances
+        2. Delete all S3 buckets and contents
+        3. Delete all SageMaker endpoints
+        4. Delete all Bedrock Knowledge Bases
+        5. Delete all OpenSearch Serverless collections
+        
+        Requires AWS_DEFAULT_REGION or AWS_REGION environment variable to be set.
+    
+    Warning:
+        All operations are destructive and irreversible. Ensure you have
+        proper backups before running this script.
     """
     logger.info("Starting AWS resource cleanup...")
 
@@ -193,6 +257,8 @@ def cleanup_all_resources(force=False):
     delete_all_sagemaker_endpoints(region, force)
     logger.info("Deleting Bedrock Knowledge Bases...")
     delete_all_bedrock_knowledge_bases(region, force)
+    logger.info("Deleting OpenSearch Serverless collections...")
+    delete_opensearch_serverless_collections(region, force)
     logger.info("AWS resource cleanup completed")
 
 if __name__ == "__main__":
