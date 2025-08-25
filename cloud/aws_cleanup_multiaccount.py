@@ -21,7 +21,7 @@ Requirements:
     - IAM permissions for:
       * EC2: DescribeInstances, StopInstances
       * S3: ListBuckets, DeleteBucket, DeleteObject
-      * SageMaker: ListEndpoints, DeleteEndpoint
+      * SageMaker: ListEndpoints, DeleteEndpoint, ListDomains, DeleteDomain, ListUserProfiles, DeleteUserProfile, ListApps, DeleteApp, ListSpaces, DeleteSpace
       * Bedrock: ListKnowledgeBases, DeleteKnowledgeBase
       * OpenSearch Serverless: ListCollections, DeleteCollection
       * STS: AssumeRole (for cross-account access)
@@ -315,6 +315,58 @@ def delete_all_bedrock_knowledge_bases(account_id, region, force=False):
     except ClientError as e:
         logger.error(f"Error listing Bedrock Knowledge Bases: {e}")
 
+def delete_all_sagemaker_domains(account_id, region, force=False):
+    """
+    Delete all SageMaker domains in the specified region.
+    
+    Args:
+        account_id (str): AWS account ID containing the SageMaker domains
+        region (str): AWS region to search for domains
+        force (bool, optional): If True, skip confirmation prompts. Defaults to False.
+    
+    Warning:
+        This will permanently delete all SageMaker domains and associated user profiles.
+    
+    Raises:
+        ClientError: If AWS API calls fail due to permissions or service errors
+    """
+    sagemaker = get_client(account_id, 'sagemaker', region=region)
+    try:
+        response = sagemaker.list_domains()
+        for domain in response['Domains']:
+            domain_id = domain['DomainId']
+            domain_name = domain['DomainName']
+            if confirm_action(f"Delete SageMaker domain '{domain_name}' ({domain_id})?", force):
+                try:
+                    # Delete all apps and spaces in user profiles first
+                    user_profiles = sagemaker.list_user_profiles(DomainIdEquals=domain_id)
+                    for profile in user_profiles['UserProfiles']:
+                        profile_name = profile['UserProfileName']
+                        # Delete apps
+                        apps = sagemaker.list_apps(DomainIdEquals=domain_id, UserProfileNameEquals=profile_name)
+                        for app in apps['Apps']:
+                            sagemaker.delete_app(DomainId=domain_id, UserProfileName=profile_name, AppType=app['AppType'], AppName=app['AppName'])
+                            logger.info(f'Deleted app: {app["AppName"]}')
+
+                        # Delete spaces
+                        spaces = sagemaker.list_spaces(DomainIdEquals=domain_id)
+                        for space in spaces['Spaces']:
+                            if space.get('OwnershipSettings', {}).get('OwnerUserProfileName') == profile_name:
+                                sagemaker.delete_space(DomainId=domain_id, SpaceName=space['SpaceName'])
+                                logger.info(f'Deleted space: {space["SpaceName"]}')
+
+                        sagemaker.delete_user_profile(DomainId=domain_id, UserProfileName=profile_name)
+                        logger.info(f'Deleted user profile: {profile_name}')
+                    
+                    sagemaker.delete_domain(DomainId=domain_id)
+                    logger.info(f"Deleted SageMaker domain: {domain_name} ({domain_id})")
+                except ClientError as e:
+                    logger.error(f"Error deleting domain {domain_name}: {e}")
+            else:
+                logger.info(f"Skipped deleting SageMaker domain: {domain_name}")
+    except ClientError as e:
+        logger.error(f"Error listing SageMaker domains: {e}")
+
 def delete_opensearch_serverless_collections(account_id, region, force=False):
     """
     Delete all OpenSearch Serverless collections in the current region.
@@ -360,8 +412,9 @@ def cleanup_all_resources(account_id, force=False):
         1. Stop all EC2 instances
         2. Delete all S3 buckets and contents
         3. Delete all SageMaker endpoints
-        4. Delete all Bedrock Knowledge Bases
-        5. Delete all OpenSearch Serverless collections
+        4. Delete all SageMaker domains
+        5. Delete all Bedrock Knowledge Bases
+        6. Delete all OpenSearch Serverless collections
         
         Requires AWS_DEFAULT_REGION or AWS_REGION environment variable to be set.
     
@@ -383,6 +436,8 @@ def cleanup_all_resources(account_id, force=False):
     delete_all_s3_buckets(account_id, force)
     logger.info("Deleting SageMaker Endpoints...")
     delete_all_sagemaker_endpoints(account_id, region, force)
+    logger.info("Deleting SageMaker Domains...")
+    delete_all_sagemaker_domains(account_id, region, force)
     logger.info("Deleting Bedrock Knowledge Bases...")
     delete_all_bedrock_knowledge_bases(account_id, region, force)
     logger.info("Deleting OpenSearch Serverless collections...")
