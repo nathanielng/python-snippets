@@ -62,6 +62,22 @@ def get_session(role_arn):
     )
 
 def get_session_keys(role_arn):
+    """
+    Get temporary AWS credentials by assuming a cross-account role.
+    
+    Args:
+        role_arn (str): The ARN of the IAM role to assume
+                       (e.g., 'arn:aws:iam::123456789012:role/OrganizationAccountAccessRole')
+        
+    Returns:
+        dict: Dictionary containing temporary AWS credentials with keys:
+              - aws_access_key_id (str): Temporary access key ID
+              - aws_secret_access_key (str): Temporary secret access key
+              - aws_session_token (str): Temporary session token
+              
+    Raises:
+        ClientError: If role assumption fails due to permissions or invalid role ARN
+    """
     resp = sts.assume_role(
         RoleArn=role_arn,
         RoleSessionName='session'  # Name for this session (appears in CloudTrail logs)
@@ -73,6 +89,20 @@ def get_session_keys(role_arn):
     }
 
 def get_resource(account_id, resource, region=None):
+    """
+    Create a boto3 resource for a specific AWS service in a target account.
+    
+    Args:
+        account_id (str): Target AWS account ID
+        resource (str): AWS service name (e.g., 's3', 'ec2', 'dynamodb')
+        region (str, optional): AWS region name. Defaults to None.
+        
+    Returns:
+        boto3.resource: A boto3 resource object for the specified service
+        
+    Raises:
+        ClientError: If role assumption fails or service is not available
+    """
     resp = sts.assume_role(
         RoleArn=f'arn:aws:iam::{account_id}:role/OrganizationAccountAccessRole',
         RoleSessionName='session'  # Name for this session (appears in CloudTrail logs)
@@ -86,6 +116,24 @@ def get_resource(account_id, resource, region=None):
     )
 
 def get_client(account_id: str, service_name: str, region=None):
+    """
+    Create a boto3 client for a specific AWS service, supporting cross-account access.
+    
+    Args:
+        account_id (str): Target AWS account ID
+        service_name (str): AWS service name (e.g., 'ec2', 's3', 'sagemaker')
+        region (str, optional): AWS region name. Defaults to None.
+        
+    Returns:
+        boto3.client: A boto3 client object for the specified service
+        
+    Note:
+        If the target account matches the current account, uses direct access.
+        Otherwise, assumes the OrganizationAccountAccessRole for cross-account access.
+        
+    Raises:
+        ClientError: If role assumption fails or service is not available
+    """
     # If target account is the same as current account, use direct access
     if account_id == main_account_id:
         if region is None:
@@ -119,13 +167,18 @@ def confirm_action(message, force=False):
 
 def stop_all_ec2_instances(account_id, region: str, force=False):
     """
-    Stop all running EC2 instances in the current region.
+    Stop all running EC2 instances in the specified region.
     
     Args:
-        force (bool): If True, skip confirmation prompts
+        account_id (str): AWS account ID containing the instances
+        region (str): AWS region to search for instances
+        force (bool, optional): If True, skip confirmation prompts. Defaults to False.
+    
+    Note:
+        Only stops instances in 'running' state. Terminated or stopped instances are ignored.
     
     Raises:
-        ClientError: If AWS API calls fail
+        ClientError: If AWS API calls fail due to permissions or service errors
     """
     ec2 = get_client(account_id, 'ec2', region=region)
     try:
@@ -153,13 +206,16 @@ def delete_all_s3_buckets(account_id, force=False):
     Delete all S3 buckets and their contents (including versioned objects).
     
     Args:
-        force (bool): If True, skip confirmation prompts
+        account_id (str): AWS account ID containing the S3 buckets
+        force (bool, optional): If True, skip confirmation prompts. Defaults to False.
     
-    Note:
-        This operation is irreversible and will delete ALL bucket contents
+    Warning:
+        This operation is irreversible and will delete ALL bucket contents,
+        including all object versions and delete markers.
     
     Raises:
-        ClientError: If AWS API calls fail
+        ClientError: If AWS API calls fail due to permissions, bucket policies,
+                    or if buckets contain objects that cannot be deleted
     """
     s3 = get_client(account_id, 's3')
     try:
@@ -185,16 +241,19 @@ def delete_all_s3_buckets(account_id, force=False):
 
 def delete_all_sagemaker_endpoints(account_id, region, force=False):
     """
-    Delete all SageMaker endpoints in the current region.
+    Delete all SageMaker endpoints in the specified region.
     
     Args:
-        force (bool): If True, skip confirmation prompts
+        account_id (str): AWS account ID containing the SageMaker endpoints
+        region (str): AWS region to search for endpoints
+        force (bool, optional): If True, skip confirmation prompts. Defaults to False.
     
-    Note:
-        This will terminate all active model endpoints
+    Warning:
+        This will terminate all active model endpoints, stopping inference capabilities.
+        Associated endpoint configurations and models are not deleted.
     
     Raises:
-        ClientError: If AWS API calls fail
+        ClientError: If AWS API calls fail due to permissions or service errors
     """
     sagemaker = get_client(account_id, 'sagemaker', region=region)
     try:
@@ -214,16 +273,19 @@ def delete_all_sagemaker_endpoints(account_id, region, force=False):
 
 def delete_all_bedrock_knowledge_bases(account_id, region, force=False):
     """
-    Delete all Bedrock Knowledge Bases in the current region.
+    Delete all Bedrock Knowledge Bases in the specified region.
     
     Args:
-        force (bool): If True, skip confirmation prompts
+        account_id (str): AWS account ID containing the Bedrock Knowledge Bases
+        region (str): AWS region to search for knowledge bases
+        force (bool, optional): If True, skip confirmation prompts. Defaults to False.
     
-    Note:
-        This will permanently delete all knowledge bases and their data
+    Warning:
+        This will permanently delete all knowledge bases and their indexed data.
+        The underlying data sources (S3 buckets, etc.) are not affected.
     
     Raises:
-        ClientError: If AWS API calls fail
+        ClientError: If AWS API calls fail due to permissions or service errors
     """
     bedrock = get_client(account_id, 'bedrock-agent', region=region)
     try:
@@ -242,15 +304,58 @@ def delete_all_bedrock_knowledge_bases(account_id, region, force=False):
     except ClientError as e:
         logger.error(f"Error listing Bedrock Knowledge Bases: {e}")
 
-def cleanup_all_resources(account_id, force=False):
+def delete_opensearch_serverless_collections(account_id, region, force=False):
     """
-    Execute all cleanup operations for AWS resources.
+    Delete all OpenSearch Serverless collections in the current region.
     
     Args:
-        force (bool): If True, skip all confirmation prompts
+        account_id (str): AWS Account ID
+        region (str): AWS region
+        force (bool): If True, skip confirmation prompts
     
     Note:
-        Runs cleanup for EC2, S3, SageMaker, and Bedrock resources
+        This will permanently delete all collections and their data
+    
+    Raises:
+        ClientError: If AWS API calls fail
+    """
+    aoss = get_client(account_id, 'opensearchserverless', region=region)
+    try:
+        response = aoss.list_collections()
+        for collection in response['collectionSummaries']:
+            collection_id = collection['id']
+            collection_name = collection['name']
+            if confirm_action(f"Delete OpenSearch Serverless collection '{collection_name}' ({collection_id})?", force):
+                try:
+                    aoss.delete_collection(id=collection_id)
+                    logger.info(f"Deleted OpenSearch Serverless collection: {collection_name} ({collection_id})")
+                except ClientError as e:
+                    logger.error(f"Error deleting collection {collection_name}: {e}")
+            else:
+                logger.info(f"Skipped deleting OpenSearch Serverless collection: {collection_name}")
+    except ClientError as e:
+        logger.error(f"Error listing OpenSearch Serverless collections: {e}")
+
+def cleanup_all_resources(account_id, force=False):
+    """
+    Execute all cleanup operations for AWS resources across multiple services.
+    
+    Args:
+        account_id (str): AWS account ID to clean up resources in
+        force (bool, optional): If True, skip all confirmation prompts. Defaults to False.
+    
+    Note:
+        Performs cleanup operations in the following order:
+        1. Stop all EC2 instances
+        2. Delete all S3 buckets and contents
+        3. Delete all SageMaker endpoints
+        4. Delete all Bedrock Knowledge Bases
+        5. Delete all OpenSearch Serverless collections
+        
+        Requires AWS_DEFAULT_REGION or AWS_REGION environment variable to be set.
+    
+    Raises:
+        SystemExit: If no AWS region is specified in environment variables
     """
     logger.info("Starting AWS resource cleanup...")
 
@@ -268,8 +373,9 @@ def cleanup_all_resources(account_id, force=False):
     delete_all_sagemaker_endpoints(account_id, region, force)
     logger.info("Deleting Bedrock Knowledge Bases...")
     delete_all_bedrock_knowledge_bases(account_id, region, force)
+    logger.info("Deleting OpenSearch Serverless collections...")
+    delete_opensearch_serverless_collections(account_id, region, force)
     logger.info("AWS resource cleanup completed")
-
 
 sts = boto3.client('sts')
 main_account_id = sts.get_caller_identity()["Account"]
