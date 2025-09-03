@@ -25,12 +25,12 @@ policy_document = {
         {
             "Action": ["s3:ListBucket"],
             "Effect": "Allow",
-            "Resource": ["arn:aws:s3:::SageMaker"]
+            "Resource": ["arn:aws:s3:::sagemaker"]
         },
         {
             "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
             "Effect": "Allow",
-            "Resource": ["arn:aws:s3:::SageMaker/*"]
+            "Resource": ["arn:aws:s3:::sagemaker/*"]
         }
     ]
 }
@@ -77,6 +77,12 @@ def create_sagemaker_execution_role(role_name):
     iam.attach_role_policy(
         RoleName=role_name,
         PolicyArn=policy_response['Policy']['Arn']
+    )
+    
+    # Attach SageMaker Full Access Policy
+    iam.attach_role_policy(
+        RoleName=role_name,
+        PolicyArn='arn:aws:iam::aws:policy/AmazonSageMakerFullAccess'
     )
     return {
         'role_response': role_response,
