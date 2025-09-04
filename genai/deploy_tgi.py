@@ -2,7 +2,7 @@
 
 # Usage:
 #   export AWS_DEFAULT_REGION="us-west-2"
-#   uv run deploy_tgi.py 
+#   uv run deploy_tgi.py
 # Dependencies:
 #   uv pip install boto3 sagemaker
 
@@ -20,7 +20,7 @@ from sagemaker.s3 import S3Uploader
 from sagemaker.session import Session
 from sagemaker.utils import name_from_base
 
-print(sagemaker.__version__)  # 2.251.0
+print(f'SageMaker version: {sagemaker.__version__}')  # 2.251.0
 
 s3_client = boto3.client('s3')
 sts = boto3.client('sts')
@@ -41,7 +41,7 @@ def get_execution_role_arn(role_name=None):
         role_arn = iam.get_role(RoleName=role_name)['Role']['Arn']
     return role_arn
 
-def create_config_folder(hf_model_id, max_model_len=8192):
+def create_config_folder(hf_model_id: str, max_model_len: int = 8192, model_loading_timeout: int = 900):
     # Create the directory that will contain the configuration files
     model_dir = Path('config')
     model_dir.mkdir(exist_ok=True)
@@ -52,7 +52,7 @@ def create_config_folder(hf_model_id, max_model_len=8192):
     option.rolling_batch=disable
     option.entryPoint=djl_python.lmi_vllm.vllm_async_service
     option.tensor_parallel_degree=max
-    option.model_loading_timeout=1200
+    option.model_loading_timeout={model_loading_timeout}
     fail_fast=true
     option.max_model_len={max_model_len}
     option.max_rolling_batch_size=16
@@ -187,7 +187,7 @@ def main(args):
 
     # Step 1: Create config folder & upload to S3
     print('Step 1: Creating config folder')
-    create_config_folder(args.hf_model_id, args.max_model_len)
+    create_config_folder(args.hf_model_id, args.max_model_len, args.model_loading_timeout)
     print('- Uploading to S3')
     config_files_uri = upload_config_folder(s3_bucket, base_name)
     if config_files_uri is None:
@@ -202,10 +202,10 @@ def main(args):
         role_arn = role_arn
     )
 
-    # Step 3: Deploy model
+    # Step 3: Deploy model to endpoint
     print(f'Step 3: Deploying model to endpoint: {endpoint_name}')
     deploy_model(model, endpoint_name, args.instance_type)
-    if wait_for_endpoint(endpoint_name, region_name = region):
+    if wait_for_endpoint(endpoint_name, region, args.model_loading_timeout+30):
         print(f"✅ Model Endpoint: {endpoint_name} has been deployed! 🚀")
 
 
@@ -215,6 +215,7 @@ if __name__ == '__main__':
     parser.add_argument('--role-name', type=str)
     parser.add_argument('--instance-type', type=str, default='ml.g5.2xlarge')
     parser.add_argument('--max-model-len', type=int, default=8192)
+    parser.add_argument('--model-loading-timeout', type=int, default=1200)
     parser.add_argument('--region', type=str, default=os.getenv('AWS_DEFAULT_REGION', 'us-west-2'))
     parser.add_argument('--s3-bucket', type=str, default='')
     args = parser.parse_args()
