@@ -1,3 +1,4 @@
+import argparse
 import boto3
 import datetime
 import json
@@ -18,22 +19,22 @@ trust_policy = {
     ]
 }
 
-# Create policy
-policy_document = {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": ["s3:ListBucket"],
-            "Effect": "Allow",
-            "Resource": ["arn:aws:s3:::sagemaker"]
-        },
-        {
-            "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
-            "Effect": "Allow",
-            "Resource": ["arn:aws:s3:::sagemaker/*"]
-        }
-    ]
-}
+def create_policy_document(s3_bucket: str):
+    return {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Action": ["s3:ListBucket"],
+                "Effect": "Allow",
+                "Resource": [f"arn:aws:s3:::{s3_bucket}"]
+            },
+            {
+                "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+                "Effect": "Allow",
+                "Resource": [f"arn:aws:s3:::{s3_bucket}/*"]
+            }
+        ]
+    }
 
 def check_if_role_exists(role_name):
     try:
@@ -59,7 +60,7 @@ def create_policy_if_not_exists(policy_name, policy_document):
     else:
         return None
 
-def create_sagemaker_execution_role(role_name):
+def create_sagemaker_execution_role(role_name, s3_bucket):
     role_response = iam.create_role(
         RoleName=role_name,
         AssumeRolePolicyDocument=json.dumps(trust_policy)
@@ -68,6 +69,7 @@ def create_sagemaker_execution_role(role_name):
 
     now = datetime.datetime.now()
     policy_name = 'SageMakerS3Policy-' + now.strftime("%Y%m")
+    policy_document = create_policy_document(s3_bucket)
     policy_response = create_policy_if_not_exists(policy_name, policy_document)
     if policy_response is None:
         print(f"Skipping policy creation because Policy {policy_name} already exists.")
@@ -89,18 +91,21 @@ def create_sagemaker_execution_role(role_name):
         'policy_response': policy_response
     }
 
-def main():
+def main(args):
     now = datetime.datetime.now()
     role_name = 'SageMakerExecutionRole-' + now.strftime("%Y%m")
     if check_if_role_exists(role_name):
         print(f"Role {role_name} already exists.")
         return
 
-    responses = create_sagemaker_execution_role(role_name)
+    responses = create_sagemaker_execution_role(role_name, args.s3_bucket)
     role_response = responses['role_response']
     policy_response = responses['policy_response']
     print(f"Role ARN: {role_response['Role']['Arn']}")
     print(f"Policy ARN: {policy_response['Policy']['Arn']}")
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--s3_bucket', type=str)
+    args = parser.parse_args()
+    main(args)
