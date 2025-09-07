@@ -40,7 +40,7 @@ uv add setuptools wheel
 uv add --script myscripy.py "boto3"
 ```
 
-### 1.4 UV Unnstallation
+### 1.4 UV Uninstallation
 
 Clean up stored data
 
