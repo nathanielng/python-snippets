@@ -8,67 +8,6 @@ Get Python version
 python -c "import sys; print(sys.version)"
 ```
 
-### 0.1 Setup virtualenv
-
-```bash
-curl -O https://bootstrap.pypa.io/get-pip.py
-python3 get-pip.py
-python3 -m pip install virtualenv
-cd ~
-python3 -m virtualenv venv
-source venv/bin/activate
-```
-
-
-### 0.2 Setup pyenv
-
-Install pyenv and a specific Python version
-
-```bash
-curl https://pyenv.run | bash
-# pyenv install --list | grep " 3\.11"  # To see available versions
-pyenv install -v 3.11.9
-```
-
-Create an environment in pyenv and activate it
-
-```bash
-pyenv virtualenv 3.11.9 venv
-pyenv activate venv
-```
-
-Go to a folder and set the environment for that folder
-
-```bash
-cd /path/to/folder/
-pyenv local venv
-pip install package1 package2 package3
-```
-
-
-### 0.3 SageMaker & HuggingFace `requirements.txt` setup
-
-```bash
-cat > requirements.txt << EOF
-accelerate
-einops
-huggingface_hub[cli]
-optimum
-sentencepiece
-sagemaker
-torch
-transformers
-EOF
-pip install -U pip
-pip install -r requirements.txt
-```
-
-```bash
-pip install --disable-pip-version-check -q exlibrary1==x.x.0
-pip uninstall -y --disable-pip-version-check exlibrary1==x.xx.1 exlibrary2==0.x.1 --quiet
-```
-
-
 ## 1. Lists
 
 1. Check that two lists, `l1`, `l2` are the same:
@@ -191,23 +130,4 @@ jupyter contrib nbextension install --user
 import datetime
 now = datetime.datetime.now()
 print(now.strftime("%Y%m%d-%H%M%S"))
-```
-
-# Anaconda Python
-
-## 1. Update
-
-```bash
-conda update -n base conda
-conda update --all
-conda update anaconda
-conda install python=3.9
-```
-
-## 2. Disabling Anaconda
-
-To prevent Anaconda from loading the base environment on startup
-
-```bash
-conda config --set auto_activate_base false
 ```
