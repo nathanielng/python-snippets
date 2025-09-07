@@ -1,5 +1,13 @@
 # PYTHON SETUP
 
+## 0. Setup
+
+Get Python version
+
+```bash
+python -c "import sys; print(sys.version)"
+```
+
 ## 1. UV
 
 ### 1.1 UV Python build on Amazon Linux 2023 with Bash autocompletion
@@ -34,10 +42,18 @@ uv add --script myscripy.py "boto3"
 
 ### 1.4 UV Unnstallation
 
+Clean up stored data
+
 ```bash
 uv cache clean
 rm -r "$(uv python dir)"
 rm -r "$(uv tool dir)"
+```
+
+Remove the uv and uvx binaries
+
+```bash
+rm ~/.local/bin/uv ~/.local/bin/uvx
 ```
 
 
@@ -60,7 +76,9 @@ To prevent Anaconda from loading the base environment on startup
 conda config --set auto_activate_base false
 ```
 
-## 3. Virtualenv
+## 3. Environments
+
+### 3.1 Setup Virtualenv
 
 ```bash
 curl -O https://bootstrap.pypa.io/get-pip.py
@@ -71,7 +89,7 @@ python3 -m virtualenv venv
 source venv/bin/activate
 ```
 
-## 4. Pyenv
+### 3.2 Stup Pyenv
 
 Install pyenv and a specific Python version
 
@@ -94,4 +112,26 @@ Go to a folder and set the environment for that folder
 cd /path/to/folder/
 pyenv local venv
 pip install package1 package2 package3
+```
+
+### 3.3 SageMaker & HuggingFace `requirements.txt` setup
+
+```bash
+cat > requirements.txt << EOF
+accelerate
+einops
+huggingface_hub[cli]
+optimum
+sentencepiece
+sagemaker
+torch
+transformers
+EOF
+pip install -U pip
+pip install -r requirements.txt
+```
+
+```bash
+pip install --disable-pip-version-check -q exlibrary1==x.x.0
+pip uninstall -y --disable-pip-version-check exlibrary1==x.xx.1 exlibrary2==0.x.1 --quiet
 ```
