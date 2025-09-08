@@ -217,7 +217,8 @@ def main(args):
         config_files_uri,
         model_name = name_from_base(base_name, short=True),
         image_uri = image_uri,
-        role_arn = role_arn
+        role_arn = role_arn,
+        OPTION_LIMIT_MM_PER_PROMPT = args.option_limit_mm_per_prompt
     )
 
     # Step 3: Deploy model to endpoint
@@ -228,9 +229,10 @@ def main(args):
 
 
 if __name__ == '__main__':
-    role_name = '...'
+    role_name = 'AmazonSageMaker-ExecutionRole-...'
     hf_model_id = '...'
-    s3_bucket = ''
+    s3_bucket = 'sagemaker-...'
+    option_limit_mm_per_prompt = "image=2"
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--hf-model-id', type=str, default=hf_model_id)
@@ -241,5 +243,6 @@ if __name__ == '__main__':
     parser.add_argument('--region', type=str, default=os.getenv('AWS_DEFAULT_REGION', 'us-west-2'))
     parser.add_argument('--s3-bucket', type=str, default=s3_bucket)
     parser.add_argument('--endpoint-name', type=str, default='')
+    parser.add_argument('--option-limit-mm-per-prompt', type=str, default=option_limit_mm_per_prompt)
     args = parser.parse_args()
     main(args)
