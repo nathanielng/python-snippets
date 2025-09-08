@@ -169,7 +169,7 @@ def invoke_model_with_strands_tools(endpoint_name, prompt, system_prompt = "You 
         error_message = f"Exception when invoking {endpoint_name}:\n{e}"
         return error_message
 
-def main():
+def main(action):
     if action == 'invoke_model':
         _ = invoke_model("Write me a poem about Machine Learning.", max_tokens=500, temperature=0.1, top_p=0.9)
     elif action == 'invoke_model_with_streaming':
