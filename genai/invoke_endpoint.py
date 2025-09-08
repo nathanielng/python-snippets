@@ -134,13 +134,63 @@ def invoke_model_with_streaming(endpoint_name, prompt, system_prompt = "You are 
         print(f"Tokens per second: {token_count/total_latency:.2f}")
 
 
-if __name__ == "__main__":
-    # _ = invoke_model("Write me a poem about Machine Learning.", max_tokens=500, temperature=0.1, top_p=0.9)
-    _ = invoke_model_with_streaming(
-        endpoint_name = endpoint_name,
-        prompt = "Write a poem about Machine Learning.",
-        system_prompt = "You are a helpful assistant.",
-        max_tokens=1000,
-        temperature=0.1,
-        top_p=0.9
+def invoke_model_with_strands_tools(endpoint_name, prompt, system_prompt = "You are a helpful assistant.", region="us-west-2", **kwargs):
+    """
+    This code has been adapted from:
+      https://docs.vllm.ai/en/stable/features/tool_calling.html
+    Dependencies
+      uv pip install -U strands-agents
+      uv pip install 'boto3-stubs[sagemaker-runtime]'
+    """
+    from strands import Agent
+    from strands.models.sagemaker import SageMakerAIModel
+    from strands_tools import calculator
+
+    payload_config={
+        "max_tokens": 1000,
+        "temperature": 0.7,
+        "stream": True,
+    }
+    for k in kwargs:
+        if k in ['max_tokens', 'temperature']:
+            payload_config[k] = kwargs[k]
+
+    model = SageMakerAIModel(
+        endpoint_config={
+            "endpoint_name": endpoint_name,
+            "region_name": region,
+        },
+        payload_config=payload_config
     )
+    try:
+        agent = Agent(model=model, tools=[calculator], system_prompt=system_prompt)
+        return agent(prompt)
+    except Exception as e:
+        error_message = f"Exception when invoking {endpoint_name}:\n{e}"
+        return error_message
+
+def main():
+    if action == 'invoke_model':
+        _ = invoke_model("Write me a poem about Machine Learning.", max_tokens=500, temperature=0.1, top_p=0.9)
+    elif action == 'invoke_model_with_streaming':
+        _ = invoke_model_with_streaming(
+            endpoint_name = endpoint_name,
+            prompt = "Write a poem about Machine Learning.",
+            system_prompt = "You are a helpful assistant.",
+            max_tokens=1000,
+            temperature=0.1,
+            top_p=0.9
+        )
+    elif action == 'invoke_model_with_strands':
+        response = invoke_model_with_strands_tools(
+            endpoint_name = endpoint_name,
+            prompt = "What is 111,111,111 multiplied by 111,111,111?",
+            system_prompt = "You are a helpful assistant.",
+            max_tokens=1000,
+            temperature=0.1,
+            top_p=0.9
+        )
+        print(response)
+
+if __name__ == "__main__":
+    main(action='invoke_model_with_strands')
