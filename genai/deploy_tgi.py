@@ -77,7 +77,7 @@ def upload_config_folder(bucket: str, base_name: str):
         print(f'Exception: {e}')
     return None
 
-def configure_model(config_files_uri, model_name, image_uri, role_arn, OPTION_LIMIT_MM_PER_PROMPT = None):
+def configure_model(config_files_uri, model_name, image_uri, role_arn, enable_auto_tool_choice=True, OPTION_LIMIT_MM_PER_PROMPT = None):
     """
     Example configuration:
       OPTION_LIMIT_MM_PER_PROMPT = "image=2"
@@ -94,6 +94,8 @@ def configure_model(config_files_uri, model_name, image_uri, role_arn, OPTION_LI
     }
     if OPTION_LIMIT_MM_PER_PROMPT is not None:
         env['OPTION_LIMIT_MM_PER_PROMPT'] = OPTION_LIMIT_MM_PER_PROMPT
+    if enable_auto_tool_choice:
+        env['OPTIONAL_ARGS'] = "--enable-auto-tool-choice --tool-call-parser gemma"
     model = Model(
         name = model_name,
         image_uri=image_uri,
@@ -165,7 +167,7 @@ def wait_for_endpoint(endpoint_name, region_name, timeout=1800):
             return False
         elif status in ['Creating', 'Updating']:
             if (status != last_status) or (count % 5 == 0):
-                print(f"Endpoint status: {status}...", end='')
+                print(f"\nEndpoint status: {status}...", end='')
                 count = 1
             else:
                 print(".", end='', flush=True)
@@ -199,7 +201,7 @@ def main(args):
     if args.endpoint_name:
         endpoint_name = args.endpoint_name
     else:
-        endpoint_name = base_name + now.strftime("%Y%m%d-%H%M")
+        endpoint_name = f'{base_name}-{now.strftime("%Y%m%d-%H%M")}'
         # endpoint_name = name_from_base(base_name, short=True)
     print(f"- endpoint_name = {endpoint_name}")
 
