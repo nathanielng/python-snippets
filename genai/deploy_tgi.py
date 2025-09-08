@@ -64,6 +64,7 @@ def create_config_folder(hf_model_id: str, max_model_len: int = 8192, model_load
     with open("config/serving.properties", "w") as f:
         f.write(config)
 
+
 def upload_config_folder(bucket: str, base_name: str):
     try:
         config_files_uri = S3Uploader.upload(
@@ -76,7 +77,11 @@ def upload_config_folder(bucket: str, base_name: str):
         print(f'Exception: {e}')
     return None
 
-def configure_model(config_files_uri, model_name, image_uri, role_arn):
+def configure_model(config_files_uri, model_name, image_uri, role_arn, OPTION_LIMIT_MM_PER_PROMPT = None):
+    """
+    Example configuration:
+      OPTION_LIMIT_MM_PER_PROMPT = "image=2"
+    """
     model_data = {
         "S3DataSource": {
             "S3Uri": f"{config_files_uri}/",
@@ -84,14 +89,17 @@ def configure_model(config_files_uri, model_name, image_uri, role_arn):
             "CompressionType": "None"
         }
     }
+    env = {
+        "HF_TASK": "Image-Text-to-Text"
+    }
+    if OPTION_LIMIT_MM_PER_PROMPT is not None:
+        env['OPTION_LIMIT_MM_PER_PROMPT'] = OPTION_LIMIT_MM_PER_PROMPT
     model = Model(
         name = model_name,
         image_uri=image_uri,
         model_data=model_data,  # Path to uncompressed code files
         role=role_arn,
-        env={
-            "HF_TASK": "Image-Text-to-Text"
-        }
+        env=env
     )
     return model
 
@@ -145,6 +153,7 @@ def wait_for_endpoint(endpoint_name, region_name, timeout=1800):
     bool: True if endpoint is in service, False if timeout or error occurs
     """
     start_time = time.time()
+    last_status = ''
     
     while time.time() - start_time < timeout:
         status = check_endpoint_status(endpoint_name, region_name)
@@ -155,8 +164,14 @@ def wait_for_endpoint(endpoint_name, region_name, timeout=1800):
             print(f"Endpoint deployment failed with status: {status}")
             return False
         elif status in ['Creating', 'Updating']:
-            print(f"Endpoint status: {status}...")
-            time.sleep(30)  # Wait for 30 seconds before checking again
+            if (status != last_status) or (count % 5 == 0):
+                print(f"Endpoint status: {status}...", end='')
+                count = 1
+            else:
+                print(".", end='', flush=True)
+                count += 1
+            time.sleep(10)  # Wait for 10 seconds before checking again
+            last_status = status
         else:
             print(f"Unexpected status: {status}")
             return False
@@ -164,8 +179,9 @@ def wait_for_endpoint(endpoint_name, region_name, timeout=1800):
     print(f"Timeout waiting for endpoint to be ready after {timeout} seconds")
     return False
 
-
 def main(args):
+    now = datetime.datetime.now()
+
     # Step 0: Configuration
     print('Step 0: Configuration')
     region = args.region
@@ -178,12 +194,14 @@ def main(args):
     print(f'- RoleARN = {role_arn}')
     base_name = args.hf_model_id.split('/')[-1].replace('.', '-').lower()
     print(f"- base_name = {base_name}")
-    now = datetime.datetime.now()
-    endpoint_name = base_name + now.strftime("%Y%m%d-%H%M")
-    # endpoint_name = name_from_base(base_name, short=True)
-    print(f"- endpoint_name = {endpoint_name}")
     model_lineage = args.hf_model_id.split("/")[0]
     print(f"- model_lineage = {model_lineage}")  # google
+    if args.endpoint_name:
+        endpoint_name = args.endpoint_name
+    else:
+        endpoint_name = base_name + now.strftime("%Y%m%d-%H%M")
+        # endpoint_name = name_from_base(base_name, short=True)
+    print(f"- endpoint_name = {endpoint_name}")
 
     # Step 1: Create config folder & upload to S3
     print('Step 1: Creating config folder')
@@ -210,13 +228,18 @@ def main(args):
 
 
 if __name__ == '__main__':
+    role_name = '...'
+    hf_model_id = '...'
+    s3_bucket = ''
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('--hf-model-id', type=str)
-    parser.add_argument('--role-name', type=str)
-    parser.add_argument('--instance-type', type=str, default='ml.g5.2xlarge')
+    parser.add_argument('--hf-model-id', type=str, default=hf_model_id)
+    parser.add_argument('--role-name', type=str, default=role_name)
+    parser.add_argument('--instance-type', type=str, default='ml.g5.12xlarge')
     parser.add_argument('--max-model-len', type=int, default=8192)
-    parser.add_argument('--model-loading-timeout', type=int, default=1200)
+    parser.add_argument('--model-loading-timeout', type=int, default=900)
     parser.add_argument('--region', type=str, default=os.getenv('AWS_DEFAULT_REGION', 'us-west-2'))
-    parser.add_argument('--s3-bucket', type=str, default='')
+    parser.add_argument('--s3-bucket', type=str, default=s3_bucket)
+    parser.add_argument('--endpoint-name', type=str, default='')
     args = parser.parse_args()
     main(args)
