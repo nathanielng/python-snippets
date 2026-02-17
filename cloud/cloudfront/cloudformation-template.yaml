@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFront distribution with S3 origin and Origin Access Control'
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: S3 bucket name for CloudFront origin
+  
+  DefaultTTL:
+    Type: Number
+    Default: 0
+    Description: Default cache TTL in seconds
+  
+  MinTTL:
+    Type: Number
+    Default: 0
+    Description: Minimum cache TTL in seconds
+  
+  MaxTTL:
+    Type: Number
+    Default: 0
+    Description: Maximum cache TTL in seconds
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub 'OAC-${AWS::StackName}'
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub 'CloudFront distribution for ${BucketName}'
+        DefaultRootObject: index.html
+        Origins:
+          - Id: !Sub 's3-${BucketName}'
+            DomainName: !GetAtt S3Bucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        DefaultCacheBehavior:
+          TargetOriginId: !Sub 's3-${BucketName}'
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          Compress: true
+          MinTTL: !Ref MinTTL
+          DefaultTTL: !Ref DefaultTTL
+          MaxTTL: !Ref MaxTTL
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontServicePrincipal
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub '${S3Bucket.Arn}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+
+Outputs:
+  BucketName:
+    Description: S3 bucket name
+    Value: !Ref S3Bucket
+  
+  DistributionId:
+    Description: CloudFront distribution ID
+    Value: !Ref CloudFrontDistribution
+  
+  DistributionDomainName:
+    Description: CloudFront distribution domain name
+    Value: !GetAtt CloudFrontDistribution.DomainName
+  
+  DistributionURL:
+    Description: CloudFront distribution URL
+    Value: !Sub 'https://${CloudFrontDistribution.DomainName}'
