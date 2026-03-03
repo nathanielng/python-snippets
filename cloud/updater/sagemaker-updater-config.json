@@ -1,0 +1,7 @@
+{
+  "regions": ["us-east-1", "ap-southeast-1"],
+  "target_platform": "notebook-al2-v3",
+  "source_platforms": ["notebook-al2-v1", "notebook-al2-v2"],
+  "mode": "interactive",
+  "max_workers": 5
+}
